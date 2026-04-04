@@ -1,4 +1,4 @@
-const DIFFICULTIES = ['easy', 'medium', 'hard'];
+const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
