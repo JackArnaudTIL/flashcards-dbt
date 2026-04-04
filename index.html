@@ -15,13 +15,27 @@
     <div class="deck-grid" id="deckGrid"></div>
   </div>
 
-  <!-- Screen 2: Filter picker -->
-  <div id="filterPicker" style="display:none">
+  <!-- Screen 2: Certification picker (only shown if certifications exist) -->
+  <div id="certPicker" style="display:none">
     <div class="topbar">
       <button class="back-btn" onclick="showPicker()">← Decks</button>
+      <span id="certDeckTitle"></span>
+    </div>
+    <h2 class="screen-heading">Choose a certification</h2>
+    <div class="cert-grid" id="certGrid"></div>
+  </div>
+
+  <!-- Screen 3: Filter picker -->
+  <div id="filterPicker" style="display:none">
+    <div class="topbar">
+      <button class="back-btn" id="filterBackBtn" onclick="filterBack()">← Back</button>
       <span id="filterDeckTitle"></span>
     </div>
-    <div class="filter-section">
+    <div class="filter-section" id="categorySection">
+      <div class="filter-heading">Category</div>
+      <div class="filter-chips" id="categoryChips"></div>
+    </div>
+    <div class="filter-section" id="groupSection">
       <div class="filter-heading">Group</div>
       <div class="filter-chips" id="groupChips"></div>
     </div>
@@ -35,7 +49,7 @@
     </div>
   </div>
 
-  <!-- Screen 3: Study view -->
+  <!-- Screen 4: Study view -->
   <div id="studyView" style="display:none">
     <div class="topbar">
       <button class="back-btn" onclick="showFilterPicker()">← Filters</button>
