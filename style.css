@@ -171,9 +171,9 @@ body {
 .rating-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.5rem; }
 .rating-btn { flex: 1; padding: 8px 0; border: 1px solid #ddd; border-radius: 8px; background: #fff; color: #888; font-size: 13px; cursor: pointer; }
 .rating-btn:hover  { background: #f5f5f3; }
-.rating-btn.hard   { border-color: #D85A30; color: #D85A30; }
-.rating-btn.ok     { border-color: #BA7517; color: #BA7517; }
-.rating-btn.good   { border-color: #1D9E75; color: #1D9E75; }
+.rating-btn.Hard   { border-color: #D85A30; color: #D85A30; }
+.rating-btn.Ok     { border-color: #BA7517; color: #BA7517; }
+.rating-btn.Good   { border-color: #1D9E75; color: #1D9E75; }
 
 /* Summary */
 .summary             { text-align: center; padding: 2rem 1rem; }

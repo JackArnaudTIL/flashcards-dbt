@@ -215,13 +215,13 @@ function render() {
   document.getElementById('cardMeta').innerHTML = metaTags;
 
   const attempted = ratings.filter(r => r !== null).length;
-  const got        = ratings.filter(r => r === 'good').length;
-  const ok         = ratings.filter(r => r === 'ok').length;
-  const hard       = ratings.filter(r => r === 'hard').length;
+  const got        = ratings.filter(r => r === 'Good').length;
+  const ok         = ratings.filter(r => r === 'Ok').length;
+  const hard       = ratings.filter(r => r === 'Hard').length;
   document.getElementById('pFill').style.width  = Math.round(attempted / deck.length * 100) + '%';
   document.getElementById('pLabel').textContent = attempted + ' / ' + deck.length + ' attempted';
   document.getElementById('pBreakdown').textContent = attempted > 0
-    ? got + ' got it · ' + ok + ' ok · ' + hard + ' hard'
+    ? got + ' Got it · ' + ok + ' Ok · ' + hard + ' Hard'
     : '';
   const label = currentCert ? `${currentCert}` : currentDeckName;
   document.getElementById('deckCount').textContent = label + ' · ' + deck.length + ' cards';
@@ -284,9 +284,9 @@ function rate(r) {
 function showSummary() {
   hide('cardArea');
   show('summary');
-  document.getElementById('sGood').textContent = ratings.filter(r => r === 'good').length;
-  document.getElementById('sOk').textContent   = ratings.filter(r => r === 'ok').length;
-  document.getElementById('sHard').textContent = ratings.filter(r => r === 'hard').length;
+  document.getElementById('sGood').textContent = ratings.filter(r => r === 'Good').length;
+  document.getElementById('sOk').textContent   = ratings.filter(r => r === 'Ok').length;
+  document.getElementById('sHard').textContent = ratings.filter(r => r === 'Hard').length;
   const flagged = deck.filter((_, i) => thumbs[i] === 'down');
   const flagSummary = document.getElementById('flagSummary');
   flagSummary.style.display = flagged.length > 0 ? 'block' : 'none';
