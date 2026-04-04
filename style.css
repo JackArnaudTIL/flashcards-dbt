@@ -62,9 +62,9 @@ body {
 }
 .chip:hover               { border-color: #ccc; background: #f5f5f3; }
 .chip.selected            { background: #1a1a18; border-color: #1a1a18; color: #fff; }
-.chip.diff-easy.selected  { background: #1D9E75; border-color: #1D9E75; color: #fff; }
-.chip.diff-medium.selected{ background: #BA7517; border-color: #BA7517; color: #fff; }
-.chip.diff-hard.selected  { background: #D85A30; border-color: #D85A30; color: #fff; }
+.chip.diff-Easy.selected  { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+.chip.diff-Medium.selected{ background: #BA7517; border-color: #BA7517; color: #fff; }
+.chip.diff-Hard.selected  { background: #D85A30; border-color: #D85A30; color: #fff; }
 
 .filter-footer {
   display: flex; align-items: center; justify-content: space-between;
@@ -121,9 +121,9 @@ body {
 .card-face.back       { transform: rotateY(180deg); background: #f5f5f3; }
 .card-meta            { display: flex; gap: 6px; margin-bottom: 0.6rem; min-height: 20px; flex-wrap: wrap; justify-content: center; }
 .card-meta-tag        { font-size: 11px; padding: 2px 8px; border-radius: 20px; background: #f0f0ee; color: #888; }
-.card-meta-tag.easy   { background: #e8f8f2; color: #1D9E75; }
-.card-meta-tag.medium { background: #fef3e2; color: #BA7517; }
-.card-meta-tag.hard   { background: #fdf0eb; color: #D85A30; }
+.card-meta-tag.Easy   { background: #e8f8f2; color: #1D9E75; }
+.card-meta-tag.Medium { background: #fef3e2; color: #BA7517; }
+.card-meta-tag.Hard   { background: #fdf0eb; color: #D85A30; }
 .card-label           { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.6rem; }
 .card-text            { font-size: 1.1rem; color: #1a1a18; line-height: 1.5; }
 
