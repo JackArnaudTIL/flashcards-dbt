@@ -1,54 +1,23 @@
-
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans)}
-#app{padding:1.5rem 1rem;max-width:640px;margin:0 auto}
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-.deck-select{font-size:14px;padding:6px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer}
-.progress-wrap{display:flex;align-items:center;gap:10px;margin-bottom:1.5rem}
-.progress-bar{flex:1;height:4px;background:var(--color-border-tertiary);border-radius:2px;overflow:hidden}
-.progress-fill{height:100%;background:var(--color-text-secondary);border-radius:2px;transition:width 0.3s}
-.progress-label{font-size:12px;color:var(--color-text-secondary);white-space:nowrap}
-.scene{width:100%;height:220px;perspective:1000px;cursor:pointer;margin-bottom:1.25rem}
-.card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 0.5s cubic-bezier(.4,0,.2,1)}
-.card-inner.flipped{transform:rotateY(180deg)}
-.card-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);background:var(--color-background-primary);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center}
-.card-face.back{transform:rotateY(180deg);background:var(--color-background-secondary)}
-.card-label{font-size:11px;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.75rem}
-.card-text{font-size:1.2rem;font-weight:400;color:var(--color-text-primary);line-height:1.5}
-.hint{font-size:12px;color:var(--color-text-tertiary);margin-bottom:1.25rem;text-align:center}
-.controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-.nav-btn{padding:8px 20px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;cursor:pointer;transition:background 0.15s}
-.nav-btn:hover{background:var(--color-background-secondary)}
-.nav-btn:disabled{opacity:0.35;cursor:default}
-.rating-row{display:flex;gap:8px;justify-content:center;margin-bottom:1.5rem}
-.rating-btn{flex:1;padding:8px 0;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-secondary);font-size:13px;cursor:pointer;transition:all 0.15s}
-.rating-btn:hover{background:var(--color-background-secondary)}
-.rating-btn.good{border-color:#1D9E75;color:#1D9E75}
-.rating-btn.hard{border-color:#D85A30;color:#D85A30}
-.rating-btn.ok{border-color:#BA7517;color:#BA7517}
-.summary{text-align:center;padding:2rem 1rem}
-.summary h2{font-size:1.25rem;font-weight:500;margin-bottom:0.5rem;color:var(--color-text-primary)}
-.summary p{font-size:14px;color:var(--color-text-secondary);margin-bottom:1.5rem}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem}
-.stat{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:0.75rem;text-align:center}
-.stat-n{font-size:1.5rem;font-weight:500;color:var(--color-text-primary)}
-.stat-l{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
-.restart-btn{padding:10px 28px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);font-size:14px;cursor:pointer}
-.restart-btn:hover{background:var(--color-background-secondary)}
-</style>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashcards</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 <div id="app">
   <div class="topbar">
-    <select class="deck-select" id="deckSel" onchange="loadDeck()"></select>
-    <span style="font-size:12px;color:var(--color-text-tertiary)" id="deckCount"></span>
+    <select id="deckSel" onchange="loadDeck()"></select>
+    <span id="deckCount"></span>
   </div>
   <div class="progress-wrap">
     <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
     <span class="progress-label" id="pLabel">0 / 0</span>
   </div>
   <div id="cardArea">
-    <div class="scene" onclick="flip()" id="scene">
+    <div class="scene" onclick="flip()">
       <div class="card-inner" id="cardInner">
         <div class="card-face front">
           <div class="card-label">question</div>
@@ -63,12 +32,12 @@ body{font-family:var(--font-sans)}
     <p class="hint" id="hintText">Click the card to reveal the answer</p>
     <div class="controls">
       <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
-      <span style="font-size:13px;color:var(--color-text-tertiary)" id="cardNum"></span>
+      <span id="cardNum"></span>
       <button class="nav-btn" id="nextBtn" onclick="next()">Next →</button>
     </div>
     <div class="rating-row" id="ratingRow" style="display:none">
       <button class="rating-btn hard" onclick="rate('hard')">Hard</button>
-      <button class="rating-btn ok" onclick="rate('ok')">OK</button>
+      <button class="rating-btn ok"   onclick="rate('ok')">OK</button>
       <button class="rating-btn good" onclick="rate('good')">Got it</button>
     </div>
   </div>
@@ -85,103 +54,6 @@ body{font-family:var(--font-sans)}
     </div>
   </div>
 </div>
-
-<script>
-const DECKS = {
-  "Geography": [
-    {q:"What is the capital of France?", a:"Paris"},
-    {q:"Which country has the most natural lakes?", a:"Canada"},
-    {q:"What is the longest river in the world?", a:"The Nile (approx. 6,650 km)"},
-    {q:"Which continent is the Sahara Desert on?", a:"Africa"},
-    {q:"What is the smallest country in the world?", a:"Vatican City"},
-  ],
-  "Science": [
-    {q:"What is the chemical symbol for gold?", a:"Au"},
-    {q:"How many bones are in the adult human body?", a:"206"},
-    {q:"What planet is known as the Red Planet?", a:"Mars"},
-    {q:"What gas do plants absorb from the atmosphere?", a:"Carbon dioxide (CO₂)"},
-    {q:"What is the speed of light (approx.)?", a:"299,792,458 m/s"},
-  ],
-  "History": [
-    {q:"In what year did World War II end?", a:"1945"},
-    {q:"Who was the first person to walk on the Moon?", a:"Neil Armstrong (1969)"},
-    {q:"What ancient wonder was located in Alexandria?", a:"The Lighthouse of Alexandria"},
-    {q:"Which empire was ruled by Julius Caesar?", a:"The Roman Republic / early Roman Empire"},
-    {q:"In what year did the Berlin Wall fall?", a:"1989"},
-  ]
-};
-
-let deck=[], index=0, flipped=false, ratings=[], deckName="";
-
-function populateDeckSel(){
-  const sel=document.getElementById('deckSel');
-  Object.keys(DECKS).forEach(k=>{
-    const o=document.createElement('option');
-    o.value=o.textContent=k; sel.appendChild(o);
-  });
-}
-
-function loadDeck(){
-  deckName=document.getElementById('deckSel').value;
-  deck=DECKS[deckName];
-  ratings=Array(deck.length).fill(null);
-  index=0; flipped=false;
-  document.getElementById('summary').style.display='none';
-  document.getElementById('cardArea').style.display='block';
-  render();
-}
-
-function render(){
-  const ci=document.getElementById('cardInner');
-  ci.classList.remove('flipped'); flipped=false;
-  document.getElementById('frontText').textContent=deck[index].q;
-  document.getElementById('backText').textContent=deck[index].a;
-  document.getElementById('cardNum').textContent=(index+1)+' of '+deck.length;
-  document.getElementById('prevBtn').disabled=index===0;
-  document.getElementById('nextBtn').disabled=index===deck.length-1;
-  document.getElementById('hintText').textContent='Click the card to reveal the answer';
-  document.getElementById('ratingRow').style.display='none';
-  const done=ratings.filter(r=>r!==null).length;
-  document.getElementById('pFill').style.width=Math.round(done/deck.length*100)+'%';
-  document.getElementById('pLabel').textContent=done+' / '+deck.length;
-  document.getElementById('deckCount').textContent=deck.length+' cards';
-}
-
-function flip(){
-  const ci=document.getElementById('cardInner');
-  flipped=!flipped;
-  ci.classList.toggle('flipped',flipped);
-  if(flipped){
-    document.getElementById('hintText').textContent='How well did you know this?';
-    document.getElementById('ratingRow').style.display='flex';
-  }
-}
-
-function prev(){if(index>0){index--;render();}}
-function next(){if(index<deck.length-1){index++;render();}}
-
-function rate(r){
-  ratings[index]=r;
-  if(index<deck.length-1){index++;render();}
-  else{showSummary();}
-}
-
-function showSummary(){
-  document.getElementById('cardArea').style.display='none';
-  document.getElementById('summary').style.display='block';
-  document.getElementById('sGood').textContent=ratings.filter(r=>r==='good').length;
-  document.getElementById('sOk').textContent=ratings.filter(r=>r==='ok').length;
-  document.getElementById('sHard').textContent=ratings.filter(r=>r==='hard').length;
-}
-
-function restart(){loadDeck();}
-
-document.addEventListener('keydown',e=>{
-  if(e.code==='Space'){e.preventDefault();flip();}
-  if(e.code==='ArrowRight')next();
-  if(e.code==='ArrowLeft')prev();
-});
-
-populateDeckSel();
-loadDeck();
-</script>
+<script src="app.js"></script>
+</body>
+</html>
