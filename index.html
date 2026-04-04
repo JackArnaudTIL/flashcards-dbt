@@ -15,10 +15,30 @@
     <div class="deck-grid" id="deckGrid"></div>
   </div>
 
-  <!-- Screen 2: Study view -->
-  <div id="studyView" style="display:none">
+  <!-- Screen 2: Filter picker -->
+  <div id="filterPicker" style="display:none">
     <div class="topbar">
       <button class="back-btn" onclick="showPicker()">← Decks</button>
+      <span id="filterDeckTitle"></span>
+    </div>
+    <div class="filter-section">
+      <div class="filter-heading">Group</div>
+      <div class="filter-chips" id="groupChips"></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-heading">Difficulty</div>
+      <div class="filter-chips" id="difficultyChips"></div>
+    </div>
+    <div class="filter-footer">
+      <span id="filterCount" class="filter-count"></span>
+      <button class="start-btn" id="startBtn" onclick="startFiltered()">Start</button>
+    </div>
+  </div>
+
+  <!-- Screen 3: Study view -->
+  <div id="studyView" style="display:none">
+    <div class="topbar">
+      <button class="back-btn" onclick="showFilterPicker()">← Filters</button>
       <span id="deckCount"></span>
     </div>
     <div class="progress-wrap">
@@ -29,10 +49,12 @@
       <div class="scene" onclick="flip()">
         <div class="card-inner" id="cardInner">
           <div class="card-face front">
+            <div class="card-meta" id="cardMeta"></div>
             <div class="card-label">question</div>
             <div class="card-text" id="frontText"></div>
           </div>
           <div class="card-face back">
+            <div class="card-meta"></div>
             <div class="card-label">answer</div>
             <div class="card-text" id="backText"></div>
           </div>
@@ -48,7 +70,6 @@
         </button>
       </div>
 
-      <!-- Flag panel — shown when thumbs down is active -->
       <div class="flag-panel" id="flagPanel" style="display:none">
         <label class="flag-label">What's wrong with this card?</label>
         <textarea id="flagNote" class="flag-textarea" placeholder="e.g. The answer seems incorrect, or the question is ambiguous…" rows="3"></textarea>
@@ -86,6 +107,7 @@
         </div>
         <div class="summary-actions">
           <button class="restart-btn" onclick="restart()">Study again</button>
+          <button class="restart-btn" onclick="showFilterPicker()">Change filters</button>
           <button class="restart-btn" onclick="showPicker()">All decks</button>
         </div>
       </div>

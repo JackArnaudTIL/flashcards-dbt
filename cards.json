@@ -1,23 +1,37 @@
 {
   "Geography": [
-    { "q": "What is the capital of France?", "a": "Paris" },
-    { "q": "Which country has the most natural lakes?", "a": "Canada" },
-    { "q": "What is the longest river in the world?", "a": "The Nile (approx. 6,650 km)" },
-    { "q": "Which continent is the Sahara Desert on?", "a": "Africa" },
-    { "q": "What is the smallest country in the world?", "a": "Vatican City" }
+    { "q": "What is the capital of France?", "a": "Paris", "group": "Europe", "difficulty": "easy" },
+    { "q": "What is the capital of Germany?", "a": "Berlin", "group": "Europe", "difficulty": "easy" },
+    { "q": "What is the capital of Portugal?", "a": "Lisbon", "group": "Europe", "difficulty": "easy" },
+    { "q": "What is the capital of Hungary?", "a": "Budapest", "group": "Europe", "difficulty": "medium" },
+    { "q": "What is the capital of Moldova?", "a": "Chișinău", "group": "Europe", "difficulty": "hard" },
+    { "q": "What is the longest river in the world?", "a": "The Nile (approx. 6,650 km)", "group": "Physical", "difficulty": "easy" },
+    { "q": "Which continent is the Sahara Desert on?", "a": "Africa", "group": "Physical", "difficulty": "easy" },
+    { "q": "What is the deepest lake in the world?", "a": "Lake Baikal", "group": "Physical", "difficulty": "medium" },
+    { "q": "What is the smallest country in the world?", "a": "Vatican City", "group": "Physical", "difficulty": "easy" },
+    { "q": "Which country has the most natural lakes?", "a": "Canada", "group": "Physical", "difficulty": "medium" },
+    { "q": "What is the capital of Japan?", "a": "Tokyo", "group": "Asia", "difficulty": "easy" },
+    { "q": "What is the capital of Kazakhstan?", "a": "Astana", "group": "Asia", "difficulty": "hard" },
+    { "q": "What is the capital of Kyrgyzstan?", "a": "Bishkek", "group": "Asia", "difficulty": "hard" }
   ],
   "Science": [
-    { "q": "What is the chemical symbol for gold?", "a": "Au" },
-    { "q": "How many bones are in the adult human body?", "a": "206" },
-    { "q": "What planet is known as the Red Planet?", "a": "Mars" },
-    { "q": "What gas do plants absorb from the atmosphere?", "a": "Carbon dioxide (CO₂)" },
-    { "q": "What is the speed of light (approx.)?", "a": "299,792,458 m/s" }
+    { "q": "What is the chemical symbol for gold?", "a": "Au", "group": "Chemistry", "difficulty": "easy" },
+    { "q": "What is the chemical symbol for iron?", "a": "Fe", "group": "Chemistry", "difficulty": "easy" },
+    { "q": "What is the atomic number of carbon?", "a": "6", "group": "Chemistry", "difficulty": "medium" },
+    { "q": "What gas do plants absorb from the atmosphere?", "a": "Carbon dioxide (CO₂)", "group": "Biology", "difficulty": "easy" },
+    { "q": "How many bones are in the adult human body?", "a": "206", "group": "Biology", "difficulty": "medium" },
+    { "q": "What is the powerhouse of the cell?", "a": "The mitochondria", "group": "Biology", "difficulty": "easy" },
+    { "q": "What planet is known as the Red Planet?", "a": "Mars", "group": "Space", "difficulty": "easy" },
+    { "q": "What is the speed of light (approx.)?", "a": "299,792,458 m/s", "group": "Space", "difficulty": "medium" },
+    { "q": "How many moons does Saturn have?", "a": "146 (as of 2023)", "group": "Space", "difficulty": "hard" }
   ],
   "History": [
-    { "q": "In what year did World War II end?", "a": "1945" },
-    { "q": "Who was the first person to walk on the Moon?", "a": "Neil Armstrong (1969)" },
-    { "q": "What ancient wonder was located in Alexandria?", "a": "The Lighthouse of Alexandria" },
-    { "q": "Which empire was ruled by Julius Caesar?", "a": "The Roman Republic / early Roman Empire" },
-    { "q": "In what year did the Berlin Wall fall?", "a": "1989" }
+    { "q": "In what year did World War II end?", "a": "1945", "group": "Modern", "difficulty": "easy" },
+    { "q": "Who was the first person to walk on the Moon?", "a": "Neil Armstrong (1969)", "group": "Modern", "difficulty": "easy" },
+    { "q": "In what year did the Berlin Wall fall?", "a": "1989", "group": "Modern", "difficulty": "medium" },
+    { "q": "Which empire was ruled by Julius Caesar?", "a": "The Roman Republic / early Roman Empire", "group": "Ancient", "difficulty": "medium" },
+    { "q": "What ancient wonder was located in Alexandria?", "a": "The Lighthouse of Alexandria", "group": "Ancient", "difficulty": "hard" },
+    { "q": "In what year was the Magna Carta signed?", "a": "1215", "group": "Medieval", "difficulty": "medium" },
+    { "q": "Who was the first Tudor monarch of England?", "a": "Henry VII", "group": "Medieval", "difficulty": "hard" }
   ]
 }
