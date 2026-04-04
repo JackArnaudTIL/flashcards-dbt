@@ -38,6 +38,26 @@
           </div>
         </div>
       </div>
+
+      <div class="card-actions">
+        <button class="thumb-btn" id="thumbUp"   onclick="thumb('up')"   title="Good card">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        </button>
+        <button class="thumb-btn" id="thumbDown" onclick="thumb('down')" title="Flag this card">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+        </button>
+      </div>
+
+      <!-- Flag panel — shown when thumbs down is active -->
+      <div class="flag-panel" id="flagPanel" style="display:none">
+        <label class="flag-label">What's wrong with this card?</label>
+        <textarea id="flagNote" class="flag-textarea" placeholder="e.g. The answer seems incorrect, or the question is ambiguous…" rows="3"></textarea>
+        <div class="flag-actions">
+          <button class="flag-cancel" onclick="cancelFlag()">Cancel</button>
+          <button class="flag-submit" onclick="submitFlag()">Submit flag</button>
+        </div>
+      </div>
+
       <p class="hint" id="hintText">Click the card to reveal the answer</p>
       <div class="controls">
         <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
@@ -50,6 +70,7 @@
         <button class="rating-btn good" onclick="rate('good')">Got it</button>
       </div>
     </div>
+
     <div id="summary" style="display:none">
       <div class="summary">
         <h2>Deck complete</h2>
@@ -58,6 +79,10 @@
           <div class="stat"><div class="stat-n" id="sGood">0</div><div class="stat-l">Got it</div></div>
           <div class="stat"><div class="stat-n" id="sOk">0</div><div class="stat-l">OK</div></div>
           <div class="stat"><div class="stat-n" id="sHard">0</div><div class="stat-l">Hard</div></div>
+        </div>
+        <div id="flagSummary" style="display:none">
+          <p class="flag-summary-label">You flagged <span id="flagCount">0</span> card(s) for review.</p>
+          <button class="export-btn" onclick="exportFlags()">Download flagged cards</button>
         </div>
         <div class="summary-actions">
           <button class="restart-btn" onclick="restart()">Study again</button>
