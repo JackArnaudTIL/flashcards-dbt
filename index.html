@@ -57,8 +57,9 @@
     </div>
     <div class="progress-wrap">
       <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
-      <span class="progress-label" id="pLabel">0 / 0</span>
+      <span class="progress-label" id="pLabel">0 / 0 attempted</span>
     </div>
+    <div class="progress-breakdown" id="pBreakdown"></div>
     <div id="cardArea">
       <div class="scene" onclick="flip()">
         <div class="card-inner" id="cardInner">
@@ -100,9 +101,9 @@
         <button class="nav-btn" id="nextBtn" onclick="next()">Next →</button>
       </div>
       <div class="rating-row" id="ratingRow" style="display:none">
-        <button class="rating-btn hard" onclick="rate('hard')">Hard</button>
-        <button class="rating-btn ok"   onclick="rate('ok')">OK</button>
         <button class="rating-btn good" onclick="rate('good')">Got it</button>
+        <button class="rating-btn ok"   onclick="rate('ok')">OK</button>
+        <button class="rating-btn hard" onclick="rate('hard')">Hard</button>
       </div>
     </div>
 

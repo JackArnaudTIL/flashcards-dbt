@@ -110,14 +110,26 @@ function buildFilterChips() {
   const cards = certCards();
 
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))].sort();
-  const groups     = [...new Set(cards.map(c => c.group).filter(Boolean))].sort();
-  const diffs      = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
 
-  const catSection = document.getElementById('categorySection');
-  catSection.style.display = categories.length ? 'block' : 'none';
+  // Groups are filtered to only those present in the currently selected categories
+  const activeCards = selectedCategories.size > 0
+    ? cards.filter(c => selectedCategories.has(c.category))
+    : cards;
+  const groups = [...new Set(activeCards.map(c => c.group).filter(Boolean))].sort();
 
+  // Remove any selectedGroups that are no longer valid after category change
+  for (const g of selectedGroups) {
+    if (!groups.includes(g)) selectedGroups.delete(g);
+  }
+
+  const diffs = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
+
+  const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
-  groupSection.style.display = groups.length ? 'block' : 'none';
+
+  // Hide entire row if only one option exists
+  catSection.style.display   = categories.length > 1 ? 'block' : 'none';
+  groupSection.style.display = groups.length > 1     ? 'block' : 'none';
 
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${cat}</div>
@@ -202,9 +214,15 @@ function render() {
   ].join('');
   document.getElementById('cardMeta').innerHTML = metaTags;
 
-  const done = ratings.filter(r => r !== null).length;
-  document.getElementById('pFill').style.width     = Math.round(done / deck.length * 100) + '%';
-  document.getElementById('pLabel').textContent    = done + ' / ' + deck.length;
+  const attempted = ratings.filter(r => r !== null).length;
+  const got        = ratings.filter(r => r === 'good').length;
+  const ok         = ratings.filter(r => r === 'ok').length;
+  const hard       = ratings.filter(r => r === 'hard').length;
+  document.getElementById('pFill').style.width  = Math.round(attempted / deck.length * 100) + '%';
+  document.getElementById('pLabel').textContent = attempted + ' / ' + deck.length + ' attempted';
+  document.getElementById('pBreakdown').textContent = attempted > 0
+    ? got + ' got it · ' + ok + ' ok · ' + hard + ' hard'
+    : '';
   const label = currentCert ? `${currentCert}` : currentDeckName;
   document.getElementById('deckCount').textContent = label + ' · ' + deck.length + ' cards';
   renderThumbs();
