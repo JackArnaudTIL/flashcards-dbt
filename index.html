@@ -8,51 +8,65 @@
 </head>
 <body>
 <div id="app">
-  <div class="topbar">
-    <select id="deckSel" onchange="loadDeck()"></select>
-    <span id="deckCount"></span>
+
+  <!-- Screen 1: Deck picker -->
+  <div id="deckPicker">
+    <h1>Choose a deck</h1>
+    <div class="deck-grid" id="deckGrid"></div>
   </div>
-  <div class="progress-wrap">
-    <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
-    <span class="progress-label" id="pLabel">0 / 0</span>
-  </div>
-  <div id="cardArea">
-    <div class="scene" onclick="flip()">
-      <div class="card-inner" id="cardInner">
-        <div class="card-face front">
-          <div class="card-label">question</div>
-          <div class="card-text" id="frontText"></div>
+
+  <!-- Screen 2: Study view -->
+  <div id="studyView" style="display:none">
+    <div class="topbar">
+      <button class="back-btn" onclick="showPicker()">← Decks</button>
+      <span id="deckCount"></span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="pFill" style="width:0%"></div></div>
+      <span class="progress-label" id="pLabel">0 / 0</span>
+    </div>
+    <div id="cardArea">
+      <div class="scene" onclick="flip()">
+        <div class="card-inner" id="cardInner">
+          <div class="card-face front">
+            <div class="card-label">question</div>
+            <div class="card-text" id="frontText"></div>
+          </div>
+          <div class="card-face back">
+            <div class="card-label">answer</div>
+            <div class="card-text" id="backText"></div>
+          </div>
         </div>
-        <div class="card-face back">
-          <div class="card-label">answer</div>
-          <div class="card-text" id="backText"></div>
+      </div>
+      <p class="hint" id="hintText">Click the card to reveal the answer</p>
+      <div class="controls">
+        <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
+        <span id="cardNum"></span>
+        <button class="nav-btn" id="nextBtn" onclick="next()">Next →</button>
+      </div>
+      <div class="rating-row" id="ratingRow" style="display:none">
+        <button class="rating-btn hard" onclick="rate('hard')">Hard</button>
+        <button class="rating-btn ok"   onclick="rate('ok')">OK</button>
+        <button class="rating-btn good" onclick="rate('good')">Got it</button>
+      </div>
+    </div>
+    <div id="summary" style="display:none">
+      <div class="summary">
+        <h2>Deck complete</h2>
+        <p>Here's how you did:</p>
+        <div class="stat-grid">
+          <div class="stat"><div class="stat-n" id="sGood">0</div><div class="stat-l">Got it</div></div>
+          <div class="stat"><div class="stat-n" id="sOk">0</div><div class="stat-l">OK</div></div>
+          <div class="stat"><div class="stat-n" id="sHard">0</div><div class="stat-l">Hard</div></div>
+        </div>
+        <div class="summary-actions">
+          <button class="restart-btn" onclick="restart()">Study again</button>
+          <button class="restart-btn" onclick="showPicker()">All decks</button>
         </div>
       </div>
     </div>
-    <p class="hint" id="hintText">Click the card to reveal the answer</p>
-    <div class="controls">
-      <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
-      <span id="cardNum"></span>
-      <button class="nav-btn" id="nextBtn" onclick="next()">Next →</button>
-    </div>
-    <div class="rating-row" id="ratingRow" style="display:none">
-      <button class="rating-btn hard" onclick="rate('hard')">Hard</button>
-      <button class="rating-btn ok"   onclick="rate('ok')">OK</button>
-      <button class="rating-btn good" onclick="rate('good')">Got it</button>
-    </div>
   </div>
-  <div id="summary" style="display:none">
-    <div class="summary">
-      <h2>Deck complete</h2>
-      <p>Here's how you did:</p>
-      <div class="stat-grid">
-        <div class="stat"><div class="stat-n" id="sGood">0</div><div class="stat-l">Got it</div></div>
-        <div class="stat"><div class="stat-n" id="sOk">0</div><div class="stat-l">OK</div></div>
-        <div class="stat"><div class="stat-n" id="sHard">0</div><div class="stat-l">Hard</div></div>
-      </div>
-      <button class="restart-btn" onclick="restart()">Study again</button>
-    </div>
-  </div>
+
 </div>
 <script src="app.js"></script>
 </body>
