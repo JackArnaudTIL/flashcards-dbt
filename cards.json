@@ -63,8 +63,8 @@
       ]
     },
     "Data Engineering Concepts":{
-    "section": "Professional Development",
-    "cards": [
+      "section": "Professional Development",
+      "cards": [
         {"q": "What does ETL stand for and what is its process?", "a": "Extract, Transform, Load. The traditional process of pulling data from source systems, transforming it into a clean/usable format on a processing server, and loading it into a target database or warehouse.", "group": ["Pipelines", "Data Processing"], "difficulty": "Easy", "category": "Section 1: Data Engineering Fundamentals"},
         {"q": "What is Data Ingestion?", "a": "The process of moving data from various external sources into a storage medium (like a data lake or database) where it can be accessed, used, and analyzed.", "group": ["Pipelines", "Data Movement"], "difficulty": "Easy", "category": "Section 1: Data Engineering Fundamentals"},
         {"q": "What is Data Cleansing?", "a": "The process of detecting and correcting (or removing) corrupt, inaccurate, or incomplete records from a dataset to improve data quality.", "group": ["Data Quality", "Data Processing"], "difficulty": "Easy", "category": "Section 1: Data Engineering Fundamentals"},
