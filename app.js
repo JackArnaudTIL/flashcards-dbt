@@ -66,9 +66,10 @@ function showPicker() { showOnly('deckPicker'); }
 function selectDeck(name) {
   currentDeckName = name;
   currentCert     = null;
-  selectedCategories  = new Set();
-  selectedGroups      = new Set();
+  selectedCategories   = new Set();
+  selectedGroups       = new Set();
   selectedDifficulties = new Set();
+  selectedDeckSize     = null;
 
   const cards = DECKS[name].cards;
   const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
@@ -100,9 +101,10 @@ function selectDeck(name) {
 
 function selectCert(cert) {
   currentCert = cert;
-  selectedCategories  = new Set();
-  selectedGroups      = new Set();
+  selectedCategories   = new Set();
+  selectedGroups       = new Set();
   selectedDifficulties = new Set();
+  selectedDeckSize     = null;
   showFilterPicker();
 }
 
@@ -121,6 +123,12 @@ function showFilterPicker() {
   showOnly('filterPicker');
 }
 
+// Normalise group field — always returns an array
+function cardGroups(card) {
+  if (!card.group) return [];
+  return Array.isArray(card.group) ? card.group : [card.group];
+}
+
 function certCards() {
   const all = DECKS[currentDeckName].cards;
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
@@ -135,7 +143,7 @@ function buildFilterChips() {
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
-  const groups = [...new Set(activeCards.map(c => c.group).filter(Boolean))].sort();
+  const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))].sort();
 
   // Remove any selectedGroups that are no longer valid after category change
   for (const g of selectedGroups) {
@@ -182,11 +190,14 @@ function toggleDifficulty(d) {
 function filteredCards() {
   return certCards().filter(c => {
     const catOk  = selectedCategories.size === 0  || selectedCategories.has(c.category);
-    const grpOk  = selectedGroups.size === 0       || selectedGroups.has(c.group);
+    const grpOk  = selectedGroups.size === 0       || cardGroups(c).some(g => selectedGroups.has(g));
     const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
     return catOk && grpOk && diffOk;
   });
 }
+
+const DECK_SIZES = [10, 20, 50];
+let selectedDeckSize = null; // null = all cards
 
 function updateFilterCount() {
   const count  = filteredCards().length;
@@ -196,12 +207,44 @@ function updateFilterCount() {
   el.innerHTML = active > 0
     ? `<span>${count}</span> of ${total} cards match`
     : `All <span>${total}</span> cards`;
+
+  // If selected size is no longer valid, reset it
+  if (selectedDeckSize !== null && selectedDeckSize > count) selectedDeckSize = null;
+
+  // Render deck size tiles
+  const row = document.getElementById('deckSizeRow');
+  const availableSizes = DECK_SIZES.filter(s => s < count);
+  row.innerHTML = '';
+
+  if (availableSizes.length > 0) {
+    // "All" tile
+    const allTile = document.createElement('div');
+    allTile.className = 'size-tile' + (selectedDeckSize === null ? ' selected' : '');
+    allTile.textContent = 'All ' + count;
+    allTile.onclick = () => selectSize(null);
+    row.appendChild(allTile);
+
+    availableSizes.forEach(s => {
+      const tile = document.createElement('div');
+      tile.className = 'size-tile' + (selectedDeckSize === s ? ' selected' : '');
+      tile.textContent = s;
+      tile.onclick = () => selectSize(s);
+      row.appendChild(tile);
+    });
+  }
+
   document.getElementById('startBtn').disabled = count === 0;
+}
+
+function selectSize(s) {
+  selectedDeckSize = s;
+  updateFilterCount();
 }
 
 // ── Screen 4: Study view ───────────────────────────────────────────────────
 function startFiltered() {
-  deck    = filteredCards().sort(() => Math.random() - 0.5);
+  const shuffled = filteredCards().sort(() => Math.random() - 0.5);
+  deck    = selectedDeckSize ? shuffled.slice(0, selectedDeckSize) : shuffled;
   ratings = Array(deck.length).fill(null);
   thumbs  = Array(deck.length).fill(null);
   flags   = Array(deck.length).fill(null);
@@ -229,7 +272,7 @@ function render() {
 
   const metaTags = [
     card.category   ? `<span class="card-meta-tag">${card.category}</span>`            : '',
-    card.group      ? `<span class="card-meta-tag">${card.group}</span>`               : '',
+    ...cardGroups(card).map(g => `<span class="card-meta-tag">${g}</span>`),
     card.difficulty ? `<span class="card-meta-tag ${card.difficulty}">${card.difficulty}</span>` : ''
   ].join('');
   document.getElementById('cardMeta').innerHTML = metaTags;

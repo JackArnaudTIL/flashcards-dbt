@@ -70,15 +70,27 @@ body {
 .chip.diff-Hard.selected  { background: #D85A30; border-color: #D85A30; color: #fff; }
 
 .filter-footer {
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex; flex-direction: column; gap: 12px;
   padding-top: 1rem; border-top: 1px solid #e5e5e3; margin-top: 0.5rem;
 }
+.filter-count-wrap { display: flex; align-items: center; }
 .filter-count      { font-size: 13px; color: #aaa; }
 .filter-count span { color: #1a1a18; font-weight: 500; }
 
+.deck-size-row     { display: flex; gap: 8px; flex-wrap: wrap; }
+.size-tile {
+  padding: 7px 16px;
+  border: 1px solid #e5e5e3; border-radius: 10px;
+  background: #fff; color: #1a1a18; font-size: 13px;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.size-tile:hover   { border-color: #ccc; background: #f5f5f3; }
+.size-tile.selected { background: #1a1a18; border-color: #1a1a18; color: #fff; }
+
 .start-btn {
   padding: 9px 28px; border: 1px solid #1a1a18; border-radius: 8px;
-  background: #1a1a18; color: #fff; font-size: 14px; cursor: pointer; transition: opacity 0.15s;
+  background: #1a1a18; color: #fff; font-size: 14px; cursor: pointer;
+  transition: opacity 0.15s; align-self: flex-end;
 }
 .start-btn:hover    { opacity: 0.85; }
 .start-btn:disabled { opacity: 0.3; cursor: default; }
