@@ -33,7 +33,17 @@ function buildDeckGrid() {
     sections[section].push(name);
   });
 
-  Object.keys(sections).forEach(section => {
+  const SECTION_ORDER = ['Professional Development', 'Other Quizzes'];
+  const sectionKeys = Object.keys(sections).sort((a, b) => {
+    const ai = SECTION_ORDER.indexOf(a);
+    const bi = SECTION_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  sectionKeys.forEach(section => {
     const heading = document.createElement('h2');
     heading.className = 'deck-section-heading';
     heading.textContent = section;
@@ -137,7 +147,8 @@ function certCards() {
 function buildFilterChips() {
   const cards = certCards();
 
-  const categories = [...new Set(cards.map(c => c.category).filter(Boolean))].sort();
+  const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
   // Groups are filtered to only those present in the currently selected categories
   const activeCards = selectedCategories.size > 0
