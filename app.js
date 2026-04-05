@@ -6,7 +6,7 @@ let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficul
 
 fetch('cards.json')
   .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-  .then(data => { DECKS = data; buildDeckGrid(); })
+  .then(data => { DECKS = data.decks; buildDeckGrid(); })
   .catch(() => {
     document.getElementById('app').innerHTML =
       '<div class="error">Could not load cards.json — make sure it is in the same folder as index.html.</div>';
@@ -24,19 +24,39 @@ function showOnly(id) {
 function buildDeckGrid() {
   const grid = document.getElementById('deckGrid');
   grid.innerHTML = '';
+
+  // Group decks by section
+  const sections = {};
   Object.keys(DECKS).forEach(name => {
-    const cards = DECKS[name];
-    const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
-    const tile  = document.createElement('div');
-    tile.className = 'deck-tile';
-    const tagHTML = certs.map(t => `<span class="deck-tile-tag">${t}</span>`).join('');
-    tile.innerHTML = `
-      <div class="deck-tile-name">${name}</div>
-      <div class="deck-tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
-      ${tagHTML ? `<div class="deck-tile-tags">${tagHTML}</div>` : ''}
-    `;
-    tile.addEventListener('click', () => selectDeck(name));
-    grid.appendChild(tile);
+    const section = DECKS[name].section || 'Other';
+    if (!sections[section]) sections[section] = [];
+    sections[section].push(name);
+  });
+
+  Object.keys(sections).forEach(section => {
+    const heading = document.createElement('h2');
+    heading.className = 'deck-section-heading';
+    heading.textContent = section;
+    grid.appendChild(heading);
+
+    const row = document.createElement('div');
+    row.className = 'deck-grid-row';
+    grid.appendChild(row);
+
+    sections[section].forEach(name => {
+      const cards = DECKS[name].cards;
+      const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
+      const tile  = document.createElement('div');
+      tile.className = 'deck-tile';
+      const tagHTML = certs.map(t => `<span class="deck-tile-tag">${t}</span>`).join('');
+      tile.innerHTML = `
+        <div class="deck-tile-name">${name}</div>
+        <div class="deck-tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
+        ${tagHTML ? `<div class="deck-tile-tags">${tagHTML}</div>` : ''}
+      `;
+      tile.addEventListener('click', () => selectDeck(name));
+      row.appendChild(tile);
+    });
   });
 }
 
@@ -50,7 +70,7 @@ function selectDeck(name) {
   selectedGroups      = new Set();
   selectedDifficulties = new Set();
 
-  const cards = DECKS[name];
+  const cards = DECKS[name].cards;
   const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
 
   if (certs.length === 0) {
@@ -88,7 +108,7 @@ function selectCert(cert) {
 
 // ── Screen 3: Filter picker ────────────────────────────────────────────────
 function filterBack() {
-  const certs = [...new Set(DECKS[currentDeckName].map(c => c.certification).filter(Boolean))];
+  const certs = [...new Set(DECKS[currentDeckName].cards.map(c => c.certification).filter(Boolean))];
   certs.length > 0 ? showOnly('certPicker') : showOnly('deckPicker');
 }
 
@@ -102,7 +122,7 @@ function showFilterPicker() {
 }
 
 function certCards() {
-  const all = DECKS[currentDeckName];
+  const all = DECKS[currentDeckName].cards;
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
 }
 

@@ -11,8 +11,7 @@
 
   <!-- Screen 1: Deck picker -->
   <div id="deckPicker">
-    <h1>Choose a deck</h1>
-    <div class="deck-grid" id="deckGrid"></div>
+    <div id="deckGrid"></div>
   </div>
 
   <!-- Screen 2: Certification picker (only shown if certifications exist) -->
@@ -64,14 +63,14 @@
       <div class="scene" onclick="flip()">
         <div class="card-inner" id="cardInner">
           <div class="card-face front">
-            <div class="card-meta" id="cardMeta"></div>
             <div class="card-label">question</div>
             <div class="card-text" id="frontText"></div>
+            <div class="card-meta" id="cardMeta"></div>
           </div>
           <div class="card-face back">
-            <div class="card-meta"></div>
             <div class="card-label">answer</div>
             <div class="card-text" id="backText"></div>
+            <div class="card-meta card-meta-back"></div>
           </div>
         </div>
       </div>
