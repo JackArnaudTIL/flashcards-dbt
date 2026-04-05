@@ -371,7 +371,8 @@ function exportFlags() {
 function restart() { startFiltered(); }
 
 document.addEventListener('keydown', e => {
-  if (document.getElementById('studyView').style.display === 'none') return;
+  const studyView = document.getElementById('studyView');
+  if (!studyView || studyView.style.display === 'none') return;
   if (e.target.tagName === 'TEXTAREA') return;
   if (e.code === 'Space')      { e.preventDefault(); flip(); }
   if (e.code === 'ArrowRight') next();
