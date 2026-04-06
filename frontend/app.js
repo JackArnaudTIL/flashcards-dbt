@@ -10,12 +10,13 @@ let cardAudio = new Audio();
 function stopAudio() {
   cardAudio.pause();
   cardAudio.currentTime = 0;
+  // Remove listeners to prevent logic ghosting on source change
   cardAudio.onloadedmetadata = null;
 }
 
 /**
  * Plays audio with an optional start time offset.
- * Works with local paths or full URLs (Azure Blob Storage).
+ * Waits for metadata to load before seeking to ensure the timestamp is valid.
  */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
@@ -29,7 +30,7 @@ function playAudio(fileName, startTime = 0) {
     cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
   };
 
-  // Ensure metadata is loaded before trying to jump to a specific time
+  // If metadata is already loaded (cached), seek immediately; otherwise, wait.
   if (cardAudio.readyState >= 1) {
     seekAndPlay();
   } else {
@@ -216,13 +217,18 @@ function certCards() {
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
 }
 
-// Replaced buildFilterChips with tightened logic
+/**
+ * Builds the filter UI. Hides sections if only one choice exists.
+ * Group section is only shown if a category is selected AND multiple groups exist.
+ */
 function buildFilterChips() {
   const cards = certCards();
 
+  // 1. Categories
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
+  // 2. Groups (filtered by category if one is selected)
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
@@ -236,27 +242,36 @@ function buildFilterChips() {
     if (!groups.includes(g)) selectedGroups.delete(g);
   }
 
+  // 3. Difficulties
   const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
 
+  // 4. UI Elements
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
   const diffSection  = document.getElementById('difficultySection'); 
   const groupHint    = document.getElementById('groupHint');
   const groupChips   = document.getElementById('groupChips');
 
-  // Logic: Only show if there is MORE than one choice
+  // ── Visibility Logic ──
   if (catSection) catSection.style.display = categories.length > 1 ? 'block' : 'none';
 
   if (groupSection) {
-    const hasMultipleGroups = groups.length > 1;
-    groupSection.style.display = hasMultipleGroups ? 'block' : 'none';
-    if (groupHint) groupHint.style.display = (selectedCategories.size === 0 && hasMultipleGroups) ? 'block' : 'none';
-    if (groupChips) groupChips.style.display = (selectedCategories.size > 0 && hasMultipleGroups) ? 'grid' : 'none';
+    const categorySelected = selectedCategories.size > 0;
+    const multipleGroups = groups.length > 1;
+
+    // Reveal group section ONLY if category is selected AND there's a choice of groups
+    if (categorySelected && multipleGroups) {
+      groupSection.style.display = 'block';
+      if (groupHint) groupHint.style.display = 'none';
+      if (groupChips) groupChips.style.display = 'grid';
+    } else {
+      groupSection.style.display = 'none';
+    }
   }
 
   if (diffSection) diffSection.style.display = diffs.length > 1 ? 'block' : 'none';
 
-  // Render chips
+  // ── Rendering ──
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
@@ -363,6 +378,7 @@ function render() {
   flipped = false;
   const card = deck[index];
   
+  // Start Question sound if it exists
   if (card.q_sound) {
     playAudio(card.q_sound, card.q_sound_start || 0);
   }
@@ -445,6 +461,7 @@ function flip() {
   const deckConfig = DECKS[currentDeckName];
 
   if (flipped) {
+    // Reveal Answer Logic
     if (card.a_sound) {
       playAudio(card.a_sound, card.a_sound_start || 0);
     } 
@@ -452,6 +469,7 @@ function flip() {
       playAudio(deckConfig.a_sound, deckConfig.a_sound_start || 0);
     }
   } else {
+    // Flip Back logic
     stopAudio();
     if (card.q_sound) playAudio(card.q_sound, card.q_sound_start || 0);
   }
