@@ -12,22 +12,24 @@ function stopAudio() {
   cardAudio.currentTime = 0;
 }
 
-/**
- * Plays audio with an optional start time offset.
- * Works with local paths or full URLs (Azure Blob Storage).
- */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
   stopAudio(); 
 
-  // Detect if fileName is a full URL (Azure) or a local filename
   const isCloud = fileName.startsWith('http');
   cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
   
-  // Set the start position before playing
-  cardAudio.currentTime = startTime; 
-  
-  cardAudio.play().catch(e => console.log("Audio blocked: User must interact first."));
+  // ── FIX: Wait for the file info to load before seeking ──
+  cardAudio.onloadedmetadata = function() {
+    cardAudio.currentTime = startTime;
+    cardAudio.play().catch(e => console.log("Interaction required"));
+  };
+
+  // Fallback for files already cached in browser memory
+  if (cardAudio.readyState >= 1) {
+    cardAudio.currentTime = startTime;
+    cardAudio.play().catch(e => console.log("Interaction required"));
+  }
 }
 // ──────────────────────────────────────────────────────────────────────────
 
