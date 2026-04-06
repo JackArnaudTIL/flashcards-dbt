@@ -7,8 +7,8 @@ from azure.storage.blob import BlobServiceClient
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
-CONTAINER_NAME = "feedback"
-BLOB_NAME       = "feedback.jsonl"
+CONTAINER_NAME = "flashcard-feedback"
+BLOB_NAME      = "feedback.jsonl"
 
 
 def get_blob_client():
