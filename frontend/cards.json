@@ -1254,6 +1254,8 @@
     },
     "*In Development*":{
       "section": "Other Quizzes",
+      "a_sound": "https://flashcardblob.blob.core.windows.net/flashcard-other-files/audio/mystery-file.MP3",
+      "a_sound_start": 43,
       "cards": [
         {"q": "What is the standard professional intake status for two veteran marriage counselors entering a joint venture?", "a": "We're no strangers to love.", "group": ["Social"], "difficulty": "Hard", "category": "The Stealth Vow"},
         {"q": "What is the baseline legal assumption for two partners signing a comprehensive mutual non-disclosure agreement?", "a": "You know the rules, and so do I.", "group": ["Legal"], "difficulty": "Medium", "category": "The Stealth Vow"},

@@ -4,6 +4,33 @@ let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
 
+// ── NEW: Global Audio Controller ──────────────────────────────────────────
+let cardAudio = new Audio();
+
+function stopAudio() {
+  cardAudio.pause();
+  cardAudio.currentTime = 0;
+}
+
+/**
+ * Plays audio with an optional start time offset.
+ * Works with local paths or full URLs (Azure Blob Storage).
+ */
+function playAudio(fileName, startTime = 0) {
+  if (!fileName) return;
+  stopAudio(); 
+
+  // Detect if fileName is a full URL (Azure) or a local filename
+  const isCloud = fileName.startsWith('http');
+  cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
+  
+  // Set the start position before playing
+  cardAudio.currentTime = startTime; 
+  
+  cardAudio.play().catch(e => console.log("Audio blocked: User must interact first."));
+}
+// ──────────────────────────────────────────────────────────────────────────
+
 fetch('cards.json')
   .then(r => { if (!r.ok) throw new Error(); return r.json(); })
   .then(data => { DECKS = data.decks; buildDeckGrid(); })
@@ -55,7 +82,6 @@ function buildDeckGrid() {
   const grid = document.getElementById('deckGrid');
   grid.innerHTML = '';
 
-  // Group decks by section
   const sections = {};
   Object.keys(DECKS).forEach(name => {
     const section = DECKS[name].section || 'Other';
@@ -97,7 +123,10 @@ function buildDeckGrid() {
   });
 }
 
-function showPicker() { showOnly('deckPicker'); }
+function showPicker() { 
+  stopAudio();
+  showOnly('deckPicker'); 
+}
 
 // ── Screen 2: Certification picker ────────────────────────────────────────
 function selectDeck(name) {
@@ -108,11 +137,12 @@ function selectDeck(name) {
   selectedDifficulties = new Set();
   selectedDeckSize     = null;
 
+  stopAudio();
+
   const cards = DECKS[name].cards;
   const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
 
   if (certs.length === 0) {
-    // No certifications — go straight to filters
     showFilterPicker();
     return;
   }
@@ -160,13 +190,11 @@ function showFilterPicker() {
   showOnly('filterPicker');
 }
 
-// Normalise group field — always returns an array
 function cardGroups(card) {
   if (!card.group) return [];
   return Array.isArray(card.group) ? card.group : [card.group];
 }
 
-// Strip leading "Anything N: " prefix for display and sorting
 function categoryLabel(cat) {
   const match = cat.match(/^[^:]+:\s*(.+)$/);
   return match ? match[1].trim() : cat;
@@ -179,36 +207,30 @@ function certCards() {
 
 function buildFilterChips() {
   const cards = certCards();
-
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
-  // Groups filtered to selected categories (or all if none selected)
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
-  // Sort groups by number of matching cards descending
+    
   const groupCounts = {};
   activeCards.forEach(c => cardGroups(c).forEach(g => { groupCounts[g] = (groupCounts[g] || 0) + 1; }));
   const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))]
     .sort((a, b) => (groupCounts[b] || 0) - (groupCounts[a] || 0));
 
-  // Remove any selectedGroups no longer valid after category change
   for (const g of selectedGroups) {
     if (!groups.includes(g)) selectedGroups.delete(g);
   }
 
-  const diffs = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
+  const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
 
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
   const groupHint    = document.getElementById('groupHint');
   const groupChips   = document.getElementById('groupChips');
 
-  // Hide category row if only one option
   catSection.style.display = categories.length > 1 ? 'block' : 'none';
-
-  // Group row: always show, but reveal chips only after a category is selected
   const categorySelected = selectedCategories.size > 0;
   groupSection.style.display = groups.length > 1 || categorySelected ? 'block' : 'none';
   groupHint.style.display    = categorySelected ? 'none' : 'block';
@@ -254,7 +276,7 @@ function filteredCards() {
 }
 
 const DECK_SIZES = [10, 20, 50];
-let selectedDeckSize = null; // null = all cards
+let selectedDeckSize = null;
 
 function updateFilterCount() {
   const count  = filteredCards().length;
@@ -265,10 +287,8 @@ function updateFilterCount() {
     ? `<span>${count}</span> of ${total} cards match`
     : `All <span>${total}</span> cards`;
 
-  // If selected size is no longer valid, reset it
   if (selectedDeckSize !== null && selectedDeckSize > count) selectedDeckSize = null;
 
-  // Render deck size tiles
   const sizeSection    = document.getElementById('deckSizeSection');
   const row            = document.getElementById('deckSizeRow');
   const availableSizes = DECK_SIZES.filter(s => s < count);
@@ -276,8 +296,6 @@ function updateFilterCount() {
 
   if (availableSizes.length > 0) {
     sizeSection.style.display = 'block';
-
-    // "All" tile
     const allTile = document.createElement('div');
     allTile.className = 'size-tile' + (selectedDeckSize === null ? ' selected' : '');
     allTile.innerHTML = `All <span class="size-tile-sub">${count} cards</span>`;
@@ -294,7 +312,6 @@ function updateFilterCount() {
   } else {
     sizeSection.style.display = 'none';
   }
-
   document.getElementById('startBtn').disabled = count === 0;
 }
 
@@ -319,9 +336,17 @@ function startFiltered() {
 }
 
 function render() {
+  stopAudio(); 
+
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
   const card = deck[index];
+  
+  // Play Question Sound if defined
+  if (card.q_sound) {
+    playAudio(card.q_sound, card.q_sound_start || 0);
+  }
+
   document.getElementById('frontText').textContent   = card.q;
   document.getElementById('backText').textContent    = card.a;
   document.getElementById('cardNum').textContent     = (index + 1) + ' of ' + deck.length;
@@ -371,7 +396,6 @@ function thumb(direction) {
     } else {
       hide('flagPanel');
       flags[index] = null;
-      // Send the 'up' feedback immediately to Azure
       sendFeedback('up');
     }
   }
@@ -390,14 +414,28 @@ function submitFlag() {
   const noteText = document.getElementById('flagNote').value.trim();
   flags[index] = noteText || '(no note provided)';
   hide('flagPanel');
-  
-  // Send the 'down' feedback with the typed note to Azure
   sendFeedback('down', noteText);
 }
 
 function flip() {
   flipped = !flipped;
   document.getElementById('cardInner').classList.toggle('flipped', flipped);
+  
+  const card = deck[index];
+  const deckConfig = DECKS[currentDeckName];
+
+  if (flipped) {
+    if (card.a_sound) {
+      playAudio(card.a_sound, card.a_sound_start || 0);
+    } 
+    else if (deckConfig.a_sound) {
+      playAudio(deckConfig.a_sound, deckConfig.a_sound_start || 0);
+    }
+  } else {
+    stopAudio();
+    if (card.q_sound) playAudio(card.q_sound, card.q_sound_start || 0);
+  }
+
   const hint = document.getElementById('hintText');
   if (flipped) {
     hint.textContent = 'How did you do?';
@@ -420,6 +458,7 @@ function rate(r) {
 }
 
 function showSummary() {
+  stopAudio();
   hide('cardArea');
   show('summary');
   document.getElementById('sGood').textContent = ratings.filter(r => r === 'Good').length;
