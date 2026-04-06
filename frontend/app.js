@@ -10,13 +10,12 @@ let cardAudio = new Audio();
 function stopAudio() {
   cardAudio.pause();
   cardAudio.currentTime = 0;
-  // Remove existing listeners to prevent memory leaks or logic ghosting
   cardAudio.onloadedmetadata = null;
 }
 
 /**
  * Plays audio with an optional start time offset.
- * Waits for metadata to load before seeking to ensure the timestamp is valid.
+ * Works with local paths or full URLs (Azure Blob Storage).
  */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
@@ -25,12 +24,12 @@ function playAudio(fileName, startTime = 0) {
   const isCloud = fileName.startsWith('http');
   cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
   
-  // Logic to handle seeking once the browser knows the file duration
   const seekAndPlay = () => {
     cardAudio.currentTime = startTime;
     cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
   };
 
+  // Ensure metadata is loaded before trying to jump to a specific time
   if (cardAudio.readyState >= 1) {
     seekAndPlay();
   } else {
@@ -217,10 +216,10 @@ function certCards() {
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
 }
 
+// Replaced buildFilterChips with tightened logic
 function buildFilterChips() {
   const cards = certCards();
 
-  // Calculate unique values
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
@@ -233,23 +232,26 @@ function buildFilterChips() {
   const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))]
     .sort((a, b) => (groupCounts[b] || 0) - (groupCounts[a] || 0));
 
+  for (const g of selectedGroups) {
+    if (!groups.includes(g)) selectedGroups.delete(g);
+  }
+
   const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
 
-  // Identify sections
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
   const diffSection  = document.getElementById('difficultySection'); 
   const groupHint    = document.getElementById('groupHint');
   const groupChips   = document.getElementById('groupChips');
 
-  // Logic: Hide sections if only 1 option exists
+  // Logic: Only show if there is MORE than one choice
   if (catSection) catSection.style.display = categories.length > 1 ? 'block' : 'none';
 
-  const categorySelected = selectedCategories.size > 0;
   if (groupSection) {
-    groupSection.style.display = (groups.length > 1 || categorySelected) ? 'block' : 'none';
-    if (groupHint) groupHint.style.display = categorySelected ? 'none' : 'block';
-    if (groupChips) groupChips.style.display = categorySelected ? 'grid' : 'none';
+    const hasMultipleGroups = groups.length > 1;
+    groupSection.style.display = hasMultipleGroups ? 'block' : 'none';
+    if (groupHint) groupHint.style.display = (selectedCategories.size === 0 && hasMultipleGroups) ? 'block' : 'none';
+    if (groupChips) groupChips.style.display = (selectedCategories.size > 0 && hasMultipleGroups) ? 'grid' : 'none';
   }
 
   if (diffSection) diffSection.style.display = diffs.length > 1 ? 'block' : 'none';
@@ -361,7 +363,6 @@ function render() {
   flipped = false;
   const card = deck[index];
   
-  // Play Question Sound immediately
   if (card.q_sound) {
     playAudio(card.q_sound, card.q_sound_start || 0);
   }
