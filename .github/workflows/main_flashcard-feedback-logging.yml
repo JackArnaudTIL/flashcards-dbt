@@ -12,7 +12,7 @@ on:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: 'function'  # ← changed from '.'
-  PYTHON_VERSION: '3.13'
+  PYTHON_VERSION: '3.11'
 
 jobs:
   build:
@@ -38,7 +38,9 @@ jobs:
         run: pip install -r function/requirements.txt  # ← changed from requirements.txt
 
       - name: Zip artifact for deployment
-        run: zip release.zip ./function/* -r  # ← changed from ./*
+        run: |
+          cd function
+          zip -r ../release.zip ./*
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
