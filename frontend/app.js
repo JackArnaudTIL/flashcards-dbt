@@ -4,14 +4,20 @@ let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
 
-// ── NEW: Global Audio Controller ──────────────────────────────────────────
+// ── Global Audio Controller ──────────────────────────────────────────────
 let cardAudio = new Audio();
 
 function stopAudio() {
   cardAudio.pause();
   cardAudio.currentTime = 0;
+  // Remove existing listeners to prevent memory leaks or logic ghosting
+  cardAudio.onloadedmetadata = null;
 }
 
+/**
+ * Plays audio with an optional start time offset.
+ * Waits for metadata to load before seeking to ensure the timestamp is valid.
+ */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
   stopAudio(); 
@@ -19,31 +25,37 @@ function playAudio(fileName, startTime = 0) {
   const isCloud = fileName.startsWith('http');
   cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
   
-  // ── FIX: Wait for the file info to load before seeking ──
-  cardAudio.onloadedmetadata = function() {
+  // Logic to handle seeking once the browser knows the file duration
+  const seekAndPlay = () => {
     cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Interaction required"));
+    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
   };
 
-  // Fallback for files already cached in browser memory
   if (cardAudio.readyState >= 1) {
-    cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Interaction required"));
+    seekAndPlay();
+  } else {
+    cardAudio.onloadedmetadata = seekAndPlay;
   }
 }
-// ──────────────────────────────────────────────────────────────────────────
 
+// ── Data Loading ──────────────────────────────────────────────────────────
 fetch('cards.json')
   .then(r => { if (!r.ok) throw new Error(); return r.json(); })
   .then(data => { DECKS = data.decks; buildDeckGrid(); })
   .catch(() => {
     document.getElementById('app').innerHTML =
-      '<div class="error">Could not load cards.json — make sure it is in the same folder as index.html.</div>';
+      '<div class="error">Could not load cards.json — check folder structure.</div>';
   });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
-function show(id) { document.getElementById(id).style.display = 'block'; }
-function hide(id) { document.getElementById(id).style.display = 'none'; }
+function show(id) { 
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'block'; 
+}
+function hide(id) { 
+  const el = document.getElementById(id);
+  if (el) el.style.display = 'none'; 
+}
 function showOnly(id) {
   ['deckPicker','certPicker','filterPicker','studyView'].forEach(s => hide(s));
   show(id);
@@ -184,9 +196,7 @@ function filterBack() {
 }
 
 function showFilterPicker() {
-  const label = currentCert
-    ? `${currentDeckName} · ${currentCert}`
-    : currentDeckName;
+  const label = currentCert ? `${currentDeckName} · ${currentCert}` : currentDeckName;
   document.getElementById('filterDeckTitle').textContent = label;
   buildFilterChips();
   showOnly('filterPicker');
@@ -209,6 +219,8 @@ function certCards() {
 
 function buildFilterChips() {
   const cards = certCards();
+
+  // Calculate unique values
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
@@ -221,23 +233,28 @@ function buildFilterChips() {
   const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))]
     .sort((a, b) => (groupCounts[b] || 0) - (groupCounts[a] || 0));
 
-  for (const g of selectedGroups) {
-    if (!groups.includes(g)) selectedGroups.delete(g);
-  }
-
   const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
 
+  // Identify sections
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
+  const diffSection  = document.getElementById('difficultySection'); 
   const groupHint    = document.getElementById('groupHint');
   const groupChips   = document.getElementById('groupChips');
 
-  catSection.style.display = categories.length > 1 ? 'block' : 'none';
-  const categorySelected = selectedCategories.size > 0;
-  groupSection.style.display = groups.length > 1 || categorySelected ? 'block' : 'none';
-  groupHint.style.display    = categorySelected ? 'none' : 'block';
-  groupChips.style.display   = categorySelected ? 'grid' : 'none';
+  // Logic: Hide sections if only 1 option exists
+  if (catSection) catSection.style.display = categories.length > 1 ? 'block' : 'none';
 
+  const categorySelected = selectedCategories.size > 0;
+  if (groupSection) {
+    groupSection.style.display = (groups.length > 1 || categorySelected) ? 'block' : 'none';
+    if (groupHint) groupHint.style.display = categorySelected ? 'none' : 'block';
+    if (groupChips) groupChips.style.display = categorySelected ? 'grid' : 'none';
+  }
+
+  if (diffSection) diffSection.style.display = diffs.length > 1 ? 'block' : 'none';
+
+  // Render chips
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
@@ -344,7 +361,7 @@ function render() {
   flipped = false;
   const card = deck[index];
   
-  // Play Question Sound if defined
+  // Play Question Sound immediately
   if (card.q_sound) {
     playAudio(card.q_sound, card.q_sound_start || 0);
   }
