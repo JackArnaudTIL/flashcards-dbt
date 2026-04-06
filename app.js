@@ -20,6 +20,36 @@ function showOnly(id) {
   show(id);
 }
 
+// ── Azure API Integration ──────────────────────────────────────────────────
+const API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback';
+
+function sendFeedback(thumbType, noteText = '') {
+  const card = deck[index];
+  if (!card) return;
+  
+  const payload = {
+    thumb: thumbType,
+    deck: currentDeckName,
+    certification: currentCert || '',
+    category: card.category || '',
+    group: Array.isArray(card.group) ? card.group.join(', ') : (card.group || ''),
+    difficulty: card.difficulty || '',
+    question: card.q,
+    answer: card.a,
+    note: noteText
+  };
+
+  fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+  .then(response => {
+    if (!response.ok) console.error("Feedback API error:", response.status);
+  })
+  .catch(err => console.error("Network error sending feedback:", err));
+}
+
 // ── Screen 1: Deck picker ──────────────────────────────────────────────────
 function buildDeckGrid() {
   const grid = document.getElementById('deckGrid');
@@ -341,6 +371,8 @@ function thumb(direction) {
     } else {
       hide('flagPanel');
       flags[index] = null;
+      // Send the 'up' feedback immediately to Azure
+      sendFeedback('up');
     }
   }
   renderThumbs();
@@ -355,8 +387,12 @@ function cancelFlag() {
 }
 
 function submitFlag() {
-  flags[index] = document.getElementById('flagNote').value.trim() || '(no note provided)';
+  const noteText = document.getElementById('flagNote').value.trim();
+  flags[index] = noteText || '(no note provided)';
   hide('flagPanel');
+  
+  // Send the 'down' feedback with the typed note to Azure
+  sendFeedback('down', noteText);
 }
 
 function flip() {
