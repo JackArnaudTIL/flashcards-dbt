@@ -11,7 +11,6 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: '.'  # ← back to '.'
   PYTHON_VERSION: '3.11'
 
 jobs:
@@ -29,28 +28,23 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Create and start virtual environment
+      - name: Install dependencies into package folder
         run: |
-          python -m venv venv
-          source venv/bin/activate
-
-      - name: Install dependencies
-        run: |
-          cd function
-          pip install -r requirements.txt --target=".python_packages/lib/site-packages"
+          pip install -r function/requirements.txt \
+            --target function/.python_packages/lib/site-packages
 
       - name: Zip artifact for deployment
         run: |
           cd function
-          zip -r ../release.zip ./*
+          zip -r ../release.zip . \
+            --exclude "*.pyc" \
+            --exclude "__pycache__/*"
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: python-app
-          path: |
-            release.zip
-            !venv/
+          path: release.zip
 
   deploy:
     runs-on: ubuntu-latest
@@ -66,9 +60,7 @@ jobs:
           name: python-app
 
       - name: Unzip artifact for deployment
-        run: |
-          unzip release.zip
-          rm release.zip
+        run: unzip release.zip
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -77,10 +69,10 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_023B4D82F08A43C98D433BF396243EA7 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_828270F499E9430F82CACB4CD8D8354B }}
 
-      - name: 'Deploy to Azure Functions'
+      - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         id: deploy-to-function
         with:
           app-name: 'flashcard-feedback-logging'
           slot-name: 'Production'
-          package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+          package: '.'
