@@ -10,13 +10,11 @@ let cardAudio = new Audio();
 function stopAudio() {
   cardAudio.pause();
   cardAudio.currentTime = 0;
-  // Remove listeners to prevent logic ghosting on source change
   cardAudio.onloadedmetadata = null;
 }
 
 /**
  * Plays audio with an optional start time offset.
- * Waits for metadata to load before seeking to ensure the timestamp is valid.
  */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
@@ -27,10 +25,9 @@ function playAudio(fileName, startTime = 0) {
   
   const seekAndPlay = () => {
     cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
+    cardAudio.play().catch(e => console.log("Playback blocked."));
   };
 
-  // If metadata is already loaded (cached), seek immediately; otherwise, wait.
   if (cardAudio.readyState >= 1) {
     seekAndPlay();
   } else {
@@ -44,7 +41,7 @@ fetch('cards.json')
   .then(data => { DECKS = data.decks; buildDeckGrid(); })
   .catch(() => {
     document.getElementById('app').innerHTML =
-      '<div class="error">Could not load cards.json — check folder structure.</div>';
+      '<div class="error">Could not load cards.json.</div>';
   });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -150,7 +147,6 @@ function selectDeck(name) {
   selectedGroups       = new Set();
   selectedDifficulties = new Set();
   selectedDeckSize     = null;
-
   stopAudio();
 
   const cards = DECKS[name].cards;
@@ -218,8 +214,8 @@ function certCards() {
 }
 
 /**
- * Builds the filter UI. Hides sections if only one choice exists.
- * Group section is only shown if a category is selected AND multiple groups exist.
+ * Builds the filter UI. 
+ * Updated: Hides the entire Group section unless a category is selected AND multiple groups exist.
  */
 function buildFilterChips() {
   const cards = certCards();
@@ -228,7 +224,7 @@ function buildFilterChips() {
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
-  // 2. Groups (filtered by category if one is selected)
+  // 2. Groups (Filter current group options based on category selection)
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
@@ -253,25 +249,28 @@ function buildFilterChips() {
   const groupChips   = document.getElementById('groupChips');
 
   // ── Visibility Logic ──
+  
+  // Categories show if more than 1 option exists
   if (catSection) catSection.style.display = categories.length > 1 ? 'block' : 'none';
 
+  // GROUPS: Completely hidden unless a category is selected AND there are multiple groups to choose from.
   if (groupSection) {
     const categorySelected = selectedCategories.size > 0;
     const multipleGroups = groups.length > 1;
 
-    // Reveal group section ONLY if category is selected AND there's a choice of groups
     if (categorySelected && multipleGroups) {
       groupSection.style.display = 'block';
-      if (groupHint) groupHint.style.display = 'none';
+      if (groupHint) groupHint.style.display = 'none'; // Hide the "instruction" text
       if (groupChips) groupChips.style.display = 'grid';
     } else {
-      groupSection.style.display = 'none';
+      groupSection.style.display = 'none'; // Hide everything (Title, Hint, and Chips)
     }
   }
 
+  // Difficulty shows if more than 1 option exists
   if (diffSection) diffSection.style.display = diffs.length > 1 ? 'block' : 'none';
 
-  // ── Rendering ──
+  // ── Rendering Chips ──
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
@@ -373,12 +372,10 @@ function startFiltered() {
 
 function render() {
   stopAudio(); 
-
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
   const card = deck[index];
   
-  // Start Question sound if it exists
   if (card.q_sound) {
     playAudio(card.q_sound, card.q_sound_start || 0);
   }
@@ -461,7 +458,6 @@ function flip() {
   const deckConfig = DECKS[currentDeckName];
 
   if (flipped) {
-    // Reveal Answer Logic
     if (card.a_sound) {
       playAudio(card.a_sound, card.a_sound_start || 0);
     } 
@@ -469,7 +465,6 @@ function flip() {
       playAudio(deckConfig.a_sound, deckConfig.a_sound_start || 0);
     }
   } else {
-    // Flip Back logic
     stopAudio();
     if (card.q_sound) playAudio(card.q_sound, card.q_sound_start || 0);
   }
