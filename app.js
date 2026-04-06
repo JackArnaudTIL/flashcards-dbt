@@ -139,6 +139,12 @@ function cardGroups(card) {
   return Array.isArray(card.group) ? card.group : [card.group];
 }
 
+// Strip leading "Anything N: " prefix for display and sorting
+function categoryLabel(cat) {
+  const match = cat.match(/^[^:]+:\s*(.+)$/);
+  return match ? match[1].trim() : cat;
+}
+
 function certCards() {
   const all = DECKS[currentDeckName].cards;
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
@@ -171,7 +177,7 @@ function buildFilterChips() {
   groupSection.style.display = groups.length > 1     ? 'block' : 'none';
 
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
-    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${cat}</div>
+    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
 
   document.getElementById('groupChips').innerHTML = groups.map(g => `
@@ -282,7 +288,7 @@ function render() {
   document.getElementById('flagNote').value          = flags[index] || '';
 
   const metaTags = [
-    card.category   ? `<span class="card-meta-tag">${card.category}</span>`            : '',
+    card.category   ? `<span class="card-meta-tag">${categoryLabel(card.category)}</span>`  : '',
     ...cardGroups(card).map(g => `<span class="card-meta-tag">${g}</span>`),
     card.difficulty ? `<span class="card-meta-tag ${card.difficulty}">${card.difficulty}</span>` : ''
   ].join('');
