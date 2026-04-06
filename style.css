@@ -7,6 +7,7 @@
   --ink-mid:    #4a4a4a;
   --ink-soft:   #9a9a9a;
   --ink-faint:  #d4d4d4;
+  --bg:         #e8e6e0;
   --surface:    #fafaf8;
   --card:       #ffffff;
   --card-back:  #f4f3ef;
@@ -26,7 +27,10 @@
 
 body {
   font-family: 'DM Sans', sans-serif;
-  background: var(--surface);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(0,0,0,0.04) 0%, transparent 50%);
   color: var(--ink);
   min-height: 100vh;
   display: flex;
@@ -35,7 +39,14 @@ body {
   padding: 2.5rem 1.25rem 4rem;
 }
 
-#app { width: 100%; max-width: 640px; }
+#app {
+  width: 100%; max-width: 640px;
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04), 0 8px 40px rgba(0,0,0,0.10);
+  padding: 2rem 2rem;
+  min-height: calc(100vh - 5rem);
+}
 
 /* ── Typography ──────────────────────────────────────────────── */
 .serif { font-family: 'DM Serif Display', serif; }
@@ -144,6 +155,15 @@ body {
   font-size: 11px; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.1em;
   color: var(--ink-soft); margin-bottom: 0.65rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.filter-optional {
+  font-size: 10px; font-weight: 400; text-transform: none;
+  letter-spacing: 0; color: var(--ink-faint);
+}
+.filter-hint {
+  font-size: 12px; color: var(--ink-faint);
+  font-style: italic; padding: 0.5rem 0;
 }
 .filter-chips    { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; }
 
@@ -159,9 +179,14 @@ body {
 }
 .chip:hover { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
 .chip.selected            { background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: var(--shadow-md); }
+.chip.selected .chip-count { color: rgba(255,255,255,0.6); }
 .chip.diff-Easy.selected  { background: var(--green); border-color: var(--green); color: #fff; }
 .chip.diff-Medium.selected{ background: var(--amber); border-color: var(--amber); color: #fff; }
 .chip.diff-Hard.selected  { background: var(--red);   border-color: var(--red);   color: #fff; }
+.chip-count {
+  font-size: 10px; font-weight: 400;
+  color: var(--ink-soft); margin-left: 4px;
+}
 
 /* ── Filter footer ───────────────────────────────────────────── */
 .filter-footer {
@@ -186,6 +211,8 @@ body {
 }
 .size-tile:hover   { border-color: var(--ink-soft); color: var(--ink); }
 .size-tile.selected { background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: var(--shadow-md); }
+.size-tile.selected .size-tile-sub { color: rgba(255,255,255,0.6); }
+.size-tile-sub { font-size: 11px; font-weight: 400; color: var(--ink-soft); margin-left: 3px; }
 
 .start-btn {
   align-self: flex-end;
@@ -287,29 +314,25 @@ body {
 .flag-submit   { font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 6px 14px; border: 1px solid var(--red); border-radius: var(--radius-xl); background: var(--card); color: var(--red); cursor: pointer; transition: background 0.15s; }
 .flag-submit:hover { background: var(--red-dim); }
 
-/* ── Hint & nav ──────────────────────────────────────────────── */
+/* ── Response block ──────────────────────────────────────────── */
+.response-block {
+  background: var(--card-back);
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 0.875rem;
+  text-align: center;
+}
 .hint {
   font-size: 12px; color: var(--ink-soft);
-  margin-bottom: 1rem; text-align: center;
+  margin-bottom: 0; letter-spacing: 0.01em;
+}
+.hint.answered {
+  font-size: 12px; font-weight: 500;
+  color: var(--ink-mid); margin-bottom: 0.75rem;
   letter-spacing: 0.01em;
 }
-.controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.controls span { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
-
-.nav-btn {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 8px 18px;
-  border: 1px solid var(--ink-faint); border-radius: var(--radius-xl);
-  background: var(--card); color: var(--ink-mid);
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-  cursor: pointer; transition: all 0.15s;
-  box-shadow: var(--shadow-sm);
-}
-.nav-btn:hover    { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
-.nav-btn:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
-
-/* ── Rating buttons ──────────────────────────────────────────── */
-.rating-row { display: flex; gap: 8px; justify-content: center; margin-bottom: 1.25rem; }
+.rating-row { display: flex; gap: 8px; justify-content: center; }
 .rating-btn {
   flex: 1; padding: 9px 0;
   border: 1px solid var(--ink-faint); border-radius: var(--radius-md);
@@ -326,7 +349,21 @@ body {
 .rating-btn.Hard   { border-color: var(--red);   color: var(--red); }
 .rating-btn.Hard:hover { background: var(--red-dim); }
 
-/* ── Summary ─────────────────────────────────────────────────── */
+/* ── Nav controls ────────────────────────────────────────────── */
+.controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+.controls span { font-size: 13px; font-weight: 500; color: var(--ink-soft); }
+
+.nav-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 8px 18px;
+  border: 1px solid var(--ink-faint); border-radius: var(--radius-xl);
+  background: var(--card); color: var(--ink-mid);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.nav-btn:hover    { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
+.nav-btn:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
 .summary       { text-align: center; padding: 2.5rem 1rem; }
 .summary h2    { font-family: 'DM Serif Display', serif; font-size: 1.75rem; font-weight: 400; margin-bottom: 0.4rem; }
 .summary p     { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.75rem; }

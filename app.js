@@ -53,16 +53,13 @@ function buildDeckGrid() {
     row.className = 'deck-grid-row';
     grid.appendChild(row);
 
-    sections[section].forEach(name => {
+    sections[section].sort((a, b) => a.localeCompare(b)).forEach(name => {
       const cards = DECKS[name].cards;
-      const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
       const tile  = document.createElement('div');
       tile.className = 'deck-tile';
-      const tagHTML = certs.map(t => `<span class="deck-tile-tag">${t}</span>`).join('');
       tile.innerHTML = `
         <div class="deck-tile-name">${name}</div>
         <div class="deck-tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
-        ${tagHTML ? `<div class="deck-tile-tags">${tagHTML}</div>` : ''}
       `;
       tile.addEventListener('click', () => selectDeck(name));
       row.appendChild(tile);
@@ -156,13 +153,17 @@ function buildFilterChips() {
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
-  // Groups are filtered to only those present in the currently selected categories
+  // Groups filtered to selected categories (or all if none selected)
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
-  const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))].sort();
+  // Sort groups by number of matching cards descending
+  const groupCounts = {};
+  activeCards.forEach(c => cardGroups(c).forEach(g => { groupCounts[g] = (groupCounts[g] || 0) + 1; }));
+  const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))]
+    .sort((a, b) => (groupCounts[b] || 0) - (groupCounts[a] || 0));
 
-  // Remove any selectedGroups that are no longer valid after category change
+  // Remove any selectedGroups no longer valid after category change
   for (const g of selectedGroups) {
     if (!groups.includes(g)) selectedGroups.delete(g);
   }
@@ -171,17 +172,26 @@ function buildFilterChips() {
 
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
+  const groupHint    = document.getElementById('groupHint');
+  const groupChips   = document.getElementById('groupChips');
 
-  // Hide entire row if only one option exists
-  catSection.style.display   = categories.length > 1 ? 'block' : 'none';
-  groupSection.style.display = groups.length > 1     ? 'block' : 'none';
+  // Hide category row if only one option
+  catSection.style.display = categories.length > 1 ? 'block' : 'none';
+
+  // Group row: always show, but reveal chips only after a category is selected
+  const categorySelected = selectedCategories.size > 0;
+  groupSection.style.display = groups.length > 1 || categorySelected ? 'block' : 'none';
+  groupHint.style.display    = categorySelected ? 'none' : 'block';
+  groupChips.style.display   = categorySelected ? 'grid' : 'none';
 
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
 
-  document.getElementById('groupChips').innerHTML = groups.map(g => `
-    <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">${g}</div>
+  groupChips.innerHTML = groups.map(g => `
+    <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">
+      ${g} <span class="chip-count">${groupCounts[g] || 0}</span>
+    </div>
   `).join('');
 
   document.getElementById('difficultyChips').innerHTML = diffs.map(d => `
@@ -229,25 +239,30 @@ function updateFilterCount() {
   if (selectedDeckSize !== null && selectedDeckSize > count) selectedDeckSize = null;
 
   // Render deck size tiles
-  const row = document.getElementById('deckSizeRow');
+  const sizeSection    = document.getElementById('deckSizeSection');
+  const row            = document.getElementById('deckSizeRow');
   const availableSizes = DECK_SIZES.filter(s => s < count);
   row.innerHTML = '';
 
   if (availableSizes.length > 0) {
+    sizeSection.style.display = 'block';
+
     // "All" tile
     const allTile = document.createElement('div');
     allTile.className = 'size-tile' + (selectedDeckSize === null ? ' selected' : '');
-    allTile.textContent = 'All ' + count;
+    allTile.innerHTML = `All <span class="size-tile-sub">${count} cards</span>`;
     allTile.onclick = () => selectSize(null);
     row.appendChild(allTile);
 
     availableSizes.forEach(s => {
       const tile = document.createElement('div');
       tile.className = 'size-tile' + (selectedDeckSize === s ? ' selected' : '');
-      tile.textContent = s;
+      tile.innerHTML = `${s} <span class="size-tile-sub">cards</span>`;
       tile.onclick = () => selectSize(s);
       row.appendChild(tile);
     });
+  } else {
+    sizeSection.style.display = 'none';
   }
 
   document.getElementById('startBtn').disabled = count === 0;
@@ -282,7 +297,8 @@ function render() {
   document.getElementById('cardNum').textContent     = (index + 1) + ' of ' + deck.length;
   document.getElementById('prevBtn').disabled        = index === 0;
   document.getElementById('nextBtn').disabled        = index === deck.length - 1;
-  document.getElementById('hintText').textContent    = 'Click the card to reveal the answer';
+  document.getElementById('hintText').textContent = 'Click the card to reveal the answer';
+  document.getElementById('hintText').className   = 'hint';
   document.getElementById('ratingRow').style.display = 'none';
   document.getElementById('flagPanel').style.display = 'none';
   document.getElementById('flagNote').value          = flags[index] || '';
@@ -346,9 +362,15 @@ function submitFlag() {
 function flip() {
   flipped = !flipped;
   document.getElementById('cardInner').classList.toggle('flipped', flipped);
+  const hint = document.getElementById('hintText');
   if (flipped) {
-    document.getElementById('hintText').textContent = 'How well did you know this?';
+    hint.textContent = 'How did you do?';
+    hint.className = 'hint answered';
     document.getElementById('ratingRow').style.display = 'flex';
+  } else {
+    hint.textContent = 'Click the card to reveal the answer';
+    hint.className = 'hint';
+    document.getElementById('ratingRow').style.display = 'none';
   }
 }
 

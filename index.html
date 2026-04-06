@@ -34,22 +34,26 @@
       <span id="filterDeckTitle"></span>
     </div>
     <div class="filter-section" id="categorySection">
-      <div class="filter-heading">Category</div>
+      <div class="filter-heading">Category <span class="filter-optional">optional</span></div>
       <div class="filter-chips" id="categoryChips"></div>
     </div>
     <div class="filter-section" id="groupSection">
-      <div class="filter-heading">Group</div>
+      <div class="filter-heading">Group <span class="filter-optional">optional</span></div>
+      <div class="filter-hint" id="groupHint">Select a category above to filter by group</div>
       <div class="filter-chips" id="groupChips"></div>
     </div>
     <div class="filter-section">
-      <div class="filter-heading">Difficulty</div>
+      <div class="filter-heading">Difficulty <span class="filter-optional">optional</span></div>
       <div class="filter-chips" id="difficultyChips"></div>
     </div>
     <div class="filter-footer">
       <div class="filter-count-wrap">
         <span id="filterCount" class="filter-count"></span>
       </div>
-      <div class="deck-size-row" id="deckSizeRow"></div>
+      <div id="deckSizeSection" style="display:none">
+        <div class="filter-heading" style="margin-bottom:0.65rem">How many cards?</div>
+        <div class="deck-size-row" id="deckSizeRow"></div>
+      </div>
       <button class="start-btn" id="startBtn" onclick="startFiltered()">Start</button>
     </div>
   </div>
@@ -99,16 +103,18 @@
         </div>
       </div>
 
-      <p class="hint" id="hintText">Click the card to reveal the answer</p>
+      <div class="response-block" id="responseBlock">
+        <p class="hint" id="hintText">Click the card to reveal the answer</p>
+        <div class="rating-row" id="ratingRow" style="display:none">
+          <button class="rating-btn Good" onclick="rate('Good')">Got it</button>
+          <button class="rating-btn Ok"   onclick="rate('Ok')">OK</button>
+          <button class="rating-btn Hard" onclick="rate('Hard')">Hard</button>
+        </div>
+      </div>
       <div class="controls">
         <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
         <span id="cardNum"></span>
         <button class="nav-btn" id="nextBtn" onclick="next()">Next →</button>
-      </div>
-      <div class="rating-row" id="ratingRow" style="display:none">
-        <button class="rating-btn Good" onclick="rate('Good')">Got it</button>
-        <button class="rating-btn Ok"   onclick="rate('Ok')">OK</button>
-        <button class="rating-btn Hard" onclick="rate('Hard')">Hard</button>
       </div>
     </div>
 
