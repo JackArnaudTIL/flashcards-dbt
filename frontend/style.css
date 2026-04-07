@@ -97,8 +97,6 @@ body {
 }
 .deck-tile-name  { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
 .deck-tile-count { font-size: 12px; color: var(--ink-soft); }
-.deck-tile-tags  { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
-.deck-tile-tag   { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: var(--accent-dim); color: var(--accent); }
 
 /* ── Certification picker ────────────────────────────────────── */
 .screen-heading {
@@ -149,6 +147,30 @@ body {
 }
 .back-btn:hover { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
 
+/* ── Fast Start UI & Customization ───────────────────────────── */
+.fast-start-hero {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--accent-dim) 0%, #ffffff 100%);
+    border: 1px solid var(--ink-faint);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow-sm);
+}
+.hero-count { font-family: 'DM Serif Display', serif; font-size: 2.25rem; color: var(--ink); margin-bottom: 0.5rem; }
+.hero-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.5rem; }
+.hero-start { align-self: center !important; width: 100%; max-width: 240px; padding: 14px; font-size: 16px; font-weight: 500; }
+
+.customize-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.15rem; cursor: pointer; border: 1px solid var(--ink-faint);
+    border-radius: var(--radius-md); font-size: 14px; font-weight: 500;
+    background: var(--card); transition: all 0.2s; margin-bottom: 1.5rem;
+}
+.customize-toggle:hover { border-color: var(--ink-soft); background: var(--card-back); }
+#customChevron { transition: transform 0.3s ease; }
+.rotated { transform: rotate(180deg); }
+
 /* ── Filter picker ───────────────────────────────────────────── */
 .filter-section  { margin-bottom: 1.75rem; }
 .filter-heading  {
@@ -157,15 +179,31 @@ body {
   color: var(--ink-soft); margin-bottom: 0.65rem;
   display: flex; align-items: center; gap: 8px;
 }
-.filter-optional {
-  font-size: 10px; font-weight: 400; text-transform: none;
-  letter-spacing: 0; color: var(--ink-faint);
-}
 .filter-hint {
   font-size: 12px; color: var(--ink-faint);
   font-style: italic; padding: 0.5rem 0;
 }
-.filter-chips    { display: grid; grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 8px; }
+
+/* ── Horizontal Scrolling ────────────────────────────────────── */
+.filter-scroll-wrapper { position: relative; width: 100%; overflow: hidden; margin-bottom: 1rem; }
+.horizontal-scroll {
+    display: flex !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 10px;
+    padding: 4px 2px 12px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+.horizontal-scroll::-webkit-scrollbar { height: 5px; }
+.horizontal-scroll::-webkit-scrollbar-thumb { background: var(--ink-faint); border-radius: 10px; }
+.horizontal-scroll::-webkit-scrollbar-track { background: transparent; }
+
+.horizontal-scroll .chip {
+    flex: 0 0 auto;
+    min-width: 140px;
+    margin-bottom: 0;
+}
 
 .chip {
   padding: 0.65rem 0.9rem;
@@ -188,20 +226,14 @@ body {
   color: var(--ink-soft); margin-left: 4px;
 }
 
-/* ── Filter footer ───────────────────────────────────────────── */
-.filter-footer {
-  display: flex; flex-direction: column; gap: 12px;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--ink-faint);
-  margin-top: 0.5rem;
-}
-.filter-count-wrap { display: flex; align-items: center; }
+/* ── Filter footer / Deck Size ───────────────────────────────── */
+.filter-count-wrap { display: flex; align-items: center; border-top: 1px solid var(--ink-faint); padding-top: 1.25rem; }
 .filter-count      { font-size: 13px; color: var(--ink-soft); }
 .filter-count span { color: var(--ink); font-weight: 500; }
 
-.deck-size-row  { display: flex; gap: 8px; flex-wrap: wrap; }
+.deck-size-row  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.5rem; }
 .size-tile {
-  padding: 6px 16px;
+  padding: 8px 18px;
   border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
   background: var(--card); color: var(--ink-mid);
@@ -364,6 +396,8 @@ body {
 }
 .nav-btn:hover    { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
 .nav-btn:disabled { opacity: 0.3; cursor: default; box-shadow: none; }
+
+/* ── Summary ─────────────────────────────────────────────────── */
 .summary       { text-align: center; padding: 2.5rem 1rem; }
 .summary h2    { font-family: 'DM Serif Display', serif; font-size: 1.75rem; font-weight: 400; margin-bottom: 0.4rem; }
 .summary p     { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.75rem; }

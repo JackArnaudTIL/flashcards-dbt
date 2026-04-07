@@ -12,12 +12,10 @@
 <body>
 <div id="app">
 
-  <!-- Screen 1: Deck picker -->
   <div id="deckPicker">
     <div id="deckGrid"></div>
   </div>
 
-  <!-- Screen 2: Certification picker (only shown if certifications exist) -->
   <div id="certPicker" style="display:none">
     <div class="topbar">
       <button class="back-btn" onclick="showPicker()">← Decks</button>
@@ -27,38 +25,57 @@
     <div class="cert-grid" id="certGrid"></div>
   </div>
 
-  <!-- Screen 3: Filter picker -->
   <div id="filterPicker" style="display:none">
     <div class="topbar">
       <button class="back-btn" id="filterBackBtn" onclick="filterBack()">← Back</button>
       <span id="filterDeckTitle"></span>
     </div>
-    <div class="filter-section" id="categorySection">
-      <div class="filter-heading">Category <span class="filter-optional">optional</span></div>
-      <div class="filter-chips" id="categoryChips"></div>
+
+    <div class="fast-start-hero">
+        <h2 class="hero-count" id="heroCountDisplay">50 cards</h2>
+        <p class="hero-sub">Ready to start? Click below to begin your session.</p>
+        <button class="start-btn hero-start" id="startBtn" onclick="startFiltered()">Start Study</button>
     </div>
-    <div class="filter-section" id="groupSection">
-      <div class="filter-heading">Group <span class="filter-optional">optional</span></div>
-      <div class="filter-hint" id="groupHint">Select a category above to filter by group</div>
-      <div class="filter-chips" id="groupChips"></div>
+
+    <div class="customize-toggle" onclick="toggleCustomization()">
+        <span>Customize Session</span>
+        <svg id="customChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     </div>
-    <div class="filter-section" id="difficultySection">
-      <div class="filter-heading">Difficulty <span class="filter-optional">optional</span></div>
-      <div class="filter-chips" id="difficultyChips"></div>
-    </div>
-    <div class="filter-footer">
-      <div class="filter-count-wrap">
-        <span id="filterCount" class="filter-count"></span>
-      </div>
-      <div id="deckSizeSection" style="display:none">
-        <div class="filter-heading" style="margin-bottom:0.65rem">How many cards?</div>
-        <div class="deck-size-row" id="deckSizeRow"></div>
-      </div>
-      <button class="start-btn" id="startBtn" onclick="startFiltered()">Start</button>
+
+    <div id="customizationPanel" style="display:none">
+        <div class="filter-section" id="categorySection">
+          <div class="filter-heading">Category</div>
+          <div class="filter-scroll-wrapper">
+            <div class="filter-chips horizontal-scroll" id="categoryChips"></div>
+          </div>
+        </div>
+
+        <div class="filter-section" id="groupSection">
+          <div class="filter-heading">Group</div>
+          <div class="filter-hint" id="groupHint">Select a category above to filter by group</div>
+          <div class="filter-scroll-wrapper">
+            <div class="filter-chips horizontal-scroll" id="groupChips"></div>
+          </div>
+        </div>
+
+        <div class="filter-section" id="difficultySection">
+          <div class="filter-heading">Difficulty</div>
+          <div class="filter-scroll-wrapper">
+            <div class="filter-chips horizontal-scroll" id="difficultyChips"></div>
+          </div>
+        </div>
+
+        <div class="filter-section" id="deckSizeSection">
+            <div class="filter-heading">Session Size</div>
+            <div class="deck-size-row" id="deckSizeRow"></div>
+        </div>
+        
+        <div class="filter-count-wrap" style="margin-top: 1rem;">
+            <span id="filterCount" class="filter-count"></span>
+        </div>
     </div>
   </div>
 
-  <!-- Screen 4: Study view -->
   <div id="studyView" style="display:none">
     <div class="topbar">
       <button class="back-btn" onclick="showFilterPicker()">← Filters</button>
@@ -69,6 +86,7 @@
       <span class="progress-label" id="pLabel">0 / 0 attempted</span>
     </div>
     <div class="progress-breakdown" id="pBreakdown"></div>
+    
     <div id="cardArea">
       <div class="scene" onclick="flip()">
         <div class="card-inner" id="cardInner">
@@ -111,6 +129,7 @@
           <button class="rating-btn Hard" onclick="rate('Hard')">Hard</button>
         </div>
       </div>
+      
       <div class="controls">
         <button class="nav-btn" id="prevBtn" onclick="prev()">← Prev</button>
         <span id="cardNum"></span>

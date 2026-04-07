@@ -1,8 +1,10 @@
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
+const DECK_SIZES = [10, 20, 50, 100];
 
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
+let selectedDeckSize = 50; 
 
 // ── Global Audio Controller ──────────────────────────────────────────────
 let cardAudio = new Audio();
@@ -15,6 +17,7 @@ function stopAudio() {
 
 /**
  * Plays audio with an optional start time offset.
+ * Waits for metadata to load before seeking to ensure the timestamp is valid.
  */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
@@ -25,9 +28,10 @@ function playAudio(fileName, startTime = 0) {
   
   const seekAndPlay = () => {
     cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Playback blocked."));
+    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
   };
 
+  // Ensure metadata is loaded before trying to jump to a specific time
   if (cardAudio.readyState >= 1) {
     seekAndPlay();
   } else {
@@ -41,7 +45,7 @@ fetch('cards.json')
   .then(data => { DECKS = data.decks; buildDeckGrid(); })
   .catch(() => {
     document.getElementById('app').innerHTML =
-      '<div class="error">Could not load cards.json.</div>';
+      '<div class="error">Could not load cards.json — check folder structure.</div>';
   });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -143,10 +147,11 @@ function showPicker() {
 function selectDeck(name) {
   currentDeckName = name;
   currentCert     = null;
-  selectedCategories   = new Set();
-  selectedGroups       = new Set();
-  selectedDifficulties = new Set();
-  selectedDeckSize     = null;
+  selectedCategories.clear(); 
+  selectedGroups.clear(); 
+  selectedDifficulties.clear();
+  selectedDeckSize = 50; // Reset to Fast Start default
+
   stopAudio();
 
   const cards = DECKS[name].cards;
@@ -178,14 +183,14 @@ function selectDeck(name) {
 
 function selectCert(cert) {
   currentCert = cert;
-  selectedCategories   = new Set();
-  selectedGroups       = new Set();
-  selectedDifficulties = new Set();
-  selectedDeckSize     = null;
+  selectedCategories.clear(); 
+  selectedGroups.clear(); 
+  selectedDifficulties.clear();
+  selectedDeckSize = 50; 
   showFilterPicker();
 }
 
-// ── Screen 3: Filter picker ────────────────────────────────────────────────
+// ── Screen 3: Filter picker / Fast Start ──────────────────────────────────
 function filterBack() {
   const certs = [...new Set(DECKS[currentDeckName].cards.map(c => c.certification).filter(Boolean))];
   certs.length > 0 ? showOnly('certPicker') : showOnly('deckPicker');
@@ -194,8 +199,22 @@ function filterBack() {
 function showFilterPicker() {
   const label = currentCert ? `${currentDeckName} · ${currentCert}` : currentDeckName;
   document.getElementById('filterDeckTitle').textContent = label;
+  
+  // Ensure customization panel is closed on initial load
+  document.getElementById('customizationPanel').style.display = 'none';
+  document.getElementById('customChevron').classList.remove('rotated');
+  
   buildFilterChips();
   showOnly('filterPicker');
+}
+
+function toggleCustomization() {
+  const panel = document.getElementById('customizationPanel');
+  const chevron = document.getElementById('customChevron');
+  const isHidden = panel.style.display === 'none';
+  
+  panel.style.display = isHidden ? 'block' : 'none';
+  chevron.classList.toggle('rotated', isHidden);
 }
 
 function cardGroups(card) {
@@ -213,10 +232,6 @@ function certCards() {
   return currentCert ? all.filter(c => c.certification === currentCert) : all;
 }
 
-/**
- * Builds the filter UI. 
- * Updated: Hides the entire Group section unless a category is selected AND multiple groups exist.
- */
 function buildFilterChips() {
   const cards = certCards();
 
@@ -224,7 +239,7 @@ function buildFilterChips() {
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
-  // 2. Groups (Filter current group options based on category selection)
+  // 2. Groups
   const activeCards = selectedCategories.size > 0
     ? cards.filter(c => selectedCategories.has(c.category))
     : cards;
@@ -241,49 +256,55 @@ function buildFilterChips() {
   // 3. Difficulties
   const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
 
-  // 4. UI Elements
+  // 4. UI Visibility Logic
   const catSection   = document.getElementById('categorySection');
   const groupSection = document.getElementById('groupSection');
   const diffSection  = document.getElementById('difficultySection'); 
   const groupHint    = document.getElementById('groupHint');
   const groupChips   = document.getElementById('groupChips');
 
-  // ── Visibility Logic ──
-  
-  // Categories show if more than 1 option exists
   if (catSection) catSection.style.display = categories.length > 1 ? 'block' : 'none';
 
-  // GROUPS: Completely hidden unless a category is selected AND there are multiple groups to choose from.
   if (groupSection) {
     const categorySelected = selectedCategories.size > 0;
     const multipleGroups = groups.length > 1;
 
+    // Reveal group section ONLY if category is selected AND there's a choice of groups
     if (categorySelected && multipleGroups) {
       groupSection.style.display = 'block';
-      if (groupHint) groupHint.style.display = 'none'; // Hide the "instruction" text
-      if (groupChips) groupChips.style.display = 'grid';
+      if (groupHint) groupHint.style.display = 'none';
+      if (groupChips) groupChips.style.display = 'flex'; // Changed to flex for horizontal scroll
     } else {
-      groupSection.style.display = 'none'; // Hide everything (Title, Hint, and Chips)
+      groupSection.style.display = 'none'; 
     }
   }
 
-  // Difficulty shows if more than 1 option exists
   if (diffSection) diffSection.style.display = diffs.length > 1 ? 'block' : 'none';
 
-  // ── Rendering Chips ──
-  document.getElementById('categoryChips').innerHTML = categories.map(cat => `
-    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
-  `).join('');
+  // 5. Render Chips
+  const renderChips = (id, items, selectedSet, toggleFn, formatter = a => a) => {
+    const container = document.getElementById(id);
+    if (!container) return;
+    container.innerHTML = items.map(item => `
+      <div class="chip${selectedSet.has(item) ? ' selected' : ''}" onclick="${toggleFn}('${CSS.escape(item)}')">${formatter(item)}</div>
+    `).join('');
+  };
 
-  groupChips.innerHTML = groups.map(g => `
-    <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">
-      ${g} <span class="chip-count">${groupCounts[g] || 0}</span>
-    </div>
-  `).join('');
+  renderChips('categoryChips', categories, selectedCategories, 'toggleCategory', categoryLabel);
+  
+  if (groupChips) {
+    groupChips.innerHTML = groups.map(g => `
+      <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">
+        ${g} <span class="chip-count">${groupCounts[g] || 0}</span>
+      </div>
+    `).join('');
+  }
 
-  document.getElementById('difficultyChips').innerHTML = diffs.map(d => `
-    <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" onclick="toggleDifficulty('${d}')">${d}</div>
-  `).join('');
+  renderChips('difficultyChips', diffs, selectedDifficulties, 'toggleDifficulty', d => {
+    // Add difficulty-specific classes for colors
+    const isSelected = selectedDifficulties.has(d);
+    return `<div style="display:contents" class="diff-${d}${isSelected ? ' selected' : ''}">${d}</div>`;
+  });
 
   updateFilterCount();
 }
@@ -310,43 +331,41 @@ function filteredCards() {
   });
 }
 
-const DECK_SIZES = [10, 20, 50];
-let selectedDeckSize = null;
-
 function updateFilterCount() {
   const count  = filteredCards().length;
   const total  = certCards().length;
-  const active = selectedCategories.size + selectedGroups.size + selectedDifficulties.size;
-  const el     = document.getElementById('filterCount');
-  el.innerHTML = active > 0
-    ? `<span>${count}</span> of ${total} cards match`
-    : `All <span>${total}</span> cards`;
-
-  if (selectedDeckSize !== null && selectedDeckSize > count) selectedDeckSize = null;
-
-  const sizeSection    = document.getElementById('deckSizeSection');
-  const row            = document.getElementById('deckSizeRow');
-  const availableSizes = DECK_SIZES.filter(s => s < count);
-  row.innerHTML = '';
-
-  if (availableSizes.length > 0) {
-    sizeSection.style.display = 'block';
-    const allTile = document.createElement('div');
-    allTile.className = 'size-tile' + (selectedDeckSize === null ? ' selected' : '');
-    allTile.innerHTML = `All <span class="size-tile-sub">${count} cards</span>`;
-    allTile.onclick = () => selectSize(null);
-    row.appendChild(allTile);
-
-    availableSizes.forEach(s => {
-      const tile = document.createElement('div');
-      tile.className = 'size-tile' + (selectedDeckSize === s ? ' selected' : '');
-      tile.innerHTML = `${s} <span class="size-tile-sub">cards</span>`;
-      tile.onclick = () => selectSize(s);
-      row.appendChild(tile);
-    });
-  } else {
-    sizeSection.style.display = 'none';
+  
+  // Dynamic Hero Update
+  const activeFilters = selectedCategories.size + selectedGroups.size + selectedDifficulties.size;
+  const heroSize = (selectedDeckSize !== null && selectedDeckSize < count) ? selectedDeckSize : count;
+  
+  document.getElementById('heroCountDisplay').textContent = `${heroSize} cards`;
+  
+  const filterSummary = document.getElementById('filterCount');
+  if (filterSummary) {
+      filterSummary.innerHTML = activeFilters > 0
+        ? `<span>${count}</span> of ${total} cards match filters`
+        : `All <span>${total}</span> cards available`;
   }
+
+  // Build Size Tiles
+  const row = document.getElementById('deckSizeRow');
+  const availableSizes = DECK_SIZES.filter(s => s < count);
+  if (row) row.innerHTML = '';
+
+  if (availableSizes.length > 0 && row) {
+    const createSizeTile = (val, label) => {
+      const tile = document.createElement('div');
+      tile.className = 'size-tile' + (selectedDeckSize === val ? ' selected' : '');
+      tile.innerHTML = label;
+      tile.onclick = () => selectSize(val);
+      row.appendChild(tile);
+    };
+
+    createSizeTile(null, `All <span class="size-tile-sub">${count}</span>`);
+    availableSizes.forEach(s => createSizeTile(s, s));
+  }
+  
   document.getElementById('startBtn').disabled = count === 0;
 }
 
@@ -372,6 +391,7 @@ function startFiltered() {
 
 function render() {
   stopAudio(); 
+
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
   const card = deck[index];
