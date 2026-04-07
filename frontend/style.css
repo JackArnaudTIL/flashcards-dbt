@@ -266,16 +266,14 @@ body {
 .progress-label { font-size: 12px; font-weight: 500; color: var(--ink-mid); white-space: nowrap; }
 .progress-breakdown { font-size: 11px; color: var(--ink-soft); text-align: right; margin-top: 3px; margin-bottom: 1.1rem; min-height: 15px; }
 
-/* ── Card ────────────────────────────────────────────────────── */
+/* ── Card (UPDATED TO CSS GRID) ──────────────────────────────── */
 .scene {
   width: 100%; 
-  /* Removed fixed height to allow dynamic sizing */
   perspective: 1200px;
   cursor: pointer; margin-bottom: 0.75rem;
 }
 
 .card-inner {
-  /* Replaced absolute positioning context with Grid stacking */
   display: grid; 
   width: 100%; 
   transform-style: preserve-3d;
@@ -284,18 +282,16 @@ body {
 .card-inner.flipped { transform: rotateY(180deg); }
 
 .card-face {
-  /* Stack the front and back faces in the exact same grid cell */
   grid-area: 1 / 1;
-  min-height: 240px; /* Keeps a nice default size for shorter cards */
-  height: 100%;      /* Stretches the shorter face to match the taller one */
-  
+  min-height: 240px; 
+  height: 100%;      
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
   background: var(--card);
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
-  padding: 1.5rem 2.25rem 1rem;
+  padding: 1.25rem 2rem 1rem;
   text-align: center;
   box-shadow: var(--shadow-lg);
 }
@@ -312,36 +308,29 @@ body {
   color: var(--ink-soft); margin-bottom: 0.65rem;
 }
 
+/* NEW: Image Styles */
+.card-image {
+  max-width: 100%;
+  max-height: 160px;
+  object-fit: contain; 
+  margin-bottom: 0.85rem;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+}
+
 .card-text {
   font-family: 'DM Serif Display', serif;
   font-size: 1.25rem; color: var(--ink); line-height: 1.5;
   font-weight: 400;
-  /* Ensures super long unbroken words/URLs don't break the card width */
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
-/* Optional: Make padding and text slightly tighter on mobile screens */
 @media (max-width: 480px) {
-  .card-face { padding: 1.5rem 1.25rem 1rem; }
+  .card-face { padding: 1.25rem 1.25rem 1rem; }
   .card-text { font-size: 1.15rem; }
 }
 
-.card-face.back {
-  transform: rotateY(180deg);
-  background: var(--card-back);
-  border-color: var(--ink-faint);
-}
-.card-label {
-  font-size: 10px; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.12em;
-  color: var(--ink-soft); margin-bottom: 0.65rem;
-}
-.card-text {
-  font-family: 'DM Serif Display', serif;
-  font-size: 1.25rem; color: var(--ink); line-height: 1.5;
-  font-weight: 400;
-}
 .card-meta { display: flex; gap: 5px; margin-top: auto; padding-top: 0.65rem; flex-wrap: wrap; justify-content: center; min-height: 20px; }
 .card-meta-tag        { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; background: #f0f0ee; color: var(--ink-soft); }
 .card-meta-tag.Easy   { background: var(--green-dim); color: var(--green); }

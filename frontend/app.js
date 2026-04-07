@@ -15,10 +15,6 @@ function stopAudio() {
   cardAudio.onloadedmetadata = null;
 }
 
-/**
- * Plays audio with an optional start time offset.
- * Waits for metadata to load before seeking to ensure the timestamp is valid.
- */
 function playAudio(fileName, startTime = 0) {
   if (!fileName) return;
   stopAudio(); 
@@ -31,12 +27,20 @@ function playAudio(fileName, startTime = 0) {
     cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
   };
 
-  // Ensure metadata is loaded before trying to jump to a specific time
   if (cardAudio.readyState >= 1) {
     seekAndPlay();
   } else {
     cardAudio.onloadedmetadata = seekAndPlay;
   }
+}
+
+/**
+ * Resolves image paths for local vs cloud URLs
+ */
+function getImagePath(fileName) {
+  if (!fileName) return '';
+  const isCloud = fileName.startsWith('http');
+  return isCloud ? fileName : `./assets/images/${fileName}`;
 }
 
 // ── Data Loading ──────────────────────────────────────────────────────────
@@ -150,7 +154,7 @@ function selectDeck(name) {
   selectedCategories.clear(); 
   selectedGroups.clear(); 
   selectedDifficulties.clear();
-  selectedDeckSize = 50; // Reset to Fast Start default
+  selectedDeckSize = 50; 
 
   stopAudio();
 
@@ -273,7 +277,7 @@ function buildFilterChips() {
     if (categorySelected && multipleGroups) {
       groupSection.style.display = 'block';
       if (groupHint) groupHint.style.display = 'none';
-      if (groupChips) groupChips.style.display = 'flex'; // Changed to flex for horizontal scroll
+      if (groupChips) groupChips.style.display = 'flex'; 
     } else {
       groupSection.style.display = 'none'; 
     }
@@ -301,7 +305,6 @@ function buildFilterChips() {
   }
 
   renderChips('difficultyChips', diffs, selectedDifficulties, 'toggleDifficulty', d => {
-    // Add difficulty-specific classes for colors
     const isSelected = selectedDifficulties.has(d);
     return `<div style="display:contents" class="diff-${d}${isSelected ? ' selected' : ''}">${d}</div>`;
   });
@@ -396,8 +399,29 @@ function render() {
   flipped = false;
   const card = deck[index];
   
+  // Audio Handle
   if (card.q_sound) {
     playAudio(card.q_sound, card.q_sound_start || 0);
+  }
+
+  // Image Handle
+  const frontImg = document.getElementById('frontImage');
+  const backImg  = document.getElementById('backImage');
+
+  if (card.q_image) {
+    frontImg.src = getImagePath(card.q_image);
+    frontImg.style.display = 'block';
+  } else {
+    frontImg.style.display = 'none';
+    frontImg.src = '';
+  }
+
+  if (card.a_image) {
+    backImg.src = getImagePath(card.a_image);
+    backImg.style.display = 'block';
+  } else {
+    backImg.style.display = 'none';
+    backImg.src = '';
   }
 
   document.getElementById('frontText').textContent   = card.q;

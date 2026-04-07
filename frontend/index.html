@@ -90,16 +90,21 @@
     <div id="cardArea">
       <div class="scene" onclick="flip()">
         <div class="card-inner" id="cardInner">
+          
           <div class="card-face front">
             <div class="card-label">question</div>
+            <img id="frontImage" class="card-image" src="" alt="Question Image" style="display:none;">
             <div class="card-text" id="frontText"></div>
             <div class="card-meta" id="cardMeta"></div>
           </div>
+
           <div class="card-face back">
             <div class="card-label">answer</div>
+            <img id="backImage" class="card-image" src="" alt="Answer Image" style="display:none;">
             <div class="card-text" id="backText"></div>
             <div class="card-meta card-meta-back"></div>
           </div>
+
         </div>
       </div>
 
