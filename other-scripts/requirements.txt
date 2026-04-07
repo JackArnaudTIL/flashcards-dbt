@@ -1,0 +1,10 @@
+# /other-scripts/requirements.txt
+
+# Handles API calls to Wikipedia and image downloads
+requests==2.31.0
+
+# Securely loads your Azure credentials from the .env file
+python-dotenv==1.0.1
+
+# The official SDK for interacting with Azure Blob Storage
+azure-storage-blob==12.20.0

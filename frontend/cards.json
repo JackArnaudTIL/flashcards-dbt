@@ -1252,9 +1252,35 @@
         {"q": "Botany: Which flower's name literally means 'star' in Greek?", "a": "Aster.", "group": ["Natural World"], "difficulty": "Hard", "category": "Whimsical Wonders"}
       ]
     },
+    "Birds of the World": {
+      "section": "Biology & Nature",
+      "cards": [
+        { "q": "Name this bird", "q_image": "bald_eagle.jpg", "a": "Bald Eagle", "group": ["Raptors"], "difficulty": "Easy", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "emperor_penguin.jpg", "a": "Emperor Penguin", "group": ["Flightless Birds", "Marine Birds"], "difficulty": "Easy", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "hummingbird.jpg", "a": "The Hummingbird", "group": ["Small Birds"], "difficulty": "Easy", "category": "Trivia" },
+        { "q": "Name this bird", "q_image": "ostrich.jpg", "a": "Ostrich", "group": ["Flightless Birds"], "difficulty": "Easy", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "peregrine_falcon.jpg", "a": "Peregrine Falcon", "a_image": "peregrine_dive.jpg", "group": ["Raptors"], "difficulty": "Medium", "category": "Trivia" },
+        { "q": "Name this bird", "q_image": "toucan.jpg", "a": "Toucan", "group": ["Tropical Birds"], "difficulty": "Easy", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "albatross.jpg", "a": "The Wandering Albatross", "group": ["Marine Birds"], "difficulty": "Medium", "category": "Extremes" },
+        { "q": "Name this bird", "q_image": "kiwi.jpg", "a": "Kiwi", "group": ["Flightless Birds"], "difficulty": "Medium", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "peacock.jpg", "a": "Peacock (Indian Peafowl)", "group": ["Gamebirds"], "difficulty": "Easy", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "puffin.jpg", "a": "Atlantic Puffin", "group": ["Marine Birds"], "difficulty": "Medium", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "cassowary.jpg", "a": "Cassowary", "a_image": "cassowary_claw.jpg", "group": ["Flightless Birds"], "difficulty": "Hard", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "shoebill.jpg", "a": "Shoebill", "group": ["Wading Birds"], "difficulty": "Hard", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "snowy_owl.jpg", "a": "Snowy Owl", "group": ["Raptors"], "difficulty": "Medium", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "flamingo.jpg", "a": "Flamingo", "group": ["Wading Birds"], "difficulty": "Easy", "category": "Trivia" },
+        { "q": "Name this bird", "q_image": "hoatzin.jpg", "a": "Hoatzin", "group": ["Tropical Birds"], "difficulty": "Hard", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "lyrebird.jpg", "a": "Superb Lyrebird", "group": ["Songbirds"], "difficulty": "Hard", "category": "Trivia" },
+        { "q": "Name this bird", "q_image": "blue_footed_booby.jpg", "a": "Blue-footed Booby", "group": ["Marine Birds"], "difficulty": "Medium", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "kingfisher.jpg", "a": "Common Kingfisher", "group": ["River Birds"], "difficulty": "Medium", "category": "Identification" },
+        { "q": "Name this bird", "q_image": "kakapo.jpg", "a": "Kakapo", "group": ["Tropical Birds", "Flightless Birds"], "difficulty": "Hard", "category": "Trivia" },
+        { "q": "Name this bird", "q_image": "andean_condor.jpg", "a": "Andean Condor", "group": ["Raptors"], "difficulty": "Hard", "category": "Identification" }
+      ]
+    },
     "*In Development*":{
       "section": "Other Quizzes",
       "a_sound": "https://flashcardblob.blob.core.windows.net/flashcard-other-files/audio/mystery-file.MP3",
+      "a_image": "https://flashcardblob.blob.core.windows.net/flashcard-other-files/images/rickroll-roll.gif",
       "a_sound_start": 43,
       "cards": [
         {"q": "What is the standard professional intake status for two veteran marriage counselors entering a joint venture?", "a": "We're no strangers to love.", "group": ["Social"], "difficulty": "Hard", "category": "The Stealth Vow"},

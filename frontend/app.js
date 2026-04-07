@@ -398,31 +398,38 @@ function render() {
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
   const card = deck[index];
+  const deckConfig = DECKS[currentDeckName];
   
   // Audio Handle
-  if (card.q_sound) {
-    playAudio(card.q_sound, card.q_sound_start || 0);
+  const finalQSound = card.q_sound || deckConfig.q_sound;
+  if (finalQSound) {
+    playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
   }
 
-  // Image Handle
+  // ── Image Handle ──
   const frontImg = document.getElementById('frontImage');
   const backImg  = document.getElementById('backImage');
 
-  if (card.q_image) {
-    frontImg.src = getImagePath(card.q_image);
+  // Check the card first, fallback to the deck config
+  const finalQImage = card.q_image || deckConfig.q_image;
+  const finalAImage = card.a_image || deckConfig.a_image;
+
+  if (finalQImage) {
+    frontImg.src = getImagePath(finalQImage);
     frontImg.style.display = 'block';
   } else {
     frontImg.style.display = 'none';
     frontImg.src = '';
   }
 
-  if (card.a_image) {
-    backImg.src = getImagePath(card.a_image);
+  if (finalAImage) {
+    backImg.src = getImagePath(finalAImage);
     backImg.style.display = 'block';
   } else {
     backImg.style.display = 'none';
     backImg.src = '';
   }
+  // ──────────────────
 
   document.getElementById('frontText').textContent   = card.q;
   document.getElementById('backText').textContent    = card.a;
@@ -502,15 +509,16 @@ function flip() {
   const deckConfig = DECKS[currentDeckName];
 
   if (flipped) {
-    if (card.a_sound) {
-      playAudio(card.a_sound, card.a_sound_start || 0);
+    const finalASound = card.a_sound || deckConfig.a_sound;
+    if (finalASound) {
+      playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
     } 
-    else if (deckConfig.a_sound) {
-      playAudio(deckConfig.a_sound, deckConfig.a_sound_start || 0);
-    }
   } else {
     stopAudio();
-    if (card.q_sound) playAudio(card.q_sound, card.q_sound_start || 0);
+    const finalQSound = card.q_sound || deckConfig.q_sound;
+    if (finalQSound) {
+        playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
+    }
   }
 
   const hint = document.getElementById('hintText');
