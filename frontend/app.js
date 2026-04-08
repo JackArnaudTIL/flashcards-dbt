@@ -1,46 +1,8 @@
-const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
-const DECK_SIZES = [10, 20, 50, 100];
+// 3. Inline Code: `code` -> <code>code</code>
+  escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
 
-let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
-let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
-let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
-let selectedDeckSize = 50; 
-
-// ── Global Audio Controller ──────────────────────────────────────────────
-let cardAudio = new Audio();
-
-function stopAudio() {
-  cardAudio.pause();
-  cardAudio.currentTime = 0;
-  cardAudio.onloadedmetadata = null;
-}
-
-function playAudio(fileName, startTime = 0) {
-  if (!fileName) return;
-  stopAudio(); 
-
-  const isCloud = fileName.startsWith('http');
-  cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
-  
-  const seekAndPlay = () => {
-    cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
-  };
-
-  if (cardAudio.readyState >= 1) {
-    seekAndPlay();
-  } else {
-    cardAudio.onloadedmetadata = seekAndPlay;
-  }
-}
-
-/**
- * Resolves image paths for local vs cloud URLs
- */
-function getImagePath(fileName) {
-  if (!fileName) return '';
-  const isCloud = fileName.startsWith('http');
-  return isCloud ? fileName : `./assets/images/${fileName}`;
+  // 4. Preserve standard line breaks for non-code text
+  return escaped.replace(/\n/g, '<br>');
 }
 
 // ── Data Loading ──────────────────────────────────────────────────────────
@@ -67,7 +29,7 @@ function showOnly(id) {
 }
 
 // ── Azure API Integration ──────────────────────────────────────────────────
-const API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback';
+const API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback](https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback)';
 
 function sendFeedback(thumbType, noteText = '') {
   const card = deck[index];
@@ -431,8 +393,10 @@ function render() {
   }
   // ──────────────────
 
-  document.getElementById('frontText').textContent   = card.q;
-  document.getElementById('backText').textContent    = card.a;
+  // Format and inject content (supporting code blocks)
+  document.getElementById('frontText').innerHTML = formatContent(card.q);
+  document.getElementById('backText').innerHTML  = formatContent(card.a);
+
   document.getElementById('cardNum').textContent     = (index + 1) + ' of ' + deck.length;
   document.getElementById('prevBtn').disabled        = index === 0;
   document.getElementById('nextBtn').disabled        = index === deck.length - 1;

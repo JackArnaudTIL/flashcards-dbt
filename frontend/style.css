@@ -440,3 +440,36 @@ body {
 
 /* ── Error ───────────────────────────────────────────────────── */
 .error { text-align: center; padding: 3rem 1rem; color: var(--red); font-size: 15px; font-family: 'Atkinson Hyperlegible', sans-serif;}
+
+/* ── Code Snippets ────────────────────────────────────────── */
+code {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: var(--accent-dim);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+/* For multi-line code blocks using triple backticks */
+pre {
+  background-color: #1e1e1e; /* Dark mode for code blocks */
+  color: #d4d4d4;
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  text-align: left;
+  width: 100%;
+  overflow-x: auto;
+  margin: 10px 0;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+  font-weight: 400;
+}
