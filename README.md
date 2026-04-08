@@ -15,7 +15,8 @@ Feedback Loop: Includes a flagging system that sends feedback (via an Azure Func
 Automated Deck Compilation: A built-in Python tool scrapes Wikipedia for high-quality images based on your flashcard answers, uploads them directly to Azure Blob Storage, and rewrites your JSON database automatically.
 
 📂 Project Structure
-Plaintext
+
+```
 /FLASHCARDS-DBT
 │
 ├── /.github/workflows/          <-- CI/CD Pipelines
@@ -40,49 +41,66 @@ Plaintext
 │   └── .env                     <-- (Ignored by Git) Azure Blob credentials
 │
 └── README.md
+```
+
 🗃️ The cards.json Database
 The entire frontend is driven by frontend/cards.json. This file holds all your decks, cards, and configuration settings.
 
 Deck Structure
-Decks are organized by their title and optionally grouped into broad sections. You can also define default sounds at the deck level.
+📝 Configuring Your Data (cards.json)
+All flashcards and decks are managed inside the cards.json file. The file is structured as a single decks object, where each key represents the name of a deck.
 
-JSON
+📂 Deck-Level Properties
+These settings apply to the entire deck.
+
+  - cards (Array, Required): The list of flashcard objects that belong to this deck.
+  - section (String, Optional): Groups the deck under a specific heading on the main Deck Picker screen (e.g., "Professional Development"). Defaults to "Other" if omitted.
+  - q_image / a_image (String, Optional): Sets a default image to display on the front (q_image) or back (a_image) of every card in this deck.
+  - q_sound / a_sound (String, Optional): Sets a default audio file to play when viewing the front or flipping to the back of every card.
+  - q_sound_start / a_sound_start (Number, Optional): The timestamp (in seconds) where the default deck audio should begin playing.
+
+🃏 Card-Level Properties
+These settings are placed inside individual card objects within the cards array.
+
+Core Content
+
+  - q (String, Required): The question text shown on the front of the card. Supports standard text, inline code (`code`), and multi-line code blocks (```code```).
+  - a (String, Required): The answer text shown on the back of the card. Supports the same formatting as the question.
+
+Filtering & Meta Tags
+
+  - category (String, Optional): The primary topic of the card. Populates the top row of filter chips.
+  - group (String or Array, Optional): A sub-topic (or multiple sub-topics). Populates the second row of filter chips (only appears after a category is selected).
+  - difficulty (String, Optional): Generates colored meta-tags on the cards. Must be "Easy", "Medium", or "Hard".
+  - certification (String, Optional): If any cards in a deck include this field, the app will automatically generate an intermediate "Choose a certification" screen before the study session.
+
+Media & Interactivity
+
+  - requires_code (Boolean, Optional): Set to true to display a code-editor text area beneath the card, allowing users to draft their answer before flipping.
+  - q_image / a_image (String, Optional): A specific image for this card. Overrides the deck-level default.
+  - q_sound / a_sound (String, Optional): Specific audio for this card. Overrides the deck-level default.
+  - q_sound_start / a_sound_start (Number, Optional): The timestamp (in seconds) to start this card's specific audio.
+
+```
 {
   "decks": {
-    "Birds of the World": {
-      "section": "Biology & Nature",
-      "cards": [ ... ]
-    },
-    "Azure Developer Associate": {
-      "section": "Professional Development",
-      "a_sound": "success_chime.mp3", 
-      "cards": [ ... ]
+    "Python Basics": {
+      "section": "Programming",
+      "cards": [
+        {
+          "q": "Write a Python function to reverse a string.",
+          "a": "```python\ndef reverse_string(s):\n    return s[::-1]\n```",
+          "category": "Strings",
+          "difficulty": "Medium",
+          "requires_code": true
+        }
+      ]
     }
   }
 }
-Card Attributes
-Each card inside the cards array supports a wide variety of attributes for text, media, and filtering.
+```
 
-JSON
-{
-  "q": "Name this bird",
-  "a": "Peregrine Falcon",
-  "q_image": "peregrine_falcon.jpg",
-  "a_image": "https://mystorage.blob.core.windows.net/images/peregrine_dive.jpg",
-  "q_sound": "falcon_screech.mp3",
-  "a_sound_start": 4,
-  "category": "Identification",
-  "group": ["Raptors", "Birds of Prey"],
-  "difficulty": "Medium",
-  "certification": "Ornithology 101"
-}
-Text: q (Question) and a (Answer) are required.
-
-Media: q_image, a_image, q_sound, a_sound. (If the string starts with http, it streams from the cloud; otherwise, it looks in /frontend/assets/).
-
-Audio Control: q_sound_start / a_sound_start skips intro seconds on audio files.
-
-Filters: category, group (can be an array), difficulty (Easy/Medium/Hard), and certification.
+💡 Note on Media Files: For images and audio, you can provide either a local filename (e.g., "eagle.jpg") which the app will look for in the /assets/ folder, or a full cloud URL (e.g., "https://example.com/audio.mp3").
 
 🛠️ Developer Setup & Automation
 1. Running the Frontend Locally

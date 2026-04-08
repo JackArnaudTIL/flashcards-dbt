@@ -473,3 +473,31 @@ pre code {
   padding: 0;
   font-weight: 400;
 }
+
+/* ── Code Input Area ─────────────────────────────────────────── */
+.code-input-container {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  text-align: left;
+  display: none; /* Hide by default! */
+}
+
+.code-textarea {
+  width: 100%;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.code-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}

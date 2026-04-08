@@ -434,10 +434,26 @@ function startFiltered() {
 function render() {
   stopAudio(); 
 
-  document.getElementById('cardInner').classList.remove('flipped');
-  flipped = false;
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
+
+  // ── Code Input Handle ──
+  const codeBox = document.getElementById('userCodeInput');
+  const codeContainer = document.getElementById('codeInputContainer');
+
+  if (codeBox) codeBox.value = '';
+
+  if (codeContainer) {
+    if (card.requires_code === true) {
+      codeContainer.style.display = 'block';
+    } else {
+      codeContainer.style.display = 'none';
+    }
+  }
+  // ───────────────────────
+
+  document.getElementById('cardInner').classList.remove('flipped');
+  flipped = false;
   
   // Audio Handle
   const finalQSound = card.q_sound || deckConfig.q_sound;
@@ -445,15 +461,13 @@ function render() {
     playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
   }
 
-// ── Image Handle ──
+  // ── Image Handle ──
   const frontImg = document.getElementById('frontImage');
   const backImg  = document.getElementById('backImage');
 
-  // Clear the old images immediately so they don't linger while new ones download
   frontImg.removeAttribute('src');
   backImg.removeAttribute('src');
 
-  // Check the card first, fallback to the deck config
   const finalQImage = card.q_image || deckConfig.q_image;
   const finalAImage = card.a_image || deckConfig.a_image;
 
