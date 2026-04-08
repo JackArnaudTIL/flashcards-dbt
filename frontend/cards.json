@@ -1253,7 +1253,7 @@
       ]
     },
     "Birds of the World": {
-      "section": "Biology & Nature",
+      "section": "Other Quizzes",
       "cards": [
         { "q": "Name this bird", "q_image": "https://flashcardblob.blob.core.windows.net/flashcard-other-files/images/bald_eagle.jpg", "a": "Bald Eagle", "group": [ "Raptors" ], "difficulty": "Easy", "category": "Identification" },
         { "q": "Name this bird", "q_image": "https://flashcardblob.blob.core.windows.net/flashcard-other-files/images/emperor_penguin.jpg", "a": "Emperor Penguin", "group": [ "Flightless Birds", "Marine Birds" ], "difficulty": "Easy", "category": "Identification" },
