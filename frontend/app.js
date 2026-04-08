@@ -1,5 +1,66 @@
-// 3. Inline Code: `code` -> <code>code</code>
-  escaped = escaped.replace(/`([^`]+)`/g, '<code>$1</code>');
+const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
+const DECK_SIZES = [10, 20, 50, 100];
+
+let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
+let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
+let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
+let selectedDeckSize = 50; 
+
+// ── Global Audio Controller ──────────────────────────────────────────────
+let cardAudio = new Audio();
+
+function stopAudio() {
+  cardAudio.pause();
+  cardAudio.currentTime = 0;
+  cardAudio.onloadedmetadata = null;
+}
+
+function playAudio(fileName, startTime = 0) {
+  if (!fileName) return;
+  stopAudio(); 
+
+  const isCloud = fileName.startsWith('http');
+  cardAudio.src = isCloud ? fileName : `./assets/sounds/${fileName}`;
+  
+  const seekAndPlay = () => {
+    cardAudio.currentTime = startTime;
+    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
+  };
+
+  if (cardAudio.readyState >= 1) {
+    seekAndPlay();
+  } else {
+    cardAudio.onloadedmetadata = seekAndPlay;
+  }
+}
+
+/**
+ * Resolves image paths for local vs cloud URLs
+ */
+function getImagePath(fileName) {
+  if (!fileName) return '';
+  const isCloud = fileName.startsWith('http');
+  return isCloud ? fileName : `./assets/images/${fileName}`;
+}
+
+/**
+ * Formats text content to support Markdown-style code blocks and inline code
+ */
+function formatContent(text) {
+  if (text === null || text === undefined) return '';
+
+  // 1. Escaping HTML and forcing to String (prevents crashes if a card answer is a number)
+  let escaped = String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // 2. Multi-line Blocks: ```code``` -> <pre><code>code</code></pre>
+  // Using \` to safely escape backticks in the regex
+  escaped = escaped.replace(/\`\`\`(?:[a-z]+)?\n?([\s\S]*?)\`\`\`/g, '<pre><code>$1</code></pre>');
+
+  // 3. Inline Code: `code` -> <code>code</code>
+  escaped = escaped.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
 
   // 4. Preserve standard line breaks for non-code text
   return escaped.replace(/\n/g, '<br>');
@@ -7,11 +68,27 @@
 
 // ── Data Loading ──────────────────────────────────────────────────────────
 fetch('cards.json')
-  .then(r => { if (!r.ok) throw new Error(); return r.json(); })
-  .then(data => { DECKS = data.decks; buildDeckGrid(); })
-  .catch(() => {
-    document.getElementById('app').innerHTML =
-      '<div class="error">Could not load cards.json — check folder structure.</div>';
+  .then(r => { 
+    if (!r.ok) throw new Error("Could not fetch cards.json file."); 
+    return r.json(); 
+  })
+  .then(data => { 
+    if (!data || !data.decks) throw new Error("cards.json is missing the 'decks' object.");
+    DECKS = data.decks; 
+    buildDeckGrid(); 
+  })
+  .catch((err) => {
+    console.error("Initialization Error:", err);
+    const container = document.getElementById('app') || document.body;
+    container.innerHTML = `
+      <div class="error" style="text-align: center; margin-top: 3rem; color: var(--red, #dc2626);">
+        <h2 style="margin-bottom: 1rem;">⚠️ Application Error</h2>
+        <p>${err.message}</p>
+        <p style="font-size: 14px; margin-top: 15px; color: var(--ink-mid, #4a4a4a);">
+          If you just ran the Python script, your <b>cards.json</b> might have a syntax error.<br>
+          Press <b>F12</b> to open the Developer Console for exact details, or validate your JSON online.
+        </p>
+      </div>`;
   });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -29,7 +106,7 @@ function showOnly(id) {
 }
 
 // ── Azure API Integration ──────────────────────────────────────────────────
-const API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback](https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback)';
+const API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback';
 
 function sendFeedback(thumbType, noteText = '') {
   const card = deck[index];
@@ -393,7 +470,7 @@ function render() {
   }
   // ──────────────────
 
-  // Format and inject content (supporting code blocks)
+  // Format and inject content (supporting Markdown code blocks)
   document.getElementById('frontText').innerHTML = formatContent(card.q);
   document.getElementById('backText').innerHTML  = formatContent(card.a);
 

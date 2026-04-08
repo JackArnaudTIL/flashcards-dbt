@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -26,7 +26,7 @@
 }
 
 body {
-  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg);
   background-image:
     radial-gradient(circle at 20% 20%, rgba(255,255,255,0.18) 0%, transparent 50%),
@@ -50,12 +50,12 @@ body {
 
 /* ── Typography ──────────────────────────────────────────────── */
 .serif, .card-text, .hero-count, .screen-heading, .summary h2, .stat-n { 
-  font-family: 'Lora', serif; 
+  font-family: 'Merriweather', serif; 
 }
 
 .label {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600; /* Inter relies on 500/600 for boldness */
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -64,7 +64,7 @@ body {
 /* ── Deck picker ─────────────────────────────────────────────── */
 .deck-section-heading {
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--ink-soft);
@@ -97,13 +97,13 @@ body {
   transform: translateY(-2px);
   border-color: var(--ink-faint);
 }
-.deck-tile-name  { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
-.deck-tile-count { font-size: 13px; color: var(--ink-soft); }
+.deck-tile-name  { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+.deck-tile-count { font-size: 12px; color: var(--ink-soft); }
 
 /* ── Certification picker ────────────────────────────────────── */
 .screen-heading {
   font-size: 1.5rem;
-  font-weight: 500; /* Lora looks great slightly bolder */
+  font-weight: 400;
   color: var(--ink);
   margin-bottom: 1.25rem;
 }
@@ -125,20 +125,20 @@ body {
   box-shadow: var(--shadow-sm);
 }
 .cert-tile:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
-.cert-tile-name  { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
-.cert-tile-count { font-size: 13px; color: var(--ink-soft); }
+.cert-tile-name  { font-size: 14px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+.cert-tile-count { font-size: 12px; color: var(--ink-soft); }
 
 /* ── Topbar ──────────────────────────────────────────────────── */
 .topbar {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 1.75rem;
 }
-.topbar span { font-size: 14px; font-weight: 700; color: var(--ink-mid); }
+.topbar span { font-size: 13px; font-weight: 600; color: var(--ink-mid); }
 
 .back-btn {
   display: inline-flex; align-items: center; gap: 5px;
   font-family: inherit;
-  font-size: 14px; font-weight: 700;
+  font-size: 13px; font-weight: 500;
   padding: 6px 14px;
   border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
@@ -158,14 +158,14 @@ body {
     margin-bottom: 1.5rem;
     box-shadow: var(--shadow-sm);
 }
-.hero-count { font-size: 2.25rem; color: var(--ink); margin-bottom: 0.5rem; font-weight: 500; }
-.hero-sub { font-size: 15px; color: var(--ink-soft); margin-bottom: 1.5rem; font-family: 'Atkinson Hyperlegible', sans-serif;}
-.hero-start { align-self: center !important; width: 100%; max-width: 240px; padding: 14px; font-size: 16px; font-weight: 700; }
+.hero-count { font-size: 2.15rem; color: var(--ink); margin-bottom: 0.5rem; }
+.hero-sub { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.5rem; font-family: 'Inter', sans-serif;}
+.hero-start { align-self: center !important; width: 100%; max-width: 240px; padding: 14px; font-size: 15px; font-weight: 600; }
 
 .customize-toggle {
     display: flex; align-items: center; justify-content: space-between;
     padding: 1.15rem; cursor: pointer; border: 1px solid var(--ink-faint);
-    border-radius: var(--radius-md); font-size: 15px; font-weight: 700;
+    border-radius: var(--radius-md); font-size: 14px; font-weight: 500;
     background: var(--card); transition: all 0.2s; margin-bottom: 1.5rem;
 }
 .customize-toggle:hover { border-color: var(--ink-soft); background: var(--card-back); }
@@ -175,13 +175,13 @@ body {
 /* ── Filter picker ───────────────────────────────────────────── */
 .filter-section  { margin-bottom: 1.75rem; }
 .filter-heading  {
-  font-size: 11px; font-weight: 700;
+  font-size: 11px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.1em;
   color: var(--ink-soft); margin-bottom: 0.65rem;
   display: flex; align-items: center; gap: 8px;
 }
 .filter-hint {
-  font-size: 13px; color: var(--ink-faint);
+  font-size: 12px; color: var(--ink-faint);
   font-style: italic; padding: 0.5rem 0;
 }
 
@@ -211,7 +211,7 @@ body {
   border: 1px solid var(--ink-faint);
   border-radius: var(--radius-md);
   background: var(--card); color: var(--ink-mid);
-  font-family: inherit; font-size: 14px;
+  font-family: inherit; font-size: 13px;
   cursor: pointer; transition: all 0.15s; user-select: none;
   text-align: left; line-height: 1.35;
   box-shadow: var(--shadow-sm);
@@ -229,8 +229,8 @@ body {
 
 /* ── Filter footer / Deck Size ───────────────────────────────── */
 .filter-count-wrap { display: flex; align-items: center; border-top: 1px solid var(--ink-faint); padding-top: 1.25rem; }
-.filter-count      { font-size: 14px; color: var(--ink-soft); }
-.filter-count span { color: var(--ink); font-weight: 700; }
+.filter-count      { font-size: 13px; color: var(--ink-soft); }
+.filter-count span { color: var(--ink); font-weight: 600; }
 
 .deck-size-row  { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.5rem; }
 .size-tile {
@@ -238,21 +238,21 @@ body {
   border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
   background: var(--card); color: var(--ink-mid);
-  font-family: inherit; font-size: 14px; font-weight: 700;
+  font-family: inherit; font-size: 13px; font-weight: 500;
   cursor: pointer; transition: all 0.15s; user-select: none;
   box-shadow: var(--shadow-sm);
 }
 .size-tile:hover   { border-color: var(--ink-soft); color: var(--ink); }
 .size-tile.selected { background: var(--ink); border-color: var(--ink); color: #fff; box-shadow: var(--shadow-md); }
 .size-tile.selected .size-tile-sub { color: rgba(255,255,255,0.6); }
-.size-tile-sub { font-size: 12px; font-weight: 400; color: var(--ink-soft); margin-left: 3px; }
+.size-tile-sub { font-size: 11px; font-weight: 400; color: var(--ink-soft); margin-left: 3px; }
 
 .start-btn {
   align-self: flex-end;
   padding: 10px 32px;
   border: none; border-radius: var(--radius-xl);
   background: var(--accent); color: #fff;
-  font-family: inherit; font-size: 15px; font-weight: 700;
+  font-family: inherit; font-size: 14px; font-weight: 600;
   cursor: pointer; transition: opacity 0.15s, transform 0.15s;
   box-shadow: 0 2px 12px rgba(37,99,235,0.3);
   letter-spacing: 0.01em;
@@ -264,8 +264,8 @@ body {
 .progress-wrap  { display: flex; align-items: center; gap: 12px; margin-bottom: 0.4rem; }
 .progress-bar   { flex: 1; height: 5px; background: var(--ink-faint); border-radius: 99px; overflow: hidden; }
 .progress-fill  { height: 100%; background: var(--accent); border-radius: 99px; transition: width 0.4s cubic-bezier(.4,0,.2,1); }
-.progress-label { font-size: 13px; font-weight: 700; color: var(--ink-mid); white-space: nowrap; }
-.progress-breakdown { font-size: 12px; color: var(--ink-soft); text-align: right; margin-top: 3px; margin-bottom: 1.1rem; min-height: 15px; }
+.progress-label { font-size: 12px; font-weight: 600; color: var(--ink-mid); white-space: nowrap; }
+.progress-breakdown { font-size: 11px; color: var(--ink-soft); text-align: right; margin-top: 3px; margin-bottom: 1.1rem; min-height: 15px; }
 
 /* ── Card ────────────────────────────────────────────────────── */
 .scene {
@@ -304,10 +304,10 @@ body {
 }
 
 .card-label {
-  font-size: 11px; font-weight: 700;
+  font-size: 10px; font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.12em;
   color: var(--ink-soft); margin-bottom: 0.65rem;
-  font-family: 'Atkinson Hyperlegible', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 .card-image {
@@ -320,20 +320,20 @@ body {
 }
 
 .card-text {
-  font-size: 1.25rem; color: var(--ink); 
+  font-size: 1.2rem; color: var(--ink); 
   line-height: 1.6; 
-  font-weight: 400; /* Lora is beautifully legible at 400 */
+  font-weight: 400; /* Merriweather handles 400 weight beautifully */
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
 
 @media (max-width: 480px) {
   .card-face { padding: 1.25rem 1.25rem 1rem; }
-  .card-text { font-size: 1.15rem; }
+  .card-text { font-size: 1.1rem; }
 }
 
-.card-meta { display: flex; gap: 5px; margin-top: auto; padding-top: 0.65rem; flex-wrap: wrap; justify-content: center; min-height: 20px; font-family: 'Atkinson Hyperlegible', sans-serif; }
-.card-meta-tag        { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: #f0f0ee; color: var(--ink-soft); }
+.card-meta { display: flex; gap: 5px; margin-top: auto; padding-top: 0.65rem; flex-wrap: wrap; justify-content: center; min-height: 20px; font-family: 'Inter', sans-serif;}
+.card-meta-tag        { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px; background: #f0f0ee; color: var(--ink-soft); }
 .card-meta-tag.Easy   { background: var(--green-dim); color: var(--green); }
 .card-meta-tag.Medium { background: var(--amber-dim); color: var(--amber); }
 .card-meta-tag.Hard   { background: var(--red-dim);   color: var(--red); }
@@ -358,18 +358,18 @@ body {
   background: var(--card); padding: 1rem; margin-bottom: 0.75rem;
   box-shadow: var(--shadow-sm);
 }
-.flag-label    { font-size: 14px; color: var(--ink-mid); display: block; margin-bottom: 8px; }
+.flag-label    { font-size: 13px; color: var(--ink-mid); display: block; margin-bottom: 8px; }
 .flag-textarea {
-  width: 100%; font-size: 14px; font-family: inherit;
+  width: 100%; font-size: 13px; font-family: inherit;
   border: 1px solid var(--ink-faint); border-radius: var(--radius-sm);
   padding: 8px 10px; resize: vertical; color: var(--ink);
   background: var(--surface); outline: none; transition: border-color 0.15s;
 }
 .flag-textarea:focus { border-color: var(--ink-soft); }
 .flag-actions  { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; }
-.flag-cancel   { font-family: inherit; font-size: 14px; padding: 6px 14px; border: 1px solid var(--ink-faint); border-radius: var(--radius-xl); background: var(--card); color: var(--ink-soft); cursor: pointer; transition: all 0.15s; }
+.flag-cancel   { font-family: inherit; font-size: 13px; padding: 6px 14px; border: 1px solid var(--ink-faint); border-radius: var(--radius-xl); background: var(--card); color: var(--ink-soft); cursor: pointer; transition: all 0.15s; }
 .flag-cancel:hover { border-color: var(--ink-soft); color: var(--ink); }
-.flag-submit   { font-family: inherit; font-size: 14px; padding: 6px 14px; border: 1px solid var(--red); border-radius: var(--radius-xl); background: var(--card); color: var(--red); cursor: pointer; transition: background 0.15s; }
+.flag-submit   { font-family: inherit; font-size: 13px; padding: 6px 14px; border: 1px solid var(--red); border-radius: var(--radius-xl); background: var(--card); color: var(--red); cursor: pointer; transition: background 0.15s; }
 .flag-submit:hover { background: var(--red-dim); }
 
 /* ── Response block ──────────────────────────────────────────── */
@@ -382,11 +382,11 @@ body {
   text-align: center;
 }
 .hint {
-  font-size: 13px; color: var(--ink-soft);
+  font-size: 12px; color: var(--ink-soft);
   margin-bottom: 0; letter-spacing: 0.01em;
 }
 .hint.answered {
-  font-size: 13px; font-weight: 700;
+  font-size: 12px; font-weight: 600;
   color: var(--ink-mid); margin-bottom: 0.75rem;
   letter-spacing: 0.01em;
 }
@@ -395,7 +395,7 @@ body {
   flex: 1; padding: 9px 0;
   border: 1px solid var(--ink-faint); border-radius: var(--radius-md);
   background: var(--card); color: var(--ink-soft);
-  font-family: inherit; font-size: 14px; font-weight: 700;
+  font-family: inherit; font-size: 13px; font-weight: 500;
   cursor: pointer; transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
@@ -409,14 +409,14 @@ body {
 
 /* ── Nav controls ────────────────────────────────────────────── */
 .controls { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.controls span { font-size: 14px; font-weight: 700; color: var(--ink-soft); }
+.controls span { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
 
 .nav-btn {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 8px 18px;
   border: 1px solid var(--ink-faint); border-radius: var(--radius-xl);
   background: var(--card); color: var(--ink-mid);
-  font-family: inherit; font-size: 14px; font-weight: 700;
+  font-family: inherit; font-size: 13px; font-weight: 600;
   cursor: pointer; transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
@@ -425,21 +425,21 @@ body {
 
 /* ── Summary ─────────────────────────────────────────────────── */
 .summary       { text-align: center; padding: 2.5rem 1rem; }
-.summary h2    { font-size: 1.75rem; font-weight: 500; margin-bottom: 0.4rem; }
-.summary p     { font-size: 15px; color: var(--ink-soft); margin-bottom: 1.75rem; font-family: 'Atkinson Hyperlegible', sans-serif;}
+.summary h2    { font-size: 1.75rem; font-weight: 400; margin-bottom: 0.4rem; }
+.summary p     { font-size: 14px; color: var(--ink-soft); margin-bottom: 1.75rem; font-family: 'Inter', sans-serif;}
 .stat-grid     { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.75rem; }
 .stat          { background: var(--card); border: 1px solid var(--ink-faint); border-radius: var(--radius-md); padding: 1rem 0.75rem; text-align: center; box-shadow: var(--shadow-sm); }
-.stat-n        { font-size: 2rem; font-weight: 500; color: var(--ink); }
-.stat-l        { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin-top: 4px; font-family: 'Atkinson Hyperlegible', sans-serif;}
-.flag-summary-label { font-size: 14px; color: var(--red); margin-bottom: 0.75rem; font-family: 'Atkinson Hyperlegible', sans-serif;}
-.export-btn    { display: inline-block; margin-bottom: 1.25rem; padding: 9px 22px; border: 1px solid var(--red); border-radius: var(--radius-xl); background: var(--card); color: var(--red); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+.stat-n        { font-size: 2rem; font-weight: 400; color: var(--ink); }
+.stat-l        { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); margin-top: 4px; font-family: 'Inter', sans-serif;}
+.flag-summary-label { font-size: 13px; color: var(--red); margin-bottom: 0.75rem; font-family: 'Inter', sans-serif;}
+.export-btn    { display: inline-block; margin-bottom: 1.25rem; padding: 9px 22px; border: 1px solid var(--red); border-radius: var(--radius-xl); background: var(--card); color: var(--red); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
 .export-btn:hover { background: var(--red-dim); }
 .summary-actions { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
-.restart-btn   { padding: 9px 22px; border: 1px solid var(--ink-faint); border-radius: var(--radius-xl); background: var(--card); color: var(--ink-mid); font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm); }
+.restart-btn   { padding: 9px 22px; border: 1px solid var(--ink-faint); border-radius: var(--radius-xl); background: var(--card); color: var(--ink-mid); font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; box-shadow: var(--shadow-sm); }
 .restart-btn:hover { border-color: var(--ink-soft); color: var(--ink); box-shadow: var(--shadow-md); }
 
 /* ── Error ───────────────────────────────────────────────────── */
-.error { text-align: center; padding: 3rem 1rem; color: var(--red); font-size: 15px; font-family: 'Atkinson Hyperlegible', sans-serif;}
+.error { text-align: center; padding: 3rem 1rem; color: var(--red); font-size: 14px; font-family: 'Inter', sans-serif;}
 
 /* ── Code Snippets ────────────────────────────────────────── */
 code {
