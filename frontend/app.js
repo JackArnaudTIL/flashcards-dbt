@@ -56,7 +56,6 @@ function formatContent(text) {
     .replace(/>/g, "&gt;");
 
   // 2. Multi-line Blocks: ```code``` -> <pre><code>code</code></pre>
-  // Using \` to safely escape backticks in the regex
   escaped = escaped.replace(/\`\`\`(?:[a-z]+)?\n?([\s\S]*?)\`\`\`/g, '<pre><code>$1</code></pre>');
 
   // 3. Inline Code: `code` -> <code>code</code>
@@ -440,8 +439,15 @@ function render() {
   // ── Code Input Handle ──
   const codeBox = document.getElementById('userCodeInput');
   const codeContainer = document.getElementById('codeInputContainer');
+  const compareBtn = document.getElementById('compareBtn');
 
-  if (codeBox) codeBox.value = '';
+  if (codeBox) {
+    codeBox.value = '';
+    codeBox.disabled = false;
+  }
+  if (compareBtn) {
+    compareBtn.style.display = 'inline-block';
+  }
 
   if (codeContainer) {
     if (card.requires_code === true) {
@@ -465,6 +471,7 @@ function render() {
   const frontImg = document.getElementById('frontImage');
   const backImg  = document.getElementById('backImage');
 
+  // Clear the old images immediately so they don't linger while new ones download
   frontImg.removeAttribute('src');
   backImg.removeAttribute('src');
 
@@ -558,12 +565,28 @@ function submitFlag() {
   sendFeedback('down', noteText);
 }
 
+function submitCode() {
+  if (!flipped) {
+    flip();
+  }
+}
+
 function flip() {
   flipped = !flipped;
   document.getElementById('cardInner').classList.toggle('flipped', flipped);
   
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
+  const codeBox = document.getElementById('userCodeInput');
+  const compareBtn = document.getElementById('compareBtn');
+  
+  // Lock drafting area and hide submit button when flipped
+  if (codeBox && card.requires_code) {
+    codeBox.disabled = flipped;
+  }
+  if (compareBtn && card.requires_code) {
+    compareBtn.style.display = flipped ? 'none' : 'inline-block';
+  }
 
   if (flipped) {
     const finalASound = card.a_sound || deckConfig.a_sound;
@@ -629,6 +652,16 @@ function restart() { startFiltered(); }
 document.addEventListener('keydown', e => {
   const studyView = document.getElementById('studyView');
   if (!studyView || studyView.style.display === 'none') return;
+
+  // Allow Cmd+Enter or Ctrl+Enter to submit code from the textarea
+  if (e.target.tagName === 'TEXTAREA' && e.target.id === 'userCodeInput') {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      submitCode();
+      return;
+    }
+  }
+
   if (e.target.tagName === 'TEXTAREA') return;
   if (e.code === 'Space')      { e.preventDefault(); flip(); }
   if (e.code === 'ArrowRight') next();

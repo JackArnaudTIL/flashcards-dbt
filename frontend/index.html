@@ -108,6 +108,13 @@
         </div>
       </div>
 
+      <!-- Code Input Area -->
+      <div class="code-input-container" id="codeInputContainer">
+        <label class="label" for="userCodeInput">Draft your answer:</label>
+        <textarea id="userCodeInput" class="code-textarea" placeholder="Type your code or answer here before flipping..." rows="4"></textarea>
+        <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
+      </div>
+
       <div class="card-actions">
         <button class="thumb-btn" id="thumbUp"   onclick="thumb('up')"   title="Good card">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
