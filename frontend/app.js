@@ -445,9 +445,13 @@ function render() {
     playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
   }
 
-  // ── Image Handle ──
+// ── Image Handle ──
   const frontImg = document.getElementById('frontImage');
   const backImg  = document.getElementById('backImage');
+
+  // Clear the old images immediately so they don't linger while new ones download
+  frontImg.removeAttribute('src');
+  backImg.removeAttribute('src');
 
   // Check the card first, fallback to the deck config
   const finalQImage = card.q_image || deckConfig.q_image;
@@ -458,7 +462,6 @@ function render() {
     frontImg.style.display = 'block';
   } else {
     frontImg.style.display = 'none';
-    frontImg.src = '';
   }
 
   if (finalAImage) {
@@ -466,7 +469,6 @@ function render() {
     backImg.style.display = 'block';
   } else {
     backImg.style.display = 'none';
-    backImg.src = '';
   }
   // ──────────────────
 
