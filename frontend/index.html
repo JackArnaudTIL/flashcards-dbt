@@ -4,15 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Flashcards</title>
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   
-  <!-- Highlight.js (VS Code Dark Theme for answers) -->
+  <!-- Highlight.js (VS Code Dark Theme for markdown code blocks) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
 
-  <!-- CodeMirror (IDE Editor for input) -->
+  <!-- JSDiff (Code Comparison Engine) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js"></script>
+
+  <!-- CodeMirror (IDE Engine for the user input) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
@@ -121,19 +125,23 @@
         </div>
       </div>
 
-      <!-- IDE Code Drafting Area (Styled like Canvas blocks) -->
+      <!-- IDE Code Drafting Area with Diff engine UI -->
       <div class="code-input-container" id="codeInputContainer">
         <label class="label" for="userCodeInput" style="margin-bottom: 6px; display: block;">Draft your answer:</label>
+        
         <div class="gemini-code-wrapper drafting-wrapper">
           <div class="gemini-code-header">
             <span class="gemini-code-lang" id="draftingLangLabel">text</span>
           </div>
           <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
         </div>
+        
         <div class="code-actions-row">
           <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
           <span id="comparisonResult" class="comparison-result" style="display:none;"></span>
         </div>
+        
+        <div id="diffContainer" class="diff-container" style="display:none;"></div>
       </div>
 
       <div class="card-actions">

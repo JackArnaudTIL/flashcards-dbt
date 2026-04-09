@@ -276,7 +276,6 @@ function selectDeck(name) {
   grid.innerHTML = '';
 
   certs.forEach(cert => {
-    const count = cards.filter(c => c.certification === cert).length;
     const tile  = document.createElement('div');
     tile.className = 'cert-tile';
     tile.innerHTML = `<div class="cert-tile-name">${cert}</div>`;
@@ -407,10 +406,11 @@ function render() {
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
 
-  // ── Code IDE Handle ──
+  // ── Code IDE & Diff Handle ──
   const codeContainer = document.getElementById('codeInputContainer');
   const compareBtn = document.getElementById('compareBtn');
   const resultEl = document.getElementById('comparisonResult');
+  const diffContainer = document.getElementById('diffContainer');
   
   if (codeEditor) { 
     codeEditor.setValue(''); 
@@ -436,6 +436,11 @@ function render() {
   if (resultEl) {
     resultEl.style.display = 'none';
     resultEl.className = 'comparison-result';
+  }
+
+  if (diffContainer) {
+    diffContainer.style.display = 'none';
+    diffContainer.innerHTML = '';
   }
 
   if (codeContainer) { 
@@ -525,9 +530,9 @@ function flip() {
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
   
-  const codeBox = document.getElementById('userCodeInput');
   const compareBtn = document.getElementById('compareBtn');
   const resultEl = document.getElementById('comparisonResult');
+  const diffContainer = document.getElementById('diffContainer');
   
   if (card.requires_code) {
     if (codeEditor) {
@@ -538,28 +543,54 @@ function flip() {
       compareBtn.style.display = flipped ? 'none' : 'inline-block';
     }
 
-    // Code comparison logic
+    // ── Code Comparison Logic ──
     if (flipped && resultEl) {
-      const userCode = codeEditor ? codeEditor.getValue() : codeBox.value;
+      const userCode = codeEditor ? codeEditor.getValue() : document.getElementById('userCodeInput').value;
       
-      // Extract code from markdown wrapper
+      // Extract code from markdown wrapper in the answer
       const expectedMatch = card.a.match(/```[a-z0-9]*\n([\s\S]*?)```/i);
       const expectedCode = expectedMatch ? expectedMatch[1] : card.a;
       
-      // Normalize to handle formatting/spacing differences safely
+      // Normalize line endings and trim padding for comparison
       const normUser = userCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
       const normExpected = expectedCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
       
       if (normUser === normExpected) {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
         resultEl.className = 'comparison-result match';
+        if (diffContainer) diffContainer.style.display = 'none';
       } else {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
         resultEl.className = 'comparison-result mismatch';
+        
+        // Generate Visual Diff
+        if (diffContainer && window.Diff) {
+          const diff = Diff.diffWordsWithSpace(normUser, normExpected);
+          let diffHtml = '';
+          diff.forEach(part => {
+            const safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            if (part.added) {
+              diffHtml += `<span class="diff-added">${safeValue}</span>`;
+            } else if (part.removed) {
+              diffHtml += `<span class="diff-removed">${safeValue}</span>`;
+            } else {
+              diffHtml += `<span class="diff-unchanged">${safeValue}</span>`;
+            }
+          });
+          
+          diffContainer.innerHTML = `
+            <div style="font-size:11px; margin-bottom:8px; color:var(--ink-soft); font-weight:600; letter-spacing:0.05em;">
+              VISUAL DIFF: <span class="diff-removed" style="padding:2px 4px; border-radius:2px; margin:0 4px;">Your Code</span> vs <span class="diff-added" style="padding:2px 4px; border-radius:2px; margin-left:4px;">Expected</span>
+            </div>
+            <pre><code>${diffHtml}</code></pre>
+          `;
+          diffContainer.style.display = 'block';
+        }
       }
       resultEl.style.display = 'inline-flex';
-    } else if (resultEl) {
-      resultEl.style.display = 'none';
+    } else {
+      if (resultEl) resultEl.style.display = 'none';
+      if (diffContainer) diffContainer.style.display = 'none';
     }
   }
 
@@ -705,14 +736,14 @@ document.addEventListener('keydown', e => {
   const studyView = document.getElementById('studyView');
   if (!studyView || studyView.style.display === 'none') return;
   
-  // Allow Cmd+Enter or Ctrl+Enter to submit code from the textarea
+  // Allow Cmd+Enter or Ctrl+Enter to submit code from the CodeMirror wrapper
   if (e.target.tagName === 'TEXTAREA' || e.target.closest('.CodeMirror')) {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
       submitCode();
       return;
     }
-    return; // Don't flip with space while typing
+    return; // Don't flip with space while typing in an input!
   }
   
   if (e.code === 'Space') { 
