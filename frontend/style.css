@@ -69,7 +69,7 @@ body {
   color: var(--ink-soft);
 }
 
-/* ── CodeMirror IDE & Highlight.js ────────────────────────────── */
+/* ── Gemini Canvas Style Code Blocks ───────────────────────── */
 code {
   font-family: 'Consolas', 'Fira Code', 'Monaco', 'Courier New', Courier, monospace;
   background-color: var(--accent-dim);
@@ -80,45 +80,91 @@ code {
   font-weight: 600;
 }
 
-/* Highlight.js styling for answers */
-pre {
-  background-color: #1e1e1e; /* VS Code Dark background */
-  color: #d4d4d4;
-  padding: 1.25rem; 
-  border-radius: var(--radius-md); 
-  text-align: left;
-  width: 100%; 
-  overflow-x: auto; 
+.gemini-code-wrapper {
+  background-color: #1e1e1e;
+  border-radius: var(--radius-md);
+  overflow: hidden;
   margin: 12px 0;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #333;
+}
+
+.gemini-code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #2d2d2d;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1e1e1e;
+  color: #a3a3a3;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.gemini-code-lang {
+  text-transform: lowercase;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.gemini-code-copy {
+  background: none;
+  border: none;
+  color: #a3a3a3;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+  transition: color 0.2s;
+}
+
+.gemini-code-copy:hover {
+  color: #fff;
+}
+
+/* Overriding default pre styles because wrapper handles the box */
+.gemini-code-wrapper pre {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background-color: transparent;
+  padding: 1.25rem;
+  text-align: left;
+  width: 100%;
+  overflow-x: auto;
   font-family: 'Consolas', 'Fira Code', 'Monaco', 'Courier New', Courier, monospace;
-  font-size: 0.85rem; 
-  line-height: 1.5; 
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+  font-size: 0.85rem;
+  line-height: 1.5;
 }
 
-pre code { 
-  background: transparent; 
-  color: inherit; 
-  padding: 0; 
-  font-weight: 400; 
+pre code {
+  background-color: transparent;
+  color: #d4d4d4; /* Base text color for code blocks */
+  padding: 0;
+  font-weight: 400;
 }
 
-/* CodeMirror overrides for drafting area */
-.code-input-container { 
-  width: 100%; 
-  margin-bottom: 1rem; 
-  text-align: left; 
-  display: none; 
+/* ── Code Drafting Area ──────────────────────────────────────── */
+.code-input-container {
+  width: 100%;
+  margin-bottom: 1rem;
+  text-align: left;
+  display: none; /* Hide by default! */
 }
 
-.CodeMirror {
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--ink-faint);
+/* Blend the CodeMirror IDE seamlessly into the Gemini wrapper */
+.drafting-wrapper .CodeMirror {
+  border: none;
+  border-radius: 0;
+  margin-top: 0;
+  box-shadow: none;
+  background-color: #1e1e1e; 
   font-family: 'Consolas', 'Fira Code', 'Monaco', 'Courier New', Courier, monospace;
   font-size: 13px;
   height: auto;
   min-height: 120px;
-  margin-top: 8px;
   transition: opacity 0.2s;
 }
 
@@ -126,44 +172,47 @@ pre code {
   min-height: 120px; 
 }
 
-.CodeMirror-focused { 
-  border-color: var(--accent); 
-  box-shadow: 0 0 0 3px var(--accent-dim); 
+/* Add a subtle highlight to the wrapper when drafting */
+.drafting-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
 .CodeMirror.cm-s-dracula.CodeMirror-nocursor { 
-  opacity: 0.7; 
+  opacity: 0.6; 
 }
 
 .compare-btn {
-  margin-top: 10px; 
-  padding: 10px 22px; 
-  border: none; 
+  margin-top: 10px;
+  padding: 10px 22px;
+  border: none;
   border-radius: var(--radius-xl);
-  background: var(--ink); 
-  color: #fff; 
-  font-size: 13px; 
+  background: var(--ink);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 600;
-  cursor: pointer; 
-  transition: all 0.15s; 
+  cursor: pointer;
+  transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
 
-.compare-btn:hover { 
-  background: var(--ink-mid); 
-  transform: translateY(-1px); 
+.compare-btn:hover {
+  background: var(--ink-mid);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* ── Deck picker ─────────────────────────────────────────────── */
 .deck-section-heading {
-  font-size: 11px; 
-  font-weight: 600; 
-  text-transform: uppercase; 
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--ink-soft); 
-  margin-bottom: 0.75rem; 
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
   margin-top: 2.25rem;
-  padding-bottom: 0.5rem; 
+  padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--ink-faint);
 }
 
@@ -171,28 +220,28 @@ pre code {
   margin-top: 0; 
 }
 
-.deck-grid-row { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); 
-  gap: 10px; 
-  margin-bottom: 0.25rem; 
+.deck-grid-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+  gap: 10px;
+  margin-bottom: 0.25rem;
 }
 
 .deck-tile {
-  background: var(--card); 
-  border: 1px solid var(--ink-faint); 
+  background: var(--card);
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-lg);
-  padding: 1.25rem 1.1rem 1rem; 
-  cursor: pointer; 
+  padding: 1.25rem 1.1rem 1rem;
+  cursor: pointer;
   transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
-  text-align: left; 
+  text-align: left;
   box-shadow: var(--shadow-sm);
 }
 
-.deck-tile:hover { 
-  box-shadow: var(--shadow-md); 
-  transform: translateY(-2px); 
-  border-color: var(--ink-faint); 
+.deck-tile:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--ink-faint);
 }
 
 .deck-tile-name { 
@@ -209,27 +258,27 @@ pre code {
 }
 
 /* ── Certification picker ────────────────────────────────────── */
-.screen-heading { 
-  font-size: 1.5rem; 
-  font-weight: 400; 
-  color: var(--ink); 
-  margin-bottom: 1.25rem; 
+.screen-heading {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 1.25rem;
 }
 
-.cert-grid { 
-  display: grid; 
-  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); 
-  gap: 10px; 
+.cert-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+  gap: 10px;
 }
 
 .cert-tile {
-  background: var(--card); 
-  border: 1px solid var(--ink-faint); 
+  background: var(--card);
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-lg);
-  padding: 1.25rem 1.1rem 1rem; 
-  cursor: pointer; 
+  padding: 1.25rem 1.1rem 1rem;
+  cursor: pointer;
   transition: box-shadow 0.2s, transform 0.15s;
-  text-align: left; 
+  text-align: left;
   box-shadow: var(--shadow-sm);
 }
 
@@ -251,11 +300,11 @@ pre code {
 }
 
 /* ── Topbar ──────────────────────────────────────────────────── */
-.topbar { 
+.topbar {
   display: flex; 
   align-items: center; 
-  justify-content: space-between; 
-  margin-bottom: 1.75rem; 
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
 }
 
 .topbar span { 
@@ -267,17 +316,17 @@ pre code {
 .back-btn {
   display: inline-flex; 
   align-items: center; 
-  gap: 5px; 
-  font-family: inherit; 
+  gap: 5px;
+  font-family: inherit;
   font-size: 13px; 
   font-weight: 500;
-  padding: 6px 14px; 
-  border: 1px solid var(--ink-faint); 
+  padding: 6px 14px;
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
   background: var(--card); 
-  color: var(--ink-mid); 
+  color: var(--ink-mid);
   cursor: pointer; 
-  transition: all 0.15s; 
+  transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
 
@@ -289,12 +338,12 @@ pre code {
 
 /* ── Fast Start UI & Customization ───────────────────────────── */
 .fast-start-hero {
-  text-align: center; 
-  padding: 2.5rem 1.5rem; 
+  text-align: center;
+  padding: 2.5rem 1.5rem;
   background: linear-gradient(135deg, var(--accent-dim) 0%, #ffffff 100%);
-  border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-lg); 
-  margin-bottom: 1.5rem; 
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
   box-shadow: var(--shadow-sm);
 }
 
@@ -323,10 +372,10 @@ pre code {
 .customize-toggle {
   display: flex; 
   align-items: center; 
-  justify-content: space-between; 
+  justify-content: space-between;
   padding: 1.15rem; 
-  cursor: pointer;
-  border: 1px solid var(--ink-faint); 
+  cursor: pointer; 
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-md); 
   font-size: 14px; 
   font-weight: 500;
@@ -353,25 +402,26 @@ pre code {
   margin-bottom: 1.75rem; 
 }
 
-.filter-heading { 
+.filter-heading {
   font-size: 11px; 
-  font-weight: 600; 
+  font-weight: 600;
   text-transform: uppercase; 
-  letter-spacing: 0.1em; 
+  letter-spacing: 0.1em;
   color: var(--ink-soft); 
-  margin-bottom: 0.65rem; 
+  margin-bottom: 0.65rem;
   display: flex; 
   align-items: center; 
-  gap: 8px; 
+  gap: 8px;
 }
 
-.filter-hint { 
+.filter-hint {
   font-size: 12px; 
-  color: var(--ink-faint); 
+  color: var(--ink-faint);
   font-style: italic; 
-  padding: 0.5rem 0; 
+  padding: 0.5rem 0;
 }
 
+/* ── Horizontal Scrolling ────────────────────────────────────── */
 .filter-scroll-wrapper { 
   position: relative; 
   width: 100%; 
@@ -380,12 +430,12 @@ pre code {
 }
 
 .horizontal-scroll {
-  display: flex !important; 
-  overflow-x: auto; 
-  overflow-y: hidden; 
+  display: flex !important;
+  overflow-x: auto;
+  overflow-y: hidden;
   gap: 10px;
-  padding: 4px 2px 12px; 
-  scroll-behavior: smooth; 
+  padding: 4px 2px 12px;
+  scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -402,25 +452,25 @@ pre code {
   background: transparent; 
 }
 
-.horizontal-scroll .chip { 
-  flex: 0 0 auto; 
-  min-width: 140px; 
-  margin-bottom: 0; 
+.horizontal-scroll .chip {
+  flex: 0 0 auto;
+  min-width: 140px;
+  margin-bottom: 0;
 }
 
 .chip {
-  padding: 0.65rem 0.9rem; 
-  border: 1px solid var(--ink-faint); 
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-md);
   background: var(--card); 
-  color: var(--ink-mid); 
+  color: var(--ink-mid);
   font-family: inherit; 
   font-size: 13px;
   cursor: pointer; 
   transition: all 0.15s; 
-  user-select: none; 
+  user-select: none;
   text-align: left; 
-  line-height: 1.35; 
+  line-height: 1.35;
   box-shadow: var(--shadow-sm);
 }
 
@@ -447,7 +497,7 @@ pre code {
   color: #fff; 
 }
 
-.chip.diff-Medium.selected{ 
+.chip.diff-Medium.selected { 
   background: var(--amber); 
   border-color: var(--amber); 
   color: #fff; 
@@ -459,11 +509,11 @@ pre code {
   color: #fff; 
 }
 
-.chip-count { 
+.chip-count {
   font-size: 11px; 
-  font-weight: 400; 
+  font-weight: 400;
   color: var(--ink-soft); 
-  margin-left: 4px; 
+  margin-left: 4px;
 }
 
 /* ── Filter footer / Deck Size ───────────────────────────────── */
@@ -492,17 +542,17 @@ pre code {
 }
 
 .size-tile {
-  padding: 8px 18px; 
-  border: 1px solid var(--ink-faint); 
+  padding: 8px 18px;
+  border: 1px solid var(--ink-faint);
   border-radius: var(--radius-xl);
   background: var(--card); 
-  color: var(--ink-mid); 
+  color: var(--ink-mid);
   font-family: inherit; 
   font-size: 13px; 
   font-weight: 500;
   cursor: pointer; 
   transition: all 0.15s; 
-  user-select: none; 
+  user-select: none;
   box-shadow: var(--shadow-sm);
 }
 
@@ -530,18 +580,18 @@ pre code {
 }
 
 .start-btn {
-  align-self: flex-end; 
-  padding: 10px 32px; 
+  align-self: flex-end;
+  padding: 10px 32px;
   border: none; 
   border-radius: var(--radius-xl);
   background: var(--accent); 
-  color: #fff; 
+  color: #fff;
   font-family: inherit; 
   font-size: 14px; 
   font-weight: 600;
   cursor: pointer; 
-  transition: opacity 0.15s, transform 0.15s; 
-  box-shadow: 0 2px 12px rgba(37,99,235,0.3); 
+  transition: opacity 0.15s, transform 0.15s;
+  box-shadow: 0 2px 12px rgba(37,99,235,0.3);
   letter-spacing: 0.01em;
 }
 
@@ -597,18 +647,18 @@ pre code {
 }
 
 /* ── Card ────────────────────────────────────────────────────── */
-.scene { 
+.scene {
   width: 100%; 
-  perspective: 1200px; 
+  perspective: 1200px;
   cursor: pointer; 
-  margin-bottom: 0.75rem; 
+  margin-bottom: 0.75rem;
 }
 
-.card-inner { 
+.card-inner {
   display: grid; 
   width: 100%; 
-  transform-style: preserve-3d; 
-  transition: transform 0.55s cubic-bezier(.4,0,.2,1); 
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(.4,0,.2,1);
 }
 
 .card-inner.flipped { 
@@ -616,60 +666,64 @@ pre code {
 }
 
 .card-face {
-  grid-area: 1 / 1; 
+  grid-area: 1 / 1;
   min-height: 240px; 
   height: 100%;      
   backface-visibility: hidden; 
   -webkit-backface-visibility: hidden;
-  border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-xl); 
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-xl);
   background: var(--card);
   display: flex; 
-  flex-direction: column; 
+  flex-direction: column;
   align-items: center; 
   justify-content: center;
-  padding: 1.25rem 2rem 1rem; 
-  text-align: center; 
+  padding: 1.25rem 2rem 1rem;
+  text-align: center;
   box-shadow: var(--shadow-lg);
 }
 
-.card-face.back { 
-  transform: rotateY(180deg); 
-  background: var(--card-back); 
-  border-color: var(--ink-faint); 
+.card-face.back {
+  transform: rotateY(180deg);
+  background: var(--card-back);
+  border-color: var(--ink-faint);
 }
 
-.card-label { 
+.card-label {
   font-size: 10px; 
-  font-weight: 600; 
+  font-weight: 600;
   text-transform: uppercase; 
-  letter-spacing: 0.12em; 
+  letter-spacing: 0.12em;
   color: var(--ink-soft); 
-  margin-bottom: 0.65rem; 
-  font-family: 'Inter', sans-serif; 
+  margin-bottom: 0.65rem;
+  font-family: 'Inter', sans-serif;
 }
 
-.card-image { 
-  max-width: 100%; 
-  max-height: 160px; 
+.card-image {
+  max-width: 100%;
+  max-height: 160px;
   object-fit: contain; 
-  margin-bottom: 0.85rem; 
-  border-radius: var(--radius-sm); 
+  margin-bottom: 0.85rem;
+  border-radius: var(--radius-sm);
   box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
 }
 
-.card-text { 
+.card-text {
   font-size: 1.2rem; 
   color: var(--ink); 
   line-height: 1.6; 
   font-weight: 400; 
-  word-wrap: break-word; 
-  overflow-wrap: break-word; 
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 @media (max-width: 480px) {
-  .card-face { padding: 1.25rem 1.25rem 1rem; }
-  .card-text { font-size: 1.1rem; }
+  .card-face { 
+    padding: 1.25rem 1.25rem 1rem; 
+  }
+  .card-text { 
+    font-size: 1.1rem; 
+  }
 }
 
 .card-meta { 
@@ -717,16 +771,16 @@ pre code {
 
 .thumb-btn {
   width: 34px; 
-  height: 34px; 
+  height: 34px;
   border: 1px solid var(--ink-faint); 
   border-radius: var(--radius-md);
   background: var(--card); 
-  color: var(--ink-faint); 
+  color: var(--ink-faint);
   display: flex; 
   align-items: center; 
   justify-content: center;
   cursor: pointer; 
-  transition: all 0.15s; 
+  transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
 
@@ -749,13 +803,13 @@ pre code {
 }
 
 /* ── Flag panel ──────────────────────────────────────────────── */
-.flag-panel { 
+.flag-panel {
   border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-md); 
+  border-radius: var(--radius-md);
   background: var(--card); 
   padding: 1rem; 
-  margin-bottom: 0.75rem; 
-  box-shadow: var(--shadow-sm); 
+  margin-bottom: 0.75rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .flag-label { 
@@ -768,12 +822,12 @@ pre code {
 .flag-textarea {
   width: 100%; 
   font-size: 13px; 
-  font-family: inherit; 
+  font-family: inherit;
   border: 1px solid var(--ink-faint); 
   border-radius: var(--radius-sm);
   padding: 8px 10px; 
   resize: vertical; 
-  color: var(--ink); 
+  color: var(--ink);
   background: var(--surface); 
   outline: none; 
   transition: border-color 0.15s;
@@ -795,7 +849,7 @@ pre code {
   font-size: 13px; 
   padding: 6px 14px; 
   border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-xl); 
+  border-radius: var(--radius-xl);
   background: var(--card); 
   color: var(--ink-soft); 
   cursor: pointer; 
@@ -812,7 +866,7 @@ pre code {
   font-size: 13px; 
   padding: 6px 14px; 
   border: 1px solid var(--red); 
-  border-radius: var(--radius-xl); 
+  border-radius: var(--radius-xl);
   background: var(--card); 
   color: var(--red); 
   cursor: pointer; 
@@ -825,27 +879,27 @@ pre code {
 
 /* ── Response block ──────────────────────────────────────────── */
 .response-block {
-  background: var(--card-back); 
-  border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-lg); 
-  padding: 1rem; 
-  margin-bottom: 0.875rem; 
+  background: var(--card-back);
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  margin-bottom: 0.875rem;
   text-align: center;
 }
 
-.hint { 
+.hint {
   font-size: 12px; 
-  color: var(--ink-soft); 
+  color: var(--ink-soft);
   margin-bottom: 0; 
-  letter-spacing: 0.01em; 
+  letter-spacing: 0.01em;
 }
 
-.hint.answered { 
+.hint.answered {
   font-size: 12px; 
-  font-weight: 600; 
+  font-weight: 600;
   color: var(--ink-mid); 
-  margin-bottom: 0.75rem; 
-  letter-spacing: 0.01em; 
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.01em;
 }
 
 .rating-row { 
@@ -856,16 +910,16 @@ pre code {
 
 .rating-btn {
   flex: 1; 
-  padding: 9px 0; 
+  padding: 9px 0;
   border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-md); 
+  border-radius: var(--radius-md);
   background: var(--card); 
   color: var(--ink-soft);
   font-family: inherit; 
   font-size: 13px; 
-  font-weight: 500; 
+  font-weight: 500;
   cursor: pointer; 
-  transition: all 0.15s; 
+  transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
 
@@ -918,17 +972,17 @@ pre code {
 .nav-btn {
   display: inline-flex; 
   align-items: center; 
-  gap: 4px; 
-  padding: 8px 18px; 
+  gap: 4px;
+  padding: 8px 18px;
   border: 1px solid var(--ink-faint); 
   border-radius: var(--radius-xl);
   background: var(--card); 
-  color: var(--ink-mid); 
+  color: var(--ink-mid);
   font-family: inherit; 
   font-size: 13px; 
   font-weight: 600;
   cursor: pointer; 
-  transition: all 0.15s; 
+  transition: all 0.15s;
   box-shadow: var(--shadow-sm);
 }
 
@@ -1007,7 +1061,7 @@ pre code {
   margin-bottom: 1.25rem; 
   padding: 9px 22px; 
   border: 1px solid var(--red); 
-  border-radius: var(--radius-xl); 
+  border-radius: var(--radius-xl);
   background: var(--card); 
   color: var(--red); 
   font-family: inherit; 
@@ -1031,7 +1085,7 @@ pre code {
 .restart-btn { 
   padding: 9px 22px; 
   border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-xl); 
+  border-radius: var(--radius-xl);
   background: var(--card); 
   color: var(--ink-mid); 
   font-family: inherit; 

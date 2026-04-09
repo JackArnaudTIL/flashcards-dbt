@@ -121,10 +121,15 @@
         </div>
       </div>
 
-      <!-- IDE Code Drafting Area -->
+      <!-- IDE Code Drafting Area (Styled like Canvas blocks) -->
       <div class="code-input-container" id="codeInputContainer">
-        <label class="label" for="userCodeInput">Draft your answer:</label>
-        <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
+        <label class="label" for="userCodeInput" style="margin-bottom: 6px; display: block;">Draft your answer:</label>
+        <div class="gemini-code-wrapper drafting-wrapper">
+          <div class="gemini-code-header">
+            <span class="gemini-code-lang" id="draftingLangLabel">text</span>
+          </div>
+          <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
+        </div>
         <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
       </div>
 

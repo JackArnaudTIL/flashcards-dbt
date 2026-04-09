@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
     codeEditor = CodeMirror.fromTextArea(textArea, {
       lineNumbers: true,
       theme: "dracula",
-      mode: "text/x-sql",
+      mode: "text/plain",
       indentUnit: 4,
       matchBrackets: true,
       extraKeys: {
@@ -61,26 +61,84 @@ function getImagePath(fileName) {
 
 /**
  * Formats text content to support Markdown-style code blocks and inline code
+ * Wraps code blocks in a Gemini-style header layout.
  */
 function formatContent(text) {
   if (text === null || text === undefined) return '';
 
+  // 1. Escaping HTML
   let escaped = String(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // Multi-line Blocks: ```language \n code ``` -> <pre><code class="language">code</code></pre>
-  escaped = escaped.replace(/\`\`\`([a-z]+)?\n?([\s\S]*?)\`\`\`/g, (match, lang, code) => {
-    const langClass = lang ? `language-${lang}` : '';
-    return `<pre><code class="${langClass}">${code}</code></pre>`;
+  // 2. Extract multi-line Blocks: ```language \n code ```
+  // We extract them first so we don't accidentally inject <br> tags into the code body
+  const codeBlocks = [];
+  escaped = escaped.replace(/\`\`\`([a-z0-9]+)?\n?([\s\S]*?)\`\`\`/gi, (match, lang, code) => {
+    const langClass = lang ? `language-${lang.toLowerCase()}` : '';
+    const langLabel = lang ? lang.toLowerCase() : 'text';
+    
+    codeBlocks.push(`
+      <div class="gemini-code-wrapper">
+        <div class="gemini-code-header">
+          <span class="gemini-code-lang">${langLabel}</span>
+          <button class="gemini-code-copy" onclick="copyCode(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            Copy
+          </button>
+        </div>
+        <pre><code class="${langClass}">${code}</code></pre>
+      </div>
+    `);
+    
+    return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
   });
 
-  // Inline Code: `code` -> <code>code</code>
+  // 3. Inline Code: `code` -> <code>code</code>
   escaped = escaped.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
 
-  return escaped.replace(/\n/g, '<br>');
+  // 4. Preserve standard line breaks for non-code text
+  escaped = escaped.replace(/\n/g, '<br>');
+
+  // 5. Restore the fully formatted code blocks
+  codeBlocks.forEach((block, i) => {
+    escaped = escaped.replace(`___CODE_BLOCK_${i}___`, block);
+  });
+
+  return escaped;
 }
+
+// ── Copy Code Logic ───────────────────────────────────────────────────────
+window.copyCode = function(btn) {
+  const codeEl = btn.closest('.gemini-code-wrapper').querySelector('code');
+  
+  // Decode HTML entities back to raw text for the clipboard
+  const textToCopy = codeEl.innerHTML
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&");
+
+  const copyFallback = (str) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = str;
+    document.body.appendChild(textArea);
+    textArea.select();
+    try { document.execCommand('copy'); } catch (err) { console.error('Copy failed', err); }
+    document.body.removeChild(textArea);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(textToCopy).catch(() => copyFallback(textToCopy));
+  } else {
+    copyFallback(textToCopy);
+  }
+
+  // Update UI to show success
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> <span style="color:#059669">Copied!</span>`;
+  setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
+};
 
 // ── Data Loading ──────────────────────────────────────────────────────────
 fetch('cards.json')
@@ -218,6 +276,7 @@ function selectDeck(name) {
   grid.innerHTML = '';
 
   certs.forEach(cert => {
+    const count = cards.filter(c => c.certification === cert).length;
     const tile  = document.createElement('div');
     tile.className = 'cert-tile';
     tile.innerHTML = `<div class="cert-tile-name">${cert}</div>`;
@@ -369,11 +428,16 @@ function render() {
     codeEditor.setOption('readOnly', false); 
     
     // Auto-detect language mode from the answer markdown for the IDE
-    let mode = "javascript";
-    if (card.a && card.a.includes('```sql')) mode = "text/x-sql";
-    if (card.a && card.a.includes('```python')) mode = "python";
-    if (card.a && card.a.includes('```jinja')) mode = "jinja2";
+    let mode = "text/plain";
+    let label = "text";
+    if (card.a && card.a.includes('```sql')) { mode = "text/x-sql"; label = "sql"; }
+    else if (card.a && card.a.includes('```python')) { mode = "python"; label = "python"; }
+    else if (card.a && card.a.includes('```jinja')) { mode = "jinja2"; label = "jinja"; }
+    
     codeEditor.setOption('mode', mode);
+    
+    const langLabelEl = document.getElementById('draftingLangLabel');
+    if (langLabelEl) langLabelEl.textContent = label;
   }
   
   if (compareBtn) { 
@@ -456,9 +520,16 @@ function submitCode() {
 
 function flip() {
   flipped = !flipped;
+  
+  const cardInner = document.getElementById('cardInner');
+  if (flipped) {
+    cardInner.classList.add('flipped');
+  } else {
+    cardInner.classList.remove('flipped');
+  }
+  
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
-  document.getElementById('cardInner').classList.toggle('flipped', flipped);
   
   const compareBtn = document.getElementById('compareBtn');
   
@@ -467,20 +538,37 @@ function flip() {
       codeEditor.setOption('readOnly', flipped ? 'nocursor' : false);
     }
     if (compareBtn) {
-      compareBtn.style.display = flipped ? 'none' : 'inline-block';
+      if (flipped) {
+        compareBtn.style.display = 'none';
+      } else {
+        compareBtn.style.display = 'inline-block';
+      }
     }
   }
 
+  const hint = document.getElementById('hintText');
+  const ratingRow = document.getElementById('ratingRow');
+
   if (flipped) {
-    if (card.a_sound || deckConfig.a_sound) {
-      playAudio(card.a_sound || deckConfig.a_sound, card.a_sound_start || deckConfig.a_sound_start || 0);
-    }
-    document.getElementById('hintText').textContent = 'How did you do?';
-    document.getElementById('hintText').className = 'hint answered';
-    document.getElementById('ratingRow').style.display = 'flex';
+    const finalASound = card.a_sound || deckConfig.a_sound;
+    if (finalASound) {
+      playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
+    } 
+    
+    hint.textContent = 'How did you do?';
+    hint.className = 'hint answered';
+    ratingRow.style.display = 'flex';
   } else {
-    stopAudio(); 
-    document.getElementById('ratingRow').style.display = 'none';
+    stopAudio();
+    
+    const finalQSound = card.q_sound || deckConfig.q_sound;
+    if (finalQSound) {
+        playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
+    }
+    
+    hint.textContent = 'Click the card to reveal the answer';
+    hint.className = 'hint';
+    ratingRow.style.display = 'none';
   }
 }
 
@@ -522,8 +610,28 @@ function thumb(dir) {
 }
 
 function renderThumbs() {
-  document.getElementById('thumbUp').classList.toggle('active-up', thumbs[index] === 'up');
-  document.getElementById('thumbDown').classList.toggle('active-down', thumbs[index] === 'down');
+  const thumbUpBtn = document.getElementById('thumbUp');
+  const thumbDownBtn = document.getElementById('thumbDown');
+  
+  if (thumbs[index] === 'up') {
+    thumbUpBtn.classList.add('active-up');
+  } else {
+    thumbUpBtn.classList.remove('active-up');
+  }
+  
+  if (thumbs[index] === 'down') {
+    thumbDownBtn.classList.add('active-down');
+  } else {
+    thumbDownBtn.classList.remove('active-down');
+  }
+}
+
+function cancelFlag() {
+  thumbs[index] = null;
+  flags[index]  = null;
+  hide('flagPanel');
+  document.getElementById('flagNote').value = '';
+  renderThumbs();
 }
 
 function submitFlag() {
@@ -538,9 +646,38 @@ function showSummary() {
   hide('cardArea'); 
   show('summary');
   
-  document.getElementById('sGood').textContent = ratings.filter(r => r === 'Good').length;
-  document.getElementById('sOk').textContent = ratings.filter(r => r === 'Ok').length;
-  document.getElementById('sHard').textContent = ratings.filter(r => r === 'Hard').length;
+  const gotItCount = ratings.filter(r => r === 'Good').length;
+  const okCount = ratings.filter(r => r === 'Ok').length;
+  const hardCount = ratings.filter(r => r === 'Hard').length;
+  
+  document.getElementById('sGood').textContent = gotItCount;
+  document.getElementById('sOk').textContent   = okCount;
+  document.getElementById('sHard').textContent = hardCount;
+  
+  const flagged = deck.filter((_, i) => thumbs[i] === 'down');
+  const flagSummary = document.getElementById('flagSummary');
+  
+  if (flagged.length > 0) {
+    flagSummary.style.display = 'block';
+    document.getElementById('flagCount').textContent = flagged.length;
+  } else {
+    flagSummary.style.display = 'none';
+  }
+}
+
+function exportFlags() {
+  const lines = deck
+    .map((card, i) => {
+      return { card: card, thumb: thumbs[i], note: flags[i] };
+    })
+    .filter(item => item.thumb === 'down')
+    .map(f => `Deck: ${currentDeckName}\nCertification: ${currentCert || 'n/a'}\nQuestion: ${f.card.q}\nAnswer: ${f.card.a}\nNote: ${f.note || ''}\n`)
+    .join('\n---\n\n');
+    
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([lines], { type: 'text/plain' }));
+  a.download = `flagged-${(currentCert || currentDeckName).toLowerCase().replace(/\s+/g, '-')}.txt`;
+  a.click();
 }
 
 function restart() { 
@@ -548,15 +685,22 @@ function restart() {
 }
 
 document.addEventListener('keydown', e => {
-  if (document.getElementById('studyView').style.display === 'none') return;
+  const studyView = document.getElementById('studyView');
+  if (!studyView || studyView.style.display === 'none') return;
   
-  // Ignore keydowns if user is typing in a textarea, input, OR our new CodeMirror IDE
+  // Ignore keydowns if user is typing in an input, textarea, OR our new CodeMirror IDE
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.closest('.CodeMirror')) return;
   
   if (e.code === 'Space') { 
     e.preventDefault(); 
     flip(); 
   }
-  if (e.code === 'ArrowRight') next();
-  if (e.code === 'ArrowLeft') prev();
+  
+  if (e.code === 'ArrowRight') {
+    next();
+  }
+  
+  if (e.code === 'ArrowLeft') {
+    prev();
+  }
 });
