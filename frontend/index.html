@@ -7,6 +7,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- Highlight.js (VS Code Dark Theme for answers) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/vs2015.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+  <!-- CodeMirror (IDE Editor for input) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/jinja2/jinja2.min.js"></script>
+
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -108,10 +121,10 @@
         </div>
       </div>
 
-      <!-- Code Input Area -->
+      <!-- IDE Code Drafting Area -->
       <div class="code-input-container" id="codeInputContainer">
         <label class="label" for="userCodeInput">Draft your answer:</label>
-        <textarea id="userCodeInput" class="code-textarea" placeholder="Type your code or answer here before flipping..." rows="4"></textarea>
+        <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
         <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
       </div>
 
