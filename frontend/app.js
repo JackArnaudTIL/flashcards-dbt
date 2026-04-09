@@ -1,22 +1,32 @@
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
 
-let DECKS = {};
-let deck = [];
-let index = 0;
-let flipped = false;
-let ratings = [];
-let thumbs = [];
-let flags = [];
-let currentDeckName = '';
-let currentCert = null;
-let selectedCategories = new Set();
-let selectedGroups = new Set();
-let selectedDifficulties = new Set();
+let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
+let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
+let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
 let selectedDeckSize = 50; 
 
-// ── Global Audio Controller ──────────────────────────────────────────────
+// ── Global IDE & Audio Controllers ───────────────────────────────────────
+let codeEditor;
 let cardAudio = new Audio();
+
+document.addEventListener("DOMContentLoaded", () => {
+  const textArea = document.getElementById('userCodeInput');
+  if (textArea) {
+    // Initialize CodeMirror IDE
+    codeEditor = CodeMirror.fromTextArea(textArea, {
+      lineNumbers: true,
+      theme: "dracula",
+      mode: "text/x-sql",
+      indentUnit: 4,
+      matchBrackets: true,
+      extraKeys: {
+        "Cmd-Enter": function() { submitCode(); },
+        "Ctrl-Enter": function() { submitCode(); }
+      }
+    });
+  }
+});
 
 function stopAudio() {
   cardAudio.pause();
@@ -33,7 +43,7 @@ function playAudio(fileName, startTime = 0) {
   
   const seekAndPlay = () => {
     cardAudio.currentTime = startTime;
-    cardAudio.play().catch(e => console.log("Playback blocked: Click the card to enable audio."));
+    cardAudio.play().catch(e => console.log("Playback blocked: Interaction required."));
   };
 
   if (cardAudio.readyState >= 1) {
@@ -43,9 +53,6 @@ function playAudio(fileName, startTime = 0) {
   }
 }
 
-/**
- * Resolves image paths for local vs cloud URLs
- */
 function getImagePath(fileName) {
   if (!fileName) return '';
   const isCloud = fileName.startsWith('http');
@@ -58,19 +65,20 @@ function getImagePath(fileName) {
 function formatContent(text) {
   if (text === null || text === undefined) return '';
 
-  // 1. Escaping HTML and forcing to String (prevents crashes if a card answer is a number)
   let escaped = String(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // 2. Multi-line Blocks: ```code``` -> <pre><code>code</code></pre>
-  escaped = escaped.replace(/\`\`\`(?:[a-z]+)?\n?([\s\S]*?)\`\`\`/g, '<pre><code>$1</code></pre>');
+  // Multi-line Blocks: ```language \n code ``` -> <pre><code class="language">code</code></pre>
+  escaped = escaped.replace(/\`\`\`([a-z]+)?\n?([\s\S]*?)\`\`\`/g, (match, lang, code) => {
+    const langClass = lang ? `language-${lang}` : '';
+    return `<pre><code class="${langClass}">${code}</code></pre>`;
+  });
 
-  // 3. Inline Code: `code` -> <code>code</code>
+  // Inline Code: `code` -> <code>code</code>
   escaped = escaped.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
 
-  // 4. Preserve standard line breaks for non-code text
   return escaped.replace(/\n/g, '<br>');
 }
 
@@ -92,30 +100,22 @@ fetch('cards.json')
       <div class="error" style="text-align: center; margin-top: 3rem; color: var(--red, #dc2626);">
         <h2 style="margin-bottom: 1rem;">⚠️ Application Error</h2>
         <p>${err.message}</p>
-        <p style="font-size: 14px; margin-top: 15px; color: var(--ink-mid, #4a4a4a);">
-          If you just ran the Python script, your <b>cards.json</b> might have a syntax error.<br>
-          Press <b>F12</b> to open the Developer Console for exact details, or validate your JSON online.
-        </p>
       </div>`;
   });
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 function show(id) { 
   const el = document.getElementById(id);
-  if (el) {
-    el.style.display = 'block';
-  }
+  if (el) el.style.display = 'block'; 
 }
 
 function hide(id) { 
   const el = document.getElementById(id);
-  if (el) {
-    el.style.display = 'none';
-  }
+  if (el) el.style.display = 'none'; 
 }
 
 function showOnly(id) {
-  ['deckPicker', 'certPicker', 'filterPicker', 'studyView'].forEach(s => hide(s));
+  ['deckPicker','certPicker','filterPicker','studyView'].forEach(s => hide(s));
   show(id);
 }
 
@@ -142,15 +142,7 @@ function sendFeedback(thumbType, noteText = '') {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
-  })
-  .then(response => {
-    if (!response.ok) {
-      console.error("Feedback API error:", response.status);
-    }
-  })
-  .catch(err => {
-    console.error("Network error sending feedback:", err);
-  });
+  }).catch(err => console.error("Feedback error:", err));
 }
 
 // ── Screen 1: Deck picker ──────────────────────────────────────────────────
@@ -161,9 +153,7 @@ function buildDeckGrid() {
   const sections = {};
   Object.keys(DECKS).forEach(name => {
     const section = DECKS[name].section || 'Other';
-    if (!sections[section]) {
-      sections[section] = [];
-    }
+    if (!sections[section]) sections[section] = [];
     sections[section].push(name);
   });
 
@@ -172,9 +162,7 @@ function buildDeckGrid() {
     const ai = SECTION_ORDER.indexOf(a);
     const bi = SECTION_ORDER.indexOf(b);
     if (ai === -1 && bi === -1) return a.localeCompare(b);
-    if (ai === -1) return 1;
-    if (bi === -1) return -1;
-    return ai - bi;
+    return ai === -1 ? 1 : bi === -1 ? -1 : ai - bi;
   });
 
   sectionKeys.forEach(section => {
@@ -193,11 +181,9 @@ function buildDeckGrid() {
       tile.className = 'deck-tile';
       tile.innerHTML = `
         <div class="deck-tile-name">${name}</div>
-        <div class="deck-tile-count">${cards.length} card${cards.length !== 1 ? 's' : ''}</div>
+        <div class="deck-tile-count">${cards.length} cards</div>
       `;
-      tile.addEventListener('click', () => {
-        selectDeck(name);
-      });
+      tile.onclick = () => selectDeck(name);
       row.appendChild(tile);
     });
   });
@@ -232,49 +218,30 @@ function selectDeck(name) {
   grid.innerHTML = '';
 
   certs.forEach(cert => {
-    const count = cards.filter(c => c.certification === cert).length;
     const tile  = document.createElement('div');
     tile.className = 'cert-tile';
-    tile.innerHTML = `
-      <div class="cert-tile-name">${cert}</div>
-      <div class="cert-tile-count">${count} card${count !== 1 ? 's' : ''}</div>
-    `;
-    tile.addEventListener('click', () => {
-      selectCert(cert);
-    });
+    tile.innerHTML = `<div class="cert-tile-name">${cert}</div>`;
+    tile.onclick = () => {
+        currentCert = cert;
+        showFilterPicker();
+    };
     grid.appendChild(tile);
   });
 
   showOnly('certPicker');
 }
 
-function selectCert(cert) {
-  currentCert = cert;
-  selectedCategories.clear(); 
-  selectedGroups.clear(); 
-  selectedDifficulties.clear();
-  selectedDeckSize = 50; 
-  showFilterPicker();
-}
-
-// ── Screen 3: Filter picker / Fast Start ──────────────────────────────────
+// ── Screen 3: Filter picker ──────────────────────────────────
 function filterBack() {
   const certs = [...new Set(DECKS[currentDeckName].cards.map(c => c.certification).filter(Boolean))];
-  if (certs.length > 0) {
-    showOnly('certPicker');
-  } else {
-    showOnly('deckPicker');
-  }
+  certs.length > 0 ? showOnly('certPicker') : showOnly('deckPicker');
 }
 
 function showFilterPicker() {
   const label = currentCert ? `${currentDeckName} · ${currentCert}` : currentDeckName;
   document.getElementById('filterDeckTitle').textContent = label;
-  
-  // Ensure customization panel is closed on initial load
   document.getElementById('customizationPanel').style.display = 'none';
   document.getElementById('customChevron').classList.remove('rotated');
-  
   buildFilterChips();
   showOnly('filterPicker');
 }
@@ -283,248 +250,83 @@ function toggleCustomization() {
   const panel = document.getElementById('customizationPanel');
   const chevron = document.getElementById('customChevron');
   const isHidden = panel.style.display === 'none';
-  
-  if (isHidden) {
-    panel.style.display = 'block';
-  } else {
-    panel.style.display = 'none';
-  }
-  
+  panel.style.display = isHidden ? 'block' : 'none';
   chevron.classList.toggle('rotated', isHidden);
-}
-
-function cardGroups(card) {
-  if (!card.group) return [];
-  if (Array.isArray(card.group)) {
-    return card.group;
-  } else {
-    return [card.group];
-  }
 }
 
 function categoryLabel(cat) {
   const match = cat.match(/^[^:]+:\s*(.+)$/);
-  if (match) {
-    return match[1].trim();
-  } else {
-    return cat;
-  }
-}
-
-function certCards() {
-  const all = DECKS[currentDeckName].cards;
-  if (currentCert) {
-    return all.filter(c => c.certification === currentCert);
-  } else {
-    return all;
-  }
+  return match ? match[1].trim() : cat;
 }
 
 function buildFilterChips() {
-  const cards = certCards();
-
-  // 1. Categories
-  const categories = [...new Set(cards.map(c => c.category).filter(Boolean))]
-    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
-
-  // 2. Groups
-  let activeCards;
-  if (selectedCategories.size > 0) {
-    activeCards = cards.filter(c => selectedCategories.has(c.category));
-  } else {
-    activeCards = cards;
-  }
-    
-  const groupCounts = {};
-  activeCards.forEach(c => {
-    cardGroups(c).forEach(g => { 
-      if (!groupCounts[g]) {
-        groupCounts[g] = 0;
-      }
-      groupCounts[g] += 1; 
-    });
-  });
-
-  const groups = [...new Set(activeCards.flatMap(c => cardGroups(c)))]
-    .sort((a, b) => (groupCounts[b] || 0) - (groupCounts[a] || 0));
-
-  for (const g of selectedGroups) {
-    if (!groups.includes(g)) {
-      selectedGroups.delete(g);
-    }
-  }
-
-  // 3. Difficulties
-  const diffs = DIFFICULTIES.filter(d => cards.some(c => d === c.difficulty));
-
-  // 4. UI Visibility Logic
-  const catSection   = document.getElementById('categorySection');
-  const groupSection = document.getElementById('groupSection');
-  const diffSection  = document.getElementById('difficultySection'); 
-  const groupHint    = document.getElementById('groupHint');
-  const groupChips   = document.getElementById('groupChips');
-
-  if (catSection) {
-    if (categories.length > 1) {
-      catSection.style.display = 'block';
-    } else {
-      catSection.style.display = 'none';
-    }
-  }
-
-  if (groupSection) {
-    const categorySelected = selectedCategories.size > 0;
-    const multipleGroups = groups.length > 1;
-
-    // Reveal group section ONLY if category is selected AND there's a choice of groups
-    if (categorySelected && multipleGroups) {
-      groupSection.style.display = 'block';
-      if (groupHint) groupHint.style.display = 'none';
-      if (groupChips) groupChips.style.display = 'flex'; 
-    } else {
-      groupSection.style.display = 'none'; 
-    }
-  }
-
-  if (diffSection) {
-    if (diffs.length > 1) {
-      diffSection.style.display = 'block';
-    } else {
-      diffSection.style.display = 'none';
-    }
-  }
-
-  // 5. Render Chips
-  const renderChips = (id, items, selectedSet, toggleFn, formatter = a => a) => {
-    const container = document.getElementById(id);
-    if (!container) return;
-    
-    let html = '';
-    items.forEach(item => {
-      const isSelected = selectedSet.has(item);
-      const selectedClass = isSelected ? ' selected' : '';
-      const formattedItem = formatter(item);
-      html += `<div class="chip${selectedClass}" onclick="${toggleFn}('${CSS.escape(item)}')">${formattedItem}</div>`;
-    });
-    container.innerHTML = html;
-  };
-
-  renderChips('categoryChips', categories, selectedCategories, 'toggleCategory', categoryLabel);
+  const cards = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  const categories = [...new Set(cards.map(c => c.category).filter(Boolean))].sort();
+  const activeCards = selectedCategories.size > 0 ? cards.filter(c => selectedCategories.has(c.category)) : cards;
   
-  if (groupChips) {
-    let groupHtml = '';
-    groups.forEach(g => {
-      const isSelected = selectedGroups.has(g);
-      const selectedClass = isSelected ? ' selected' : '';
-      const count = groupCounts[g] || 0;
-      groupHtml += `
-        <div class="chip${selectedClass}" onclick="toggleGroup('${CSS.escape(g)}')">
-          ${g} <span class="chip-count">${count}</span>
-        </div>
-      `;
-    });
-    groupChips.innerHTML = groupHtml;
+  const groupCounts = {}; 
+  activeCards.forEach(c => (Array.isArray(c.group) ? c.group : [c.group]).filter(Boolean).forEach(g => groupCounts[g] = (groupCounts[g] || 0) + 1));
+  const groups = Object.keys(groupCounts).sort((a,b) => groupCounts[b] - groupCounts[a]);
+  const diffs = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
+
+  document.getElementById('categoryChips').innerHTML = categories.map(cat => `
+    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
+  `).join('');
+  
+  const grpSec = document.getElementById('groupSection');
+  if (selectedCategories.size > 0 && groups.length > 1) {
+    grpSec.style.display = 'block';
+    document.getElementById('groupChips').innerHTML = groups.map(g => `
+      <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">${g} <span class="chip-count">${groupCounts[g]}</span></div>
+    `).join('');
+  } else { 
+    grpSec.style.display = 'none'; 
   }
 
-  renderChips('difficultyChips', diffs, selectedDifficulties, 'toggleDifficulty', d => {
-    const isSelected = selectedDifficulties.has(d);
-    const selectedClass = isSelected ? ' selected' : '';
-    return `<div style="display:contents" class="diff-${d}${selectedClass}">${d}</div>`;
-  });
-
+  document.getElementById('difficultyChips').innerHTML = diffs.map(d => `
+    <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" onclick="toggleDifficulty('${CSS.escape(d)}')">${d}</div>
+  `).join('');
+  
   updateFilterCount();
 }
 
-function toggleCategory(cat) {
-  if (selectedCategories.has(cat)) {
-    selectedCategories.delete(cat);
-  } else {
-    selectedCategories.add(cat);
-  }
-  buildFilterChips();
+function toggleCategory(cat) { 
+  selectedCategories.has(cat) ? selectedCategories.delete(cat) : selectedCategories.add(cat); 
+  buildFilterChips(); 
 }
 
-function toggleGroup(g) {
-  if (selectedGroups.has(g)) {
-    selectedGroups.delete(g);
-  } else {
-    selectedGroups.add(g);
-  }
-  buildFilterChips();
+function toggleGroup(g) { 
+  selectedGroups.has(g) ? selectedGroups.delete(g) : selectedGroups.add(g); 
+  buildFilterChips(); 
 }
 
-function toggleDifficulty(d) {
-  if (selectedDifficulties.has(d)) {
-    selectedDifficulties.delete(d);
-  } else {
-    selectedDifficulties.add(d);
-  }
-  buildFilterChips();
-}
-
-function filteredCards() {
-  return certCards().filter(c => {
-    const catOk  = selectedCategories.size === 0  || selectedCategories.has(c.category);
-    const grpOk  = selectedGroups.size === 0       || cardGroups(c).some(g => selectedGroups.has(g));
-    const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
-    return catOk && grpOk && diffOk;
-  });
+function toggleDifficulty(d) { 
+  selectedDifficulties.has(d) ? selectedDifficulties.delete(d) : selectedDifficulties.add(d); 
+  buildFilterChips(); 
 }
 
 function updateFilterCount() {
-  const count  = filteredCards().length;
-  const total  = certCards().length;
+  const all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  const filtered = all.filter(c => {
+    const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
+    const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
+    const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
+    return catOk && grpOk && diffOk;
+  });
   
-  // Dynamic Hero Update
-  const activeFilters = selectedCategories.size + selectedGroups.size + selectedDifficulties.size;
+  const count = filtered.length;
+  document.getElementById('heroCountDisplay').textContent = `${selectedDeckSize !== null && selectedDeckSize < count ? selectedDeckSize : count} cards`;
+  document.getElementById('filterCount').innerHTML = `<span>${count}</span> of ${all.length} cards match filters`;
   
-  let heroSize = count;
-  if (selectedDeckSize !== null && selectedDeckSize < count) {
-    heroSize = selectedDeckSize;
-  }
-  
-  document.getElementById('heroCountDisplay').textContent = `${heroSize} cards`;
-  
-  const filterSummary = document.getElementById('filterCount');
-  if (filterSummary) {
-    if (activeFilters > 0) {
-      filterSummary.innerHTML = `<span>${count}</span> of ${total} cards match filters`;
-    } else {
-      filterSummary.innerHTML = `All <span>${total}</span> cards available`;
-    }
-  }
-
-  // Build Size Tiles
-  const row = document.getElementById('deckSizeRow');
-  const availableSizes = DECK_SIZES.filter(s => s < count);
-  
-  if (row) {
-    row.innerHTML = '';
-  }
-
-  if (availableSizes.length > 0 && row) {
-    const createSizeTile = (val, label) => {
-      const tile = document.createElement('div');
-      let className = 'size-tile';
-      if (selectedDeckSize === val) {
-        className += ' selected';
-      }
-      tile.className = className;
-      tile.innerHTML = label;
-      tile.onclick = () => {
-        selectSize(val);
-      };
-      row.appendChild(tile);
-    };
-
-    createSizeTile(null, `All <span class="size-tile-sub">${count}</span>`);
-    
-    availableSizes.forEach(s => {
-      createSizeTile(s, s);
-    });
-  }
-  
-  document.getElementById('startBtn').disabled = (count === 0);
+  const row = document.getElementById('deckSizeRow'); row.innerHTML = '';
+  [null, 10, 20, 50, 100].filter(s => s === null || s < count).forEach(s => {
+    const tile = document.createElement('div'); 
+    tile.className = `size-tile ${selectedDeckSize === s ? 'selected' : ''}`;
+    tile.innerHTML = s === null ? `All <span class="size-tile-sub">${count}</span>` : s;
+    tile.onclick = () => { selectedDeckSize = s; updateFilterCount(); };
+    row.appendChild(tile);
+  });
+  document.getElementById('startBtn').disabled = count === 0;
 }
 
 function selectSize(s) {
@@ -534,250 +336,161 @@ function selectSize(s) {
 
 // ── Screen 4: Study view ───────────────────────────────────────────────────
 function startFiltered() {
-  const shuffled = filteredCards().sort(() => Math.random() - 0.5);
+  const all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  const filtered = all.filter(c => {
+    const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
+    const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
+    const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
+    return catOk && grpOk && diffOk;
+  });
   
-  if (selectedDeckSize !== null) {
-    deck = shuffled.slice(0, selectedDeckSize);
-  } else {
-    deck = shuffled;
-  }
+  deck = filtered.sort(() => Math.random() - 0.5).slice(0, selectedDeckSize || filtered.length);
+  ratings = Array(deck.length).fill(null); 
+  thumbs = Array(deck.length).fill(null); 
+  flags = Array(deck.length).fill(null);
+  index = 0; 
+  flipped = false; 
   
-  ratings = Array(deck.length).fill(null);
-  thumbs  = Array(deck.length).fill(null);
-  flags   = Array(deck.length).fill(null);
-  index   = 0;
-  flipped = false;
-  
-  showOnly('studyView');
-  hide('summary');
-  show('cardArea');
+  showOnly('studyView'); 
   render();
 }
 
 function render() {
-  stopAudio(); 
-
+  stopAudio();
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
 
-  // ── Code Input Handle ──
-  const codeBox = document.getElementById('userCodeInput');
+  // ── Code IDE Handle ──
   const codeContainer = document.getElementById('codeInputContainer');
   const compareBtn = document.getElementById('compareBtn');
-
-  if (codeBox) {
-    codeBox.value = '';
-    codeBox.disabled = false;
+  
+  if (codeEditor) { 
+    codeEditor.setValue(''); 
+    codeEditor.setOption('readOnly', false); 
+    
+    // Auto-detect language mode from the answer markdown for the IDE
+    let mode = "javascript";
+    if (card.a && card.a.includes('```sql')) mode = "text/x-sql";
+    if (card.a && card.a.includes('```python')) mode = "python";
+    if (card.a && card.a.includes('```jinja')) mode = "jinja2";
+    codeEditor.setOption('mode', mode);
   }
   
-  if (compareBtn) {
-    compareBtn.style.display = 'inline-block';
+  if (compareBtn) { 
+    compareBtn.style.display = 'inline-block'; 
   }
-
-  if (codeContainer) {
-    if (card.requires_code === true) {
-      codeContainer.style.display = 'block';
+  
+  if (codeContainer) { 
+    if (card.requires_code) {
+      codeContainer.style.display = 'block'; 
+      // CodeMirror needs a manual refresh when its container becomes visible
+      setTimeout(() => codeEditor.refresh(), 10); 
     } else {
-      codeContainer.style.display = 'none';
+      codeContainer.style.display = 'none'; 
     }
   }
-  // ───────────────────────
 
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
   
-  // Audio Handle
-  const finalQSound = card.q_sound || deckConfig.q_sound;
-  if (finalQSound) {
-    playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
+  if (card.q_sound || deckConfig.q_sound) {
+    playAudio(card.q_sound || deckConfig.q_sound, card.q_sound_start || deckConfig.q_sound_start || 0);
   }
 
-  // ── Image Handle ──
-  const frontImg = document.getElementById('frontImage');
-  const backImg  = document.getElementById('backImage');
-
-  // Clear the old images immediately so they don't linger while new ones download
-  frontImg.removeAttribute('src');
-  backImg.removeAttribute('src');
-
-  const finalQImage = card.q_image || deckConfig.q_image;
-  const finalAImage = card.a_image || deckConfig.a_image;
-
-  if (finalQImage) {
-    frontImg.src = getImagePath(finalQImage);
-    frontImg.style.display = 'block';
-  } else {
-    frontImg.style.display = 'none';
+  // ── Image Clear Fix ──
+  const fImg = document.getElementById('frontImage'); 
+  const bImg = document.getElementById('backImage');
+  fImg.removeAttribute('src'); 
+  bImg.removeAttribute('src');
+  
+  if (card.q_image || deckConfig.q_image) { 
+    fImg.src = getImagePath(card.q_image || deckConfig.q_image); 
+    fImg.style.display = 'block'; 
+  } else { 
+    fImg.style.display = 'none'; 
+  }
+  
+  if (card.a_image || deckConfig.a_image) { 
+    bImg.src = getImagePath(card.a_image || deckConfig.a_image); 
+    bImg.style.display = 'block'; 
+  } else { 
+    bImg.style.display = 'none'; 
   }
 
-  if (finalAImage) {
-    backImg.src = getImagePath(finalAImage);
-    backImg.style.display = 'block';
-  } else {
-    backImg.style.display = 'none';
-  }
-  // ──────────────────
-
-  // Format and inject content (supporting Markdown code blocks)
   document.getElementById('frontText').innerHTML = formatContent(card.q);
   document.getElementById('backText').innerHTML  = formatContent(card.a);
-
-  document.getElementById('cardNum').textContent     = (index + 1) + ' of ' + deck.length;
-  document.getElementById('prevBtn').disabled        = (index === 0);
-  document.getElementById('nextBtn').disabled        = (index === deck.length - 1);
-  document.getElementById('hintText').textContent    = 'Click the card or "Submit" to reveal the answer';
-  document.getElementById('hintText').className      = 'hint';
   
+  // Apply Highlight.js to any code blocks in the flashcard answers
+  if (window.hljs) {
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block);
+    });
+  }
+
+  document.getElementById('cardNum').textContent = `${index + 1} of ${deck.length}`;
+  document.getElementById('prevBtn').disabled = index === 0;
+  document.getElementById('nextBtn').disabled = index === deck.length - 1;
   document.getElementById('ratingRow').style.display = 'none';
-  document.getElementById('flagPanel').style.display = 'none';
-  document.getElementById('flagNote').value          = flags[index] || '';
+  document.getElementById('hintText').textContent = 'Click the card or "Submit" to reveal the answer';
+  document.getElementById('hintText').className = 'hint';
 
-  let metaTagsHtml = '';
-  
-  if (card.category) {
-    metaTagsHtml += `<span class="card-meta-tag">${categoryLabel(card.category)}</span>`;
-  }
-  
-  cardGroups(card).forEach(g => {
-    metaTagsHtml += `<span class="card-meta-tag">${g}</span>`;
-  });
-  
-  if (card.difficulty) {
-    metaTagsHtml += `<span class="card-meta-tag ${card.difficulty}">${card.difficulty}</span>`;
-  }
-  
-  document.getElementById('cardMeta').innerHTML = metaTagsHtml;
+  document.getElementById('cardMeta').innerHTML = [
+    card.category ? `<span class="card-meta-tag">${categoryLabel(card.category)}</span>` : '',
+    ...(Array.isArray(card.group) ? card.group : [card.group]).filter(Boolean).map(g => `<span class="card-meta-tag">${g}</span>`),
+    card.difficulty ? `<span class="card-meta-tag ${card.difficulty}">${card.difficulty}</span>` : ''
+  ].join('');
 
-  const attempted = ratings.filter(r => r !== null).length;
-  const got       = ratings.filter(r => r === 'Good').length;
-  const ok        = ratings.filter(r => r === 'Ok').length;
-  const hard      = ratings.filter(r => r === 'Hard').length;
-  
-  document.getElementById('pFill').style.width  = Math.round(attempted / deck.length * 100) + '%';
-  document.getElementById('pLabel').textContent = attempted + ' / ' + deck.length + ' attempted';
-  
-  if (attempted > 0) {
-    document.getElementById('pBreakdown').textContent = got + ' Got it · ' + ok + ' Ok · ' + hard + ' Hard';
-  } else {
-    document.getElementById('pBreakdown').textContent = '';
-  }
-  
-  const label = currentCert ? `${currentCert}` : currentDeckName;
-  document.getElementById('deckCount').textContent = label + ' · ' + deck.length + ' cards';
+  const att = ratings.filter(r => r !== null).length;
+  document.getElementById('pFill').style.width = Math.round((att / deck.length) * 100) + '%';
+  document.getElementById('pLabel').textContent = `${att} / ${deck.length} attempted`;
+  document.getElementById('pBreakdown').textContent = att > 0 ? `${ratings.filter(r=>r==='Good').length} Got it · ${ratings.filter(r=>r==='Ok').length} Ok · ${ratings.filter(r=>r==='Hard').length} Hard` : '';
   
   renderThumbs();
 }
 
-function renderThumbs() {
-  const thumbUpBtn = document.getElementById('thumbUp');
-  const thumbDownBtn = document.getElementById('thumbDown');
-  
-  if (thumbs[index] === 'up') {
-    thumbUpBtn.classList.add('active-up');
-  } else {
-    thumbUpBtn.classList.remove('active-up');
-  }
-  
-  if (thumbs[index] === 'down') {
-    thumbDownBtn.classList.add('active-down');
-  } else {
-    thumbDownBtn.classList.remove('active-down');
-  }
-}
-
-function thumb(direction) {
-  if (thumbs[index] === direction) {
-    thumbs[index] = null;
-    if (direction === 'down') {
-      hide('flagPanel');
-    }
-  } else {
-    thumbs[index] = direction;
-    if (direction === 'down') {
-      show('flagPanel');
-      document.getElementById('flagNote').focus();
-    } else {
-      hide('flagPanel');
-      flags[index] = null;
-      sendFeedback('up');
-    }
-  }
-  renderThumbs();
-}
-
-function cancelFlag() {
-  thumbs[index] = null;
-  flags[index]  = null;
-  hide('flagPanel');
-  document.getElementById('flagNote').value = '';
-  renderThumbs();
-}
-
-function submitFlag() {
-  const noteText = document.getElementById('flagNote').value.trim();
-  flags[index] = noteText || '(no note provided)';
-  hide('flagPanel');
-  sendFeedback('down', noteText);
-}
-
-function submitCode() {
+function submitCode() { 
   if (!flipped) {
-    flip();
+    flip(); 
   }
 }
 
 function flip() {
   flipped = !flipped;
-  
-  const cardInner = document.getElementById('cardInner');
-  if (flipped) {
-    cardInner.classList.add('flipped');
-  } else {
-    cardInner.classList.remove('flipped');
-  }
-  
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
+  document.getElementById('cardInner').classList.toggle('flipped', flipped);
   
-  const codeBox = document.getElementById('userCodeInput');
   const compareBtn = document.getElementById('compareBtn');
   
   if (card.requires_code) {
-    if (codeBox) {
-      codeBox.disabled = flipped;
+    if (codeEditor) {
+      codeEditor.setOption('readOnly', flipped ? 'nocursor' : false);
     }
     if (compareBtn) {
-      if (flipped) {
-        compareBtn.style.display = 'none';
-      } else {
-        compareBtn.style.display = 'inline-block';
-      }
+      compareBtn.style.display = flipped ? 'none' : 'inline-block';
     }
   }
 
-  const hint = document.getElementById('hintText');
-  const ratingRow = document.getElementById('ratingRow');
-
   if (flipped) {
-    const finalASound = card.a_sound || deckConfig.a_sound;
-    if (finalASound) {
-      playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
-    } 
-    
-    hint.textContent = 'How did you do?';
-    hint.className = 'hint answered';
-    ratingRow.style.display = 'flex';
-  } else {
-    stopAudio();
-    
-    const finalQSound = card.q_sound || deckConfig.q_sound;
-    if (finalQSound) {
-        playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
+    if (card.a_sound || deckConfig.a_sound) {
+      playAudio(card.a_sound || deckConfig.a_sound, card.a_sound_start || deckConfig.a_sound_start || 0);
     }
-    
-    hint.textContent = 'Click the card to reveal the answer';
-    hint.className = 'hint';
-    ratingRow.style.display = 'none';
+    document.getElementById('hintText').textContent = 'How did you do?';
+    document.getElementById('hintText').className = 'hint answered';
+    document.getElementById('ratingRow').style.display = 'flex';
+  } else {
+    stopAudio(); 
+    document.getElementById('ratingRow').style.display = 'none';
+  }
+}
+
+function rate(r) {
+  ratings[index] = r;
+  if (index < deck.length - 1) { 
+    index++; 
+    render(); 
+  } else { 
+    showSummary(); 
   }
 }
 
@@ -795,53 +508,39 @@ function next() {
   } 
 }
 
-function rate(r) {
-  ratings[index] = r;
-  if (index < deck.length - 1) { 
-    index++; 
-    render(); 
+function thumb(dir) {
+  thumbs[index] = (thumbs[index] === dir) ? null : dir;
+  if (dir === 'down' && thumbs[index]) {
+    show('flagPanel');
   } else { 
-    showSummary(); 
+    hide('flagPanel'); 
+    if (dir === 'up') {
+      sendFeedback('up'); 
+    }
   }
+  renderThumbs();
+}
+
+function renderThumbs() {
+  document.getElementById('thumbUp').classList.toggle('active-up', thumbs[index] === 'up');
+  document.getElementById('thumbDown').classList.toggle('active-down', thumbs[index] === 'down');
+}
+
+function submitFlag() {
+  const note = document.getElementById('flagNote').value.trim();
+  flags[index] = note || '(no note)';
+  hide('flagPanel'); 
+  sendFeedback('down', note);
 }
 
 function showSummary() {
-  stopAudio();
-  hide('cardArea');
+  stopAudio(); 
+  hide('cardArea'); 
   show('summary');
   
-  const gotItCount = ratings.filter(r => r === 'Good').length;
-  const okCount = ratings.filter(r => r === 'Ok').length;
-  const hardCount = ratings.filter(r => r === 'Hard').length;
-  
-  document.getElementById('sGood').textContent = gotItCount;
-  document.getElementById('sOk').textContent   = okCount;
-  document.getElementById('sHard').textContent = hardCount;
-  
-  const flagged = deck.filter((_, i) => thumbs[i] === 'down');
-  const flagSummary = document.getElementById('flagSummary');
-  
-  if (flagged.length > 0) {
-    flagSummary.style.display = 'block';
-    document.getElementById('flagCount').textContent = flagged.length;
-  } else {
-    flagSummary.style.display = 'none';
-  }
-}
-
-function exportFlags() {
-  const lines = deck
-    .map((card, i) => {
-      return { card: card, thumb: thumbs[i], note: flags[i] };
-    })
-    .filter(item => item.thumb === 'down')
-    .map(f => `Deck: ${currentDeckName}\nCertification: ${currentCert || 'n/a'}\nQuestion: ${f.card.q}\nAnswer: ${f.card.a}\nNote: ${f.note || ''}\n`)
-    .join('\n---\n\n');
-    
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([lines], { type: 'text/plain' }));
-  a.download = `flagged-${(currentCert || currentDeckName).toLowerCase().replace(/\s+/g, '-')}.txt`;
-  a.click();
+  document.getElementById('sGood').textContent = ratings.filter(r => r === 'Good').length;
+  document.getElementById('sOk').textContent = ratings.filter(r => r === 'Ok').length;
+  document.getElementById('sHard').textContent = ratings.filter(r => r === 'Hard').length;
 }
 
 function restart() { 
@@ -849,30 +548,15 @@ function restart() {
 }
 
 document.addEventListener('keydown', e => {
-  const studyView = document.getElementById('studyView');
-  if (!studyView || studyView.style.display === 'none') return;
+  if (document.getElementById('studyView').style.display === 'none') return;
   
-  // Allow Cmd+Enter or Ctrl+Enter to submit code from the textarea
-  if (e.target.tagName === 'TEXTAREA' && e.target.id === 'userCodeInput') {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      submitCode();
-      return;
-    }
-  }
-  
-  if (e.target.tagName === 'TEXTAREA') return;
+  // Ignore keydowns if user is typing in a textarea, input, OR our new CodeMirror IDE
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.closest('.CodeMirror')) return;
   
   if (e.code === 'Space') { 
     e.preventDefault(); 
     flip(); 
   }
-  
-  if (e.code === 'ArrowRight') {
-    next();
-  }
-  
-  if (e.code === 'ArrowLeft') {
-    prev();
-  }
+  if (e.code === 'ArrowRight') next();
+  if (e.code === 'ArrowLeft') prev();
 });
