@@ -182,8 +182,34 @@ pre code {
   opacity: 0.6; 
 }
 
-.compare-btn {
+.code-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-top: 10px;
+}
+
+.comparison-result {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-xl);
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s;
+}
+
+.comparison-result.match {
+  background-color: var(--green-dim);
+  color: var(--green);
+}
+
+.comparison-result.mismatch {
+  background-color: var(--red-dim);
+  color: var(--red);
+}
+
+.compare-btn {
   padding: 10px 22px;
   border: none;
   border-radius: var(--radius-xl);

@@ -130,7 +130,10 @@
           </div>
           <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
         </div>
-        <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
+        <div class="code-actions-row">
+          <button class="compare-btn" id="compareBtn" onclick="submitCode()">Submit & Compare</button>
+          <span id="comparisonResult" class="comparison-result" style="display:none;"></span>
+        </div>
       </div>
 
       <div class="card-actions">

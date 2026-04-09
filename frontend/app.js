@@ -349,20 +349,9 @@ function buildFilterChips() {
   updateFilterCount();
 }
 
-function toggleCategory(cat) { 
-  selectedCategories.has(cat) ? selectedCategories.delete(cat) : selectedCategories.add(cat); 
-  buildFilterChips(); 
-}
-
-function toggleGroup(g) { 
-  selectedGroups.has(g) ? selectedGroups.delete(g) : selectedGroups.add(g); 
-  buildFilterChips(); 
-}
-
-function toggleDifficulty(d) { 
-  selectedDifficulties.has(d) ? selectedDifficulties.delete(d) : selectedDifficulties.add(d); 
-  buildFilterChips(); 
-}
+function toggleCategory(cat) { selectedCategories.has(cat) ? selectedCategories.delete(cat) : selectedCategories.add(cat); buildFilterChips(); }
+function toggleGroup(g) { selectedGroups.has(g) ? selectedGroups.delete(g) : selectedGroups.add(g); buildFilterChips(); }
+function toggleDifficulty(d) { selectedDifficulties.has(d) ? selectedDifficulties.delete(d) : selectedDifficulties.add(d); buildFilterChips(); }
 
 function updateFilterCount() {
   const all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
@@ -379,8 +368,7 @@ function updateFilterCount() {
   
   const row = document.getElementById('deckSizeRow'); row.innerHTML = '';
   [null, 10, 20, 50, 100].filter(s => s === null || s < count).forEach(s => {
-    const tile = document.createElement('div'); 
-    tile.className = `size-tile ${selectedDeckSize === s ? 'selected' : ''}`;
+    const tile = document.createElement('div'); tile.className = `size-tile ${selectedDeckSize === s ? 'selected' : ''}`;
     tile.innerHTML = s === null ? `All <span class="size-tile-sub">${count}</span>` : s;
     tile.onclick = () => { selectedDeckSize = s; updateFilterCount(); };
     row.appendChild(tile);
@@ -422,6 +410,7 @@ function render() {
   // ── Code IDE Handle ──
   const codeContainer = document.getElementById('codeInputContainer');
   const compareBtn = document.getElementById('compareBtn');
+  const resultEl = document.getElementById('comparisonResult');
   
   if (codeEditor) { 
     codeEditor.setValue(''); 
@@ -444,6 +433,11 @@ function render() {
     compareBtn.style.display = 'inline-block'; 
   }
   
+  if (resultEl) {
+    resultEl.style.display = 'none';
+    resultEl.className = 'comparison-result';
+  }
+
   if (codeContainer) { 
     if (card.requires_code) {
       codeContainer.style.display = 'block'; 
@@ -531,18 +525,41 @@ function flip() {
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
   
+  const codeBox = document.getElementById('userCodeInput');
   const compareBtn = document.getElementById('compareBtn');
+  const resultEl = document.getElementById('comparisonResult');
   
   if (card.requires_code) {
     if (codeEditor) {
       codeEditor.setOption('readOnly', flipped ? 'nocursor' : false);
     }
+    
     if (compareBtn) {
-      if (flipped) {
-        compareBtn.style.display = 'none';
+      compareBtn.style.display = flipped ? 'none' : 'inline-block';
+    }
+
+    // Code comparison logic
+    if (flipped && resultEl) {
+      const userCode = codeEditor ? codeEditor.getValue() : codeBox.value;
+      
+      // Extract code from markdown wrapper
+      const expectedMatch = card.a.match(/```[a-z0-9]*\n([\s\S]*?)```/i);
+      const expectedCode = expectedMatch ? expectedMatch[1] : card.a;
+      
+      // Normalize to handle formatting/spacing differences safely
+      const normUser = userCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
+      const normExpected = expectedCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
+      
+      if (normUser === normExpected) {
+        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
+        resultEl.className = 'comparison-result match';
       } else {
-        compareBtn.style.display = 'inline-block';
+        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
+        resultEl.className = 'comparison-result mismatch';
       }
+      resultEl.style.display = 'inline-flex';
+    } else if (resultEl) {
+      resultEl.style.display = 'none';
     }
   }
 
@@ -688,8 +705,15 @@ document.addEventListener('keydown', e => {
   const studyView = document.getElementById('studyView');
   if (!studyView || studyView.style.display === 'none') return;
   
-  // Ignore keydowns if user is typing in an input, textarea, OR our new CodeMirror IDE
-  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.closest('.CodeMirror')) return;
+  // Allow Cmd+Enter or Ctrl+Enter to submit code from the textarea
+  if (e.target.tagName === 'TEXTAREA' || e.target.closest('.CodeMirror')) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      submitCode();
+      return;
+    }
+    return; // Don't flip with space while typing
+  }
   
   if (e.code === 'Space') { 
     e.preventDefault(); 
