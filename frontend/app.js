@@ -593,7 +593,16 @@ async function flip() {
     // ── Code Comparison & JSDiff Logic ──
     if (flipped && resultEl) {
       const userCode = codeEditorView ? codeEditorView.state.doc.toString() : "";
-      const expectedLanguage = card.language || null;
+      
+      // Auto-detect language if not explicitly defined in the card
+      let expectedLanguage = card.language || null;
+      if (!expectedLanguage) {
+        const langRegex = new RegExp('\`{3}([a-z0-9]*)\\n', 'i');
+        const match = card.a ? card.a.match(langRegex) : null;
+        if (match && match[1]) {
+          expectedLanguage = match[1].toLowerCase();
+        }
+      }
       
       if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
 
