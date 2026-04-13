@@ -1,3 +1,15 @@
+// ── CodeMirror 6 Modules ──────────────────────────────────────────────────
+import { EditorState, Compartment } from "@codemirror/state";
+import { EditorView, keymap, lineNumbers } from "@codemirror/view";
+import { defaultKeymap, indentWithTab } from "@codemirror/commands";
+import { oneDark } from "@codemirror/theme-one-dark";
+import { sql, PostgreSQL, MySQL, StandardSQL, SQLite } from "@codemirror/lang-sql";
+import { python } from "@codemirror/lang-python";
+import { yaml } from "@codemirror/lang-yaml";
+import { StreamLanguage } from "@codemirror/language";
+import { shell } from "@codemirror/legacy-modes/mode/shell";
+import { jinja2 } from "@codemirror/legacy-modes/mode/jinja2";
+
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
 
@@ -7,23 +19,37 @@ let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficul
 let selectedDeckSize = 50; 
 
 // ── Global IDE & Audio Controllers ───────────────────────────────────────
-let codeEditor;
+let codeEditorView;
 let cardAudio = new Audio();
 
+// Dynamic compartments allow us to change language & readonly states instantly
+const languageConf = new Compartment();
+const readOnlyConf = new Compartment();
+
 document.addEventListener("DOMContentLoaded", () => {
-  const textArea = document.getElementById('userCodeInput');
-  if (textArea) {
-    // Initialize CodeMirror IDE
-    codeEditor = CodeMirror.fromTextArea(textArea, {
-      lineNumbers: true,
-      theme: "dracula",
-      mode: "text/plain",
-      indentUnit: 4,
-      matchBrackets: true,
-      extraKeys: {
-        "Cmd-Enter": function() { submitCode(); },
-        "Ctrl-Enter": function() { submitCode(); }
-      }
+  const container = document.getElementById('editorContainer');
+  if (container) {
+    const submitKeymap = keymap.of([{
+      key: "Mod-Enter",
+      run: () => { submitCode(); return true; }
+    }]);
+
+    const state = EditorState.create({
+      doc: "",
+      extensions: [
+        lineNumbers(),
+        keymap.of([...defaultKeymap, indentWithTab]),
+        submitKeymap,
+        oneDark,
+        EditorView.lineWrapping,
+        languageConf.of([]), // Loads empty initially
+        readOnlyConf.of(EditorState.readOnly.of(false))
+      ]
+    });
+
+    codeEditorView = new EditorView({
+      state,
+      parent: container
     });
   }
 });
@@ -60,22 +86,39 @@ function getImagePath(fileName) {
 }
 
 /**
+ * Returns the exact CodeMirror language extension based on a string label.
+ */
+function getCM6LanguageExtension(label) {
+  const l = label.toLowerCase();
+  if (l.includes('postgresql') || l.includes('postgres') || l.includes('snowflake')) return sql({dialect: PostgreSQL});
+  if (l.includes('mysql')) return sql({dialect: MySQL});
+  if (l.includes('sqlite')) return sql({dialect: SQLite});
+  if (l.includes('sql') || l.includes('bigquery') || l.includes('gbq')) return sql({dialect: StandardSQL});
+  if (l.includes('python') || l.includes('py')) return python();
+  if (l.includes('yaml') || l.includes('yml')) return yaml();
+  if (l.includes('bash') || l.includes('sh')) return StreamLanguage.define(shell);
+  if (l.includes('jinja')) return StreamLanguage.define(jinja2);
+  return []; // Fallback to plain text
+}
+
+/**
  * Formats text content to support Markdown-style code blocks and inline code
  * Wraps code blocks in a Gemini-style header layout.
  */
 function formatContent(text) {
   if (text === null || text === undefined) return '';
 
-  // 1. Escaping HTML
   let escaped = String(text)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
 
-  // 2. Extract multi-line Blocks: ```language \n code ```
-  // We extract them first so we don't accidentally inject <br> tags into the code body
   const codeBlocks = [];
-  escaped = escaped.replace(/\`\`\`([a-z0-9]+)?\n?([\s\S]*?)\`\`\`/gi, (match, lang, code) => {
+  
+  // Safe RegExp to prevent markdown parser breaks in the response
+  const blockRegex = new RegExp('\`{3}([a-z0-9]+)?\\n?([\\s\\S]*?)\`{3}', 'gi');
+  
+  escaped = escaped.replace(blockRegex, (match, lang, code) => {
     const langClass = lang ? `language-${lang.toLowerCase()}` : '';
     const langLabel = lang ? lang.toLowerCase() : 'text';
     
@@ -95,13 +138,9 @@ function formatContent(text) {
     return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
   });
 
-  // 3. Inline Code: `code` -> <code>code</code>
   escaped = escaped.replace(/\`([^\`]+)\`/g, '<code>$1</code>');
-
-  // 4. Preserve standard line breaks for non-code text
   escaped = escaped.replace(/\n/g, '<br>');
 
-  // 5. Restore the fully formatted code blocks
   codeBlocks.forEach((block, i) => {
     escaped = escaped.replace(`___CODE_BLOCK_${i}___`, block);
   });
@@ -113,7 +152,6 @@ function formatContent(text) {
 window.copyCode = function(btn) {
   const codeEl = btn.closest('.gemini-code-wrapper').querySelector('code');
   
-  // Decode HTML entities back to raw text for the clipboard
   const textToCopy = codeEl.innerHTML
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
@@ -134,7 +172,6 @@ window.copyCode = function(btn) {
     copyFallback(textToCopy);
   }
 
-  // Update UI to show success
   const originalHtml = btn.innerHTML;
   btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> <span style="color:#059669">Copied!</span>`;
   setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
@@ -179,6 +216,7 @@ function showOnly(id) {
 
 // ── Azure API Integration ──────────────────────────────────────────────────
 const API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback';
+const VALIDATE_API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/validate_code';
 
 function sendFeedback(thumbType, noteText = '') {
   const card = deck[index];
@@ -412,18 +450,24 @@ function render() {
   const resultEl = document.getElementById('comparisonResult');
   const diffContainer = document.getElementById('diffContainer');
   
-  if (codeEditor) { 
-    codeEditor.setValue(''); 
-    codeEditor.setOption('readOnly', false); 
-    
+  if (codeEditorView) { 
     // Auto-detect language mode from the answer markdown for the IDE
-    let mode = "text/plain";
     let label = "text";
-    if (card.a && card.a.includes('```sql')) { mode = "text/x-sql"; label = "sql"; }
-    else if (card.a && card.a.includes('```python')) { mode = "python"; label = "python"; }
-    else if (card.a && card.a.includes('```jinja')) { mode = "jinja2"; label = "jinja"; }
+    const answerRegex = new RegExp('\`{3}([a-z0-9]*)\\n', 'i');
+    const codeMatch = card.a ? card.a.match(answerRegex) : null;
     
-    codeEditor.setOption('mode', mode);
+    if (codeMatch && codeMatch[1]) {
+      label = codeMatch[1].toLowerCase();
+    }
+    
+    // Clear the document, reset ReadOnly, and update language rules dynamically!
+    codeEditorView.dispatch({
+      changes: { from: 0, to: codeEditorView.state.doc.length, insert: "" },
+      effects: [
+        languageConf.reconfigure(getCM6LanguageExtension(label)),
+        readOnlyConf.reconfigure(EditorState.readOnly.of(false))
+      ]
+    });
     
     const langLabelEl = document.getElementById('draftingLangLabel');
     if (langLabelEl) langLabelEl.textContent = label;
@@ -443,14 +487,14 @@ function render() {
     diffContainer.innerHTML = '';
   }
 
+  const syntaxErrorContainer = document.getElementById('syntaxErrorContainer');
+  if (syntaxErrorContainer) {
+    syntaxErrorContainer.style.display = 'none';
+    syntaxErrorContainer.innerHTML = '';
+  }
+
   if (codeContainer) { 
-    if (card.requires_code) {
-      codeContainer.style.display = 'block'; 
-      // CodeMirror needs a manual refresh when its container becomes visible
-      setTimeout(() => codeEditor.refresh(), 10); 
-    } else {
-      codeContainer.style.display = 'none'; 
-    }
+    codeContainer.style.display = card.requires_code ? 'block' : 'none'; 
   }
 
   document.getElementById('cardInner').classList.remove('flipped');
@@ -517,7 +561,7 @@ function submitCode() {
   }
 }
 
-function flip() {
+async function flip() {
   flipped = !flipped;
   
   const cardInner = document.getElementById('cardInner');
@@ -533,27 +577,63 @@ function flip() {
   const compareBtn = document.getElementById('compareBtn');
   const resultEl = document.getElementById('comparisonResult');
   const diffContainer = document.getElementById('diffContainer');
+  const syntaxErrorContainer = document.getElementById('syntaxErrorContainer');
   
   if (card.requires_code) {
-    if (codeEditor) {
-      codeEditor.setOption('readOnly', flipped ? 'nocursor' : false);
+    if (codeEditorView) {
+      codeEditorView.dispatch({
+        effects: readOnlyConf.reconfigure(EditorState.readOnly.of(flipped))
+      });
     }
     
     if (compareBtn) {
       compareBtn.style.display = flipped ? 'none' : 'inline-block';
     }
 
-    // ── Code Comparison Logic ──
+    // ── Code Comparison & JSDiff Logic ──
     if (flipped && resultEl) {
-      const userCode = codeEditor ? codeEditor.getValue() : document.getElementById('userCodeInput').value;
+      const userCode = codeEditorView ? codeEditorView.state.doc.toString() : "";
+      const expectedLanguage = card.language || null;
       
-      // Extract code from markdown wrapper in the answer
-      const expectedMatch = card.a.match(/```[a-z0-9]*\n([\s\S]*?)```/i);
+      if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
+
+      // ── API Validation Call ──
+      if (expectedLanguage) {
+        try {
+          const response = await fetch(VALIDATE_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: userCode, language: expectedLanguage })
+          });
+          
+          const validation = await response.json();
+          
+          if (!validation.is_valid && validation.errors && validation.errors.length > 0) {
+            if (syntaxErrorContainer) {
+              let errorHtml = `<div class="syntax-error-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Syntax Error (${expectedLanguage})</div><ul class="syntax-error-list">`;
+              validation.errors.forEach(err => {
+                const lineText = err.line ? `Line ${err.line}: ` : '';
+                const desc = err.description || err.message || JSON.stringify(err);
+                errorHtml += `<li><strong>${lineText}</strong>${desc}</li>`;
+              });
+              errorHtml += '</ul>';
+              syntaxErrorContainer.innerHTML = errorHtml;
+              syntaxErrorContainer.style.display = 'block';
+            }
+          }
+        } catch (e) {
+          console.error("Validation API failed:", e);
+        }
+      }
+      
+      // Extract code from markdown wrapper safely
+      const extractionRegex = new RegExp('\`{3}[a-z0-9]*\\n([\\s\\S]*?)\`{3}', 'i');
+      const expectedMatch = card.a ? card.a.match(extractionRegex) : null;
       const expectedCode = expectedMatch ? expectedMatch[1] : card.a;
       
-      // Normalize line endings and trim padding for comparison
-      const normUser = userCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
-      const normExpected = expectedCode.replace(/\r\n/g, '\n').split('\n').map(l => l.trimEnd()).join('\n').trim();
+      // Normalize line endings, convert tabs to spaces, and trim padding for comparison
+      const normUser = userCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
+      const normExpected = expectedCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       
       if (normUser === normExpected) {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
@@ -563,15 +643,18 @@ function flip() {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
         resultEl.className = 'comparison-result mismatch';
         
-        // Generate Visual Diff
+        // Generate Visual Diff with visible spaces
         if (diffContainer && window.Diff) {
           const diff = Diff.diffWordsWithSpace(normUser, normExpected);
           let diffHtml = '';
           diff.forEach(part => {
-            const safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            let safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            
             if (part.added) {
+              safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
               diffHtml += `<span class="diff-added">${safeValue}</span>`;
             } else if (part.removed) {
+              safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
               diffHtml += `<span class="diff-removed">${safeValue}</span>`;
             } else {
               diffHtml += `<span class="diff-unchanged">${safeValue}</span>`;
@@ -591,6 +674,7 @@ function flip() {
     } else {
       if (resultEl) resultEl.style.display = 'none';
       if (diffContainer) diffContainer.style.display = 'none';
+      if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
     }
   }
 
@@ -736,15 +820,8 @@ document.addEventListener('keydown', e => {
   const studyView = document.getElementById('studyView');
   if (!studyView || studyView.style.display === 'none') return;
   
-  // Allow Cmd+Enter or Ctrl+Enter to submit code from the CodeMirror wrapper
-  if (e.target.tagName === 'TEXTAREA' || e.target.closest('.CodeMirror')) {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-      e.preventDefault();
-      submitCode();
-      return;
-    }
-    return; // Don't flip with space while typing in an input!
-  }
+  // Ignore keydowns if user is typing in an input, textarea, OR our new CodeMirror IDE
+  if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.closest('.cm-editor')) return;
   
   if (e.code === 'Space') { 
     e.preventDefault(); 
@@ -759,3 +836,22 @@ document.addEventListener('keydown', e => {
     prev();
   }
 });
+
+// Since we're using a module, bind necessary UI hooks to the window so HTML onclicks work:
+window.submitCode = submitCode;
+window.flip = flip;
+window.showPicker = showPicker;
+window.filterBack = filterBack;
+window.startFiltered = startFiltered;
+window.toggleCustomization = toggleCustomization;
+window.toggleCategory = toggleCategory;
+window.toggleGroup = toggleGroup;
+window.toggleDifficulty = toggleDifficulty;
+window.thumb = thumb;
+window.cancelFlag = cancelFlag;
+window.submitFlag = submitFlag;
+window.rate = rate;
+window.prev = prev;
+window.next = next;
+window.restart = restart;
+window.exportFlags = exportFlags;

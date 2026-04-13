@@ -1,4 +1,4 @@
-@import url('[https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap)');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap');
 
 *, *::before, *::after { 
   box-sizing: border-box; 
@@ -154,22 +154,25 @@ pre code {
   display: none; /* Hide by default! */
 }
 
-/* Blend the CodeMirror IDE seamlessly into the Gemini wrapper */
-.drafting-wrapper .CodeMirror {
-  border: none;
-  border-radius: 0;
-  margin-top: 0;
-  box-shadow: none;
+/* Blend the CodeMirror 6 IDE seamlessly into the Gemini wrapper */
+.cm-editor {
   background-color: #1e1e1e; 
-  font-family: 'Consolas', 'Fira Code', 'Monaco', 'Courier New', Courier, monospace;
+  font-family: 'Consolas', 'Fira Code', 'Monaco', 'Courier New', Courier, monospace !important;
   font-size: 13px;
   height: auto;
   min-height: 120px;
   transition: opacity 0.2s;
+  border: none !important;
 }
 
-.CodeMirror-scroll { 
-  min-height: 120px; 
+.cm-scroller {
+  font-family: inherit !important;
+  min-height: 120px;
+}
+
+/* Remove default focus ring on the editor, handle it on the wrapper */
+.cm-editor.cm-focused {
+  outline: none !important;
 }
 
 /* Add a subtle highlight to the wrapper when drafting */
@@ -178,8 +181,8 @@ pre code {
   box-shadow: 0 0 0 3px var(--accent-dim);
 }
 
-.CodeMirror.cm-s-dracula.CodeMirror-nocursor { 
-  opacity: 0.6; 
+.cm-editor[contenteditable="false"] {
+  opacity: 0.6;
 }
 
 .code-actions-row {
@@ -227,6 +230,11 @@ pre code {
   word-wrap: break-word;
 }
 
+.diff-space {
+  opacity: 0.4;
+  user-select: none;
+}
+
 .diff-added {
   background-color: rgba(16, 185, 129, 0.25);
   color: #34d399;
@@ -243,6 +251,36 @@ pre code {
 
 .diff-unchanged {
   color: #d4d4d4;
+}
+
+.syntax-error-container {
+  margin-top: 12px;
+  background: var(--red-dim);
+  border: 1px solid var(--red);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  color: var(--red);
+  font-family: 'Consolas', 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.syntax-error-title {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.syntax-error-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.syntax-error-list li {
+  margin-bottom: 4px;
+  line-height: 1.4;
 }
 
 .compare-btn {

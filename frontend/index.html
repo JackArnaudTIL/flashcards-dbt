@@ -16,13 +16,23 @@
   <!-- JSDiff (Code Comparison Engine) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js"></script>
 
-  <!-- CodeMirror (IDE Engine for the user input) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/theme/dracula.min.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/sql/sql.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/python/python.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.13/mode/jinja2/jinja2.min.js"></script>
+  <!-- Import Map for CodeMirror 6 ES Modules -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@codemirror/state": "https://esm.sh/@codemirror/state",
+      "@codemirror/view": "https://esm.sh/@codemirror/view",
+      "@codemirror/commands": "https://esm.sh/@codemirror/commands",
+      "@codemirror/language": "https://esm.sh/@codemirror/language",
+      "@codemirror/theme-one-dark": "https://esm.sh/@codemirror/theme-one-dark",
+      "@codemirror/lang-sql": "https://esm.sh/@codemirror/lang-sql",
+      "@codemirror/lang-python": "https://esm.sh/@codemirror/lang-python",
+      "@codemirror/lang-yaml": "https://esm.sh/@codemirror/lang-yaml",
+      "@codemirror/legacy-modes/mode/shell": "https://esm.sh/@codemirror/legacy-modes/mode/shell",
+      "@codemirror/legacy-modes/mode/jinja2": "https://esm.sh/@codemirror/legacy-modes/mode/jinja2"
+    }
+  }
+  </script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -125,15 +135,16 @@
         </div>
       </div>
 
-      <!-- IDE Code Drafting Area with Diff engine UI -->
+      <!-- IDE Code Drafting Area (CodeMirror 6 Target) -->
       <div class="code-input-container" id="codeInputContainer">
-        <label class="label" for="userCodeInput" style="margin-bottom: 6px; display: block;">Draft your answer:</label>
+        <label class="label" for="editorContainer" style="margin-bottom: 6px; display: block;">Draft your answer:</label>
         
         <div class="gemini-code-wrapper drafting-wrapper">
           <div class="gemini-code-header">
             <span class="gemini-code-lang" id="draftingLangLabel">text</span>
           </div>
-          <textarea id="userCodeInput" placeholder="Type your code or answer here before flipping..."></textarea>
+          <!-- CM6 renders its view here -->
+          <div id="editorContainer"></div> 
         </div>
         
         <div class="code-actions-row">
@@ -142,6 +153,7 @@
         </div>
         
         <div id="diffContainer" class="diff-container" style="display:none;"></div>
+        <div id="syntaxErrorContainer" class="syntax-error-container" style="display:none;"></div>
       </div>
 
       <div class="card-actions">
@@ -201,6 +213,6 @@
   </div>
 
 </div>
-<script src="app.js"></script>
+<script type="module" src="app.js"></script>
 </body>
 </html>
