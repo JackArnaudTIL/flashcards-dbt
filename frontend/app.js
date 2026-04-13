@@ -119,7 +119,11 @@ function formatContent(text) {
   const blockRegex = new RegExp('\`{3}([a-z0-9]+)?\\n?([\\s\\S]*?)\`{3}', 'gi');
   
   escaped = escaped.replace(blockRegex, (match, lang, code) => {
-    const langClass = lang ? `language-${lang.toLowerCase()}` : '';
+    // Map jinja to django so highlight.js knows how to colorize it
+    let mappedLang = lang ? lang.toLowerCase() : '';
+    if (mappedLang === 'jinja' || mappedLang === 'jinja2') mappedLang = 'django';
+
+    const langClass = mappedLang ? `language-${mappedLang}` : '';
     const langLabel = lang ? lang.toLowerCase() : 'text';
     
     codeBlocks.push(`
@@ -614,6 +618,13 @@ async function flip() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: userCode, language: expectedLanguage })
           });
+          
+          // Check if the response was successful before parsing JSON
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Validation API failed with status ${response.status}:`, errorText);
+            throw new Error(`API returned status ${response.status}`);
+          }
           
           const validation = await response.json();
           
