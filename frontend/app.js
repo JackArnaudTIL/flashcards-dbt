@@ -600,6 +600,8 @@ async function flip() {
       
       // Auto-detect language if not explicitly defined in the card
       let expectedLanguage = card.language || null;
+      let apiSuccess = false;
+
       if (!expectedLanguage) {
         const langRegex = new RegExp('\`{3}([a-z0-9]*)\\n', 'i');
         const match = card.a ? card.a.match(langRegex) : null;
@@ -619,75 +621,86 @@ async function flip() {
             body: JSON.stringify({ code: userCode, language: expectedLanguage })
           });
           
-          // Check if the response was successful before parsing JSON
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Validation API failed with status ${response.status}:`, errorText);
-            throw new Error(`API returned status ${response.status}`);
-          }
-          
-          const validation = await response.json();
-          
-          if (!validation.is_valid && validation.errors && validation.errors.length > 0) {
-            if (syntaxErrorContainer) {
-              let errorHtml = `<div class="syntax-error-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Syntax Error (${expectedLanguage})</div><ul class="syntax-error-list">`;
-              validation.errors.forEach(err => {
-                const lineText = err.line ? `Line ${err.line}: ` : '';
-                const desc = err.description || err.message || JSON.stringify(err);
-                errorHtml += `<li><strong>${lineText}</strong>${desc}</li>`;
-              });
-              errorHtml += '</ul>';
-              syntaxErrorContainer.innerHTML = errorHtml;
-              syntaxErrorContainer.style.display = 'block';
+          if (response.ok) {
+            apiSuccess = true; // Mark as successful!
+            const validation = await response.json();
+            
+            if (!validation.is_valid && validation.errors && validation.errors.length > 0) {
+              if (syntaxErrorContainer) {
+                let errorHtml = `<div class="syntax-error-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Syntax Error (${expectedLanguage})</div><ul class="syntax-error-list">`;
+                validation.errors.forEach(err => {
+                  const lineText = err.line ? `Line ${err.line}: ` : '';
+                  const desc = err.description || err.message || JSON.stringify(err);
+                  errorHtml += `<li><strong>${lineText}</strong>${desc}</li>`;
+                });
+                errorHtml += '</ul>';
+                syntaxErrorContainer.innerHTML = errorHtml;
+                syntaxErrorContainer.style.display = 'block';
+              }
             }
+          } else {
+            const errorText = await response.text();
+            console.warn(`Validation API failed with status ${response.status}. Falling back to JSDiff.`, errorText);
           }
         } catch (e) {
-          console.error("Validation API failed:", e);
+          console.error("Validation API unreachable. Falling back to JSDiff:", e);
         }
       }
       
-      // Extract code from markdown wrapper safely
+      // Extract expected code from markdown wrapper safely for comparison
       const extractionRegex = new RegExp('\`{3}[a-z0-9]*\\n([\\s\\S]*?)\`{3}', 'i');
       const expectedMatch = card.a ? card.a.match(extractionRegex) : null;
       const expectedCode = expectedMatch ? expectedMatch[1] : card.a;
       
-      // Normalize line endings, convert tabs to spaces, and trim padding for comparison
+      // Normalize line endings, convert tabs to spaces, and trim padding
       const normUser = userCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       const normExpected = expectedCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       
+      // 1. ALWAYS reward a perfect match, regardless of the API!
       if (normUser === normExpected) {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
         resultEl.className = 'comparison-result match';
         if (diffContainer) diffContainer.style.display = 'none';
-      } else {
-        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
-        resultEl.className = 'comparison-result mismatch';
-        
-        // Generate Visual Diff with visible spaces
-        if (diffContainer && window.Diff) {
-          const diff = Diff.diffWordsWithSpace(normUser, normExpected);
-          let diffHtml = '';
-          diff.forEach(part => {
-            let safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            
-            if (part.added) {
-              safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
-              diffHtml += `<span class="diff-added">${safeValue}</span>`;
-            } else if (part.removed) {
-              safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
-              diffHtml += `<span class="diff-removed">${safeValue}</span>`;
-            } else {
-              diffHtml += `<span class="diff-unchanged">${safeValue}</span>`;
-            }
-          });
+        if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none'; // hide false-positive API errors if it's identical
+      } 
+      // 2. If it's NOT a perfect match...
+      else {
+        // Fallback: If API crashed or 404'd, we show the visual diff
+        if (!apiSuccess) {
+          resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
+          resultEl.className = 'comparison-result mismatch';
           
-          diffContainer.innerHTML = `
-            <div style="font-size:11px; margin-bottom:8px; color:var(--ink-soft); font-weight:600; letter-spacing:0.05em;">
-              VISUAL DIFF: <span class="diff-removed" style="padding:2px 4px; border-radius:2px; margin:0 4px;">Your Code</span> vs <span class="diff-added" style="padding:2px 4px; border-radius:2px; margin-left:4px;">Expected</span>
-            </div>
-            <pre><code>${diffHtml}</code></pre>
-          `;
-          diffContainer.style.display = 'block';
+          // Generate Visual Diff with visible spaces
+          if (diffContainer && window.Diff) {
+            const diff = Diff.diffWordsWithSpace(normUser, normExpected);
+            let diffHtml = '';
+            diff.forEach(part => {
+              let safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+              if (part.added) {
+                safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
+                diffHtml += `<span class="diff-added">${safeValue}</span>`;
+              } else if (part.removed) {
+                safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
+                diffHtml += `<span class="diff-removed">${safeValue}</span>`;
+              } else {
+                diffHtml += `<span class="diff-unchanged">${safeValue}</span>`;
+              }
+            });
+            
+            diffContainer.innerHTML = `
+              <div style="font-size:11px; margin-bottom:8px; color:var(--ink-soft); font-weight:600; letter-spacing:0.05em;">
+                VISUAL DIFF: <span class="diff-removed" style="padding:2px 4px; border-radius:2px; margin:0 4px;">Your Code</span> vs <span class="diff-added" style="padding:2px 4px; border-radius:2px; margin-left:4px;">Expected</span>
+              </div>
+              <pre><code>${diffHtml}</code></pre>
+            `;
+            diffContainer.style.display = 'block';
+          }
+        } 
+        // 3. API Succeeded: Hide the ugly JSDiff since we already parsed syntax!
+        else {
+          resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
+          resultEl.className = 'comparison-result mismatch';
+          if (diffContainer) diffContainer.style.display = 'none';
         }
       }
       resultEl.style.display = 'inline-flex';
