@@ -861,6 +861,7 @@ document.addEventListener('keydown', e => {
 window.submitCode = submitCode;
 window.flip = flip;
 window.showPicker = showPicker;
+window.showFilterPicker = showFilterPicker;
 window.filterBack = filterBack;
 window.startFiltered = startFiltered;
 window.toggleCustomization = toggleCustomization;
