@@ -93,7 +93,7 @@ function getCM6LanguageExtension(label) {
   if (l.includes('postgresql') || l.includes('postgres') || l.includes('snowflake')) return sql({dialect: PostgreSQL});
   if (l.includes('mysql')) return sql({dialect: MySQL});
   if (l.includes('sqlite')) return sql({dialect: SQLite});
-  if (l.includes('sql') || l.includes('bigquery') || l.includes('gbq')) return sql({dialect: StandardSQL});
+  if (l.includes('sql') || l.includes('bigquery') || l.includes('gbq') || l.includes('dbt')) return sql({dialect: StandardSQL});
   if (l.includes('python') || l.includes('py')) return python();
   if (l.includes('yaml') || l.includes('yml')) return yaml();
   if (l.includes('bash') || l.includes('sh')) return StreamLanguage.define(shell);
@@ -115,8 +115,8 @@ function formatContent(text) {
 
   const codeBlocks = [];
   
-  // Safe RegExp to prevent markdown parser breaks in the response
-  const blockRegex = new RegExp('\`{3}([a-z0-9]+)?\\n?([\\s\\S]*?)\`{3}', 'gi');
+  // Robust regex that handles Windows (\r\n) line endings and trailing spaces
+  const blockRegex = /```([a-z0-9]+)?[ \t]*\r?\n([\s\S]*?)```/gi;
   
   escaped = escaped.replace(blockRegex, (match, lang, code) => {
     // Map jinja to django so highlight.js knows how to colorize it
@@ -219,8 +219,8 @@ function showOnly(id) {
 }
 
 // ── Azure API Integration ──────────────────────────────────────────────────
-const API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback';
-const VALIDATE_API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/validate_code';
+const API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback](https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback)';
+const VALIDATE_API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/validate_code](https://flashcard-feedback-logging.azurewebsites.net/api/validate_code)';
 
 function sendFeedback(thumbType, noteText = '') {
   const card = deck[index];
@@ -457,7 +457,7 @@ function render() {
   if (codeEditorView) { 
     // Auto-detect language mode from the answer markdown for the IDE
     let label = "text";
-    const answerRegex = new RegExp('\`{3}([a-z0-9]*)\\n', 'i');
+    const answerRegex = /```([a-z0-9]*)[ \t]*\r?\n/i;
     const codeMatch = card.a ? card.a.match(answerRegex) : null;
     
     if (codeMatch && codeMatch[1]) {
@@ -603,7 +603,7 @@ async function flip() {
       let apiSuccess = false;
 
       if (!expectedLanguage) {
-        const langRegex = new RegExp('\`{3}([a-z0-9]*)\\n', 'i');
+        const langRegex = /```([a-z0-9]*)[ \t]*\r?\n/i;
         const match = card.a ? card.a.match(langRegex) : null;
         if (match && match[1]) {
           expectedLanguage = match[1].toLowerCase();
@@ -648,7 +648,7 @@ async function flip() {
       }
       
       // Extract expected code from markdown wrapper safely for comparison
-      const extractionRegex = new RegExp('\`{3}[a-z0-9]*\\n([\\s\\S]*?)\`{3}', 'i');
+      const extractionRegex = /```[a-z0-9]*[ \t]*\r?\n([\s\S]*?)```/i;
       const expectedMatch = card.a ? card.a.match(extractionRegex) : null;
       const expectedCode = expectedMatch ? expectedMatch[1] : card.a;
       
