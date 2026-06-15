@@ -8,6 +8,7 @@ import sqlfluff
 import ast
 import yaml
 from jinja2 import Environment, TemplateSyntaxError
+import anthropic
 
 app = func.FunctionApp(http_auth_level=func.AuthLevel.ANONYMOUS)
 
@@ -209,8 +210,94 @@ def validate_code(req: func.HttpRequest) -> func.HttpResponse:
     except Exception as e:
         logging.error(f"Validation error: {str(e)}")
         return func.HttpResponse(
-             json.dumps({"error": str(e)}), 
-             status_code=500, 
+             json.dumps({"error": str(e)}),
+             status_code=500,
              mimetype="application/json",
              headers=cors_headers
+        )
+
+
+# ─── ENDPOINT 3: AI Code Review ───────────────────────────────────────────
+@app.route(route="review_code", methods=["POST", "OPTIONS"])
+def review_code(req: func.HttpRequest) -> func.HttpResponse:
+    logging.info('Processing AI code review request.')
+
+    allowed_origin = os.environ.get("ALLOWED_ORIGIN", "*")
+    cors_headers = {
+        "Access-Control-Allow-Origin":  allowed_origin,
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    }
+
+    if req.method == "OPTIONS":
+        return func.HttpResponse(status_code=204, headers=cors_headers)
+
+    try:
+        body = req.get_json()
+    except ValueError:
+        return func.HttpResponse(
+            json.dumps({"error": "Invalid JSON body"}),
+            status_code=400,
+            mimetype="application/json",
+            headers=cors_headers,
+        )
+
+    user_code = (body.get("user_code") or "").strip()
+    expected_code = (body.get("expected_code") or "").strip()
+    language = (body.get("language") or "code").strip()
+
+    if not user_code or not expected_code:
+        return func.HttpResponse(
+            json.dumps({"error": "user_code and expected_code are required"}),
+            status_code=400,
+            mimetype="application/json",
+            headers=cors_headers,
+        )
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return func.HttpResponse(
+            json.dumps({"error": "ANTHROPIC_API_KEY not configured"}),
+            status_code=500,
+            mimetype="application/json",
+            headers=cors_headers,
+        )
+
+    try:
+        client = anthropic.Anthropic(api_key=api_key)
+        message = client.messages.create(
+            model="claude-haiku-4-5",
+            max_tokens=400,
+            system=(
+                "You are a code review assistant for a flashcard learning app. "
+                "Compare the student's submission against the expected answer and give brief, educational feedback. "
+                "Focus on what's conceptually different or missing. Be encouraging and specific. "
+                "Keep your response to 2-4 sentences. Do not include code blocks."
+            ),
+            messages=[{
+                "role": "user",
+                "content": (
+                    f"Language: {language}\n\n"
+                    f"Student's code:\n```\n{user_code}\n```\n\n"
+                    f"Expected answer:\n```\n{expected_code}\n```\n\n"
+                    "What are the key differences, and what should the student focus on?"
+                )
+            }]
+        )
+
+        feedback = message.content[0].text
+        return func.HttpResponse(
+            json.dumps({"feedback": feedback}),
+            status_code=200,
+            mimetype="application/json",
+            headers=cors_headers,
+        )
+
+    except Exception as e:
+        logging.error("AI review error: %s", e)
+        return func.HttpResponse(
+            json.dumps({"error": str(e)}),
+            status_code=500,
+            mimetype="application/json",
+            headers=cors_headers,
         )

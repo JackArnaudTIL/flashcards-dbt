@@ -221,6 +221,7 @@ function showOnly(id) {
 // ── Azure API Integration ──────────────────────────────────────────────────
 const API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback](https://flashcard-feedback-logging.azurewebsites.net/api/flashcardfeedback)';
 const VALIDATE_API_URL = '[https://flashcard-feedback-logging.azurewebsites.net/api/validate_code](https://flashcard-feedback-logging.azurewebsites.net/api/validate_code)';
+const REVIEW_API_URL = 'https://flashcard-feedback-logging.azurewebsites.net/api/review_code';
 
 function sendFeedback(thumbType, noteText = '') {
   const card = deck[index];
@@ -665,42 +666,42 @@ async function flip() {
       } 
       // 2. If it's NOT a perfect match...
       else {
-        // Fallback: If API crashed or 404'd, we show the visual diff
-        if (!apiSuccess) {
-          resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
-          resultEl.className = 'comparison-result mismatch';
-          
-          // Generate Visual Diff with visible spaces
-          if (diffContainer && window.Diff) {
-            const diff = Diff.diffWordsWithSpace(normUser, normExpected);
-            let diffHtml = '';
-            diff.forEach(part => {
-              let safeValue = part.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-              if (part.added) {
-                safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
-                diffHtml += `<span class="diff-added">${safeValue}</span>`;
-              } else if (part.removed) {
-                safeValue = safeValue.replace(/ /g, '<span class="diff-space">·</span>');
-                diffHtml += `<span class="diff-removed">${safeValue}</span>`;
-              } else {
-                diffHtml += `<span class="diff-unchanged">${safeValue}</span>`;
-              }
-            });
-            
-            diffContainer.innerHTML = `
-              <div style="font-size:11px; margin-bottom:8px; color:var(--ink-soft); font-weight:600; letter-spacing:0.05em;">
-                VISUAL DIFF: <span class="diff-removed" style="padding:2px 4px; border-radius:2px; margin:0 4px;">Your Code</span> vs <span class="diff-added" style="padding:2px 4px; border-radius:2px; margin-left:4px;">Expected</span>
-              </div>
-              <pre><code>${diffHtml}</code></pre>
-            `;
-            diffContainer.style.display = 'block';
+        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
+        resultEl.className = 'comparison-result mismatch';
+
+        // Show loading state while AI review is in-flight
+        if (diffContainer) {
+          diffContainer.innerHTML = '<div style="padding:10px 12px; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
+          diffContainer.style.display = 'block';
+        }
+
+        // Try AI code review
+        let reviewShown = false;
+        try {
+          const reviewRes = await fetch(REVIEW_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_code: normUser, expected_code: normExpected, language: expectedLanguage || 'code' })
+          });
+          if (reviewRes.ok) {
+            const { feedback } = await reviewRes.json();
+            if (diffContainer && feedback) {
+              const safeFeedback = feedback.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+              diffContainer.innerHTML = `
+                <div style="border-left:3px solid #6366f1; padding:10px 14px; background:rgba(99,102,241,0.06); border-radius:0 6px 6px 0;">
+                  <div style="font-size:11px; font-weight:600; letter-spacing:0.05em; color:#6366f1; margin-bottom:6px;">AI REVIEW</div>
+                  <div style="font-size:13px; line-height:1.6; color:var(--ink)">${safeFeedback}</div>
+                </div>
+              `;
+              reviewShown = true;
+            }
           }
-        } 
-        // 3. API Succeeded: Hide the ugly JSDiff since we already parsed syntax!
-        else {
-          resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
-          resultEl.className = 'comparison-result mismatch';
-          if (diffContainer) diffContainer.style.display = 'none';
+        } catch (e) {
+          console.warn("AI review unavailable, falling back to diff:", e);
+        }
+
+        if (!reviewShown && diffContainer) {
+          diffContainer.style.display = 'none';
         }
       }
       resultEl.style.display = 'inline-flex';
