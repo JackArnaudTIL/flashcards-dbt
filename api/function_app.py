@@ -267,27 +267,40 @@ def review_code(req: func.HttpRequest) -> func.HttpResponse:
         client = anthropic.Anthropic(api_key=api_key)
         message = client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=400,
+            max_tokens=500,
             system=(
                 "You are a code review assistant for a flashcard learning app. "
-                "Compare the student's submission against the expected answer and give brief, educational feedback. "
-                "Focus on what's conceptually different or missing. Be encouraging and specific. "
-                "Keep your response to 2-4 sentences. Do not include code blocks."
+                "Compare the student's submission against the expected answer and rate it.\n\n"
+                "Ratings:\n"
+                "- Good: conceptually correct, minor differences only\n"
+                "- Ok: mostly right but missing key elements or has logical gaps\n"
+                "- Hard: significantly wrong or substantially incomplete\n\n"
+                "Respond ONLY with valid JSON, no other text:\n"
+                "{\"score\": \"Good\", \"feedback\": \"2-3 sentences of educational feedback.\"}"
             ),
             messages=[{
                 "role": "user",
                 "content": (
                     f"Language: {language}\n\n"
-                    f"Student's code:\n```\n{user_code}\n```\n\n"
-                    f"Expected answer:\n```\n{expected_code}\n```\n\n"
-                    "What are the key differences, and what should the student focus on?"
+                    f"Student:\n```\n{user_code}\n```\n\n"
+                    f"Expected:\n```\n{expected_code}\n```"
                 )
             }]
         )
 
-        feedback = message.content[0].text
+        raw = message.content[0].text.strip()
+        try:
+            result = json.loads(raw)
+            feedback = result.get("feedback", "").strip()
+            score = result.get("score", "Ok")
+            if score not in ("Good", "Ok", "Hard"):
+                score = "Ok"
+        except (ValueError, KeyError):
+            feedback = raw
+            score = "Ok"
+
         return func.HttpResponse(
-            json.dumps({"feedback": feedback}),
+            json.dumps({"feedback": feedback, "score": score}),
             status_code=200,
             mimetype="application/json",
             headers=cors_headers,

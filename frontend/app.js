@@ -503,8 +503,13 @@ function render() {
     codeContainer.style.display = card.requires_code ? 'block' : 'none';
   }
 
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('ai-suggested'));
+
   const studyUnit = document.getElementById('cardStudyUnit');
-  if (studyUnit) studyUnit.classList.toggle('code-mode', !!card.requires_code);
+  if (studyUnit) {
+    studyUnit.classList.toggle('code-mode', !!card.requires_code);
+    studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
+  }
 
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
@@ -564,10 +569,23 @@ function render() {
   renderThumbs();
 }
 
-function submitCode() { 
+function submitCode() {
   if (!flipped) {
-    flip(); 
+    flip();
   }
+}
+
+function autoRate(score) {
+  ratings[index] = score;
+  const att = ratings.filter(r => r !== null).length;
+  document.getElementById('pFill').style.width = Math.round((att / deck.length) * 100) + '%';
+  document.getElementById('pLabel').textContent = `${att} / ${deck.length} attempted`;
+  document.getElementById('pBreakdown').textContent = att > 0 ?
+    `${ratings.filter(r=>r==='Good').length} Got it · ${ratings.filter(r=>r==='Ok').length} Ok · ${ratings.filter(r=>r==='Hard').length} Hard` : '';
+  document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('ai-suggested'));
+  const btn = document.querySelector(`.rating-btn.${score}`);
+  if (btn) btn.classList.add('ai-suggested');
+  document.getElementById('hintText').textContent = 'AI rated this:';
 }
 
 async function flip() {
@@ -587,6 +605,7 @@ async function flip() {
   const resultEl = document.getElementById('comparisonResult');
   const diffContainer = document.getElementById('diffContainer');
   const syntaxErrorContainer = document.getElementById('syntaxErrorContainer');
+  const studyUnit = document.getElementById('cardStudyUnit');
   
   if (card.requires_code) {
     if (codeEditorView) {
@@ -661,26 +680,28 @@ async function flip() {
       const normUser = userCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       const normExpected = expectedCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       
-      // 1. ALWAYS reward a perfect match, regardless of the API!
+      // 1. Perfect match — auto-rate Good, no AI call needed
       if (normUser === normExpected) {
-        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
+        resultEl.innerHTML = '✓ Perfect match';
         resultEl.className = 'comparison-result match';
+        resultEl.style.display = 'flex';
         if (diffContainer) { diffContainer.classList.remove('ai-mode'); diffContainer.style.display = 'none'; }
         if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
-      } 
-      // 2. If it's NOT a perfect match...
+        if (studyUnit) studyUnit.classList.add('result-match');
+        autoRate('Good');
+      }
+      // 2. Code differs — ask the AI to score and review
       else {
-        resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg> Code Differs';
-        resultEl.className = 'comparison-result mismatch';
+        resultEl.innerHTML = 'Reviewing…';
+        resultEl.className = 'comparison-result';
+        resultEl.style.display = 'flex';
 
-        // Show loading state while AI review is in-flight
         if (diffContainer) {
           diffContainer.classList.add('ai-mode');
           diffContainer.innerHTML = '<div style="padding:8px 0; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
           diffContainer.style.display = 'block';
         }
 
-        // Try AI code review
         let reviewShown = false;
         try {
           const reviewRes = await fetch(REVIEW_API_URL, {
@@ -689,7 +710,7 @@ async function flip() {
             body: JSON.stringify({ user_code: normUser, expected_code: normExpected, language: expectedLanguage || 'code' })
           });
           if (reviewRes.ok) {
-            const { feedback } = await reviewRes.json();
+            const { feedback, score } = await reviewRes.json();
             if (diffContainer && feedback) {
               const safeFeedback = feedback.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
               diffContainer.innerHTML = `
@@ -699,6 +720,15 @@ async function flip() {
                 </div>
               `;
               reviewShown = true;
+              const scoreClass = { Good: 'match', Ok: 'ok', Hard: 'hard' };
+              const scoreLabel = { Good: '✓ Good answer', Ok: '~ Partially correct', Hard: '✗ Needs work' };
+              resultEl.innerHTML = scoreLabel[score] || '~ Reviewed';
+              resultEl.className = `comparison-result ${scoreClass[score] || 'ok'}`;
+              if (studyUnit) {
+                studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
+                studyUnit.classList.add(score === 'Good' ? 'result-match' : score === 'Hard' ? 'result-hard' : 'result-ok');
+              }
+              autoRate(score || 'Ok');
             }
           }
         } catch (e) {
@@ -708,9 +738,10 @@ async function flip() {
         if (!reviewShown && diffContainer) {
           diffContainer.classList.remove('ai-mode');
           diffContainer.style.display = 'none';
+          resultEl.innerHTML = '~ Could not review';
+          resultEl.className = 'comparison-result ok';
         }
       }
-      resultEl.style.display = 'inline-flex';
     } else {
       if (resultEl) resultEl.style.display = 'none';
       if (diffContainer) diffContainer.style.display = 'none';
@@ -727,7 +758,7 @@ async function flip() {
       playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
     } 
     
-    hint.textContent = 'How did you do?';
+    hint.textContent = card.requires_code ? 'Reviewing…' : 'How did you do?';
     hint.className = 'hint answered';
     ratingRow.style.display = 'flex';
   } else {

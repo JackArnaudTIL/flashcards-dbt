@@ -195,11 +195,13 @@ pre code {
 .comparison-result {
   font-size: 13px;
   font-weight: 600;
-  padding: 8px 14px;
-  border-radius: var(--radius-xl);
-  display: inline-flex;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  display: flex;
   align-items: center;
+  gap: 8px;
   transition: all 0.2s;
+  width: 100%;
 }
 
 .comparison-result.match {
@@ -207,7 +209,12 @@ pre code {
   color: var(--green);
 }
 
-.comparison-result.mismatch {
+.comparison-result.ok {
+  background-color: var(--amber-dim);
+  color: var(--amber);
+}
+
+.comparison-result.hard {
   background-color: var(--red-dim);
   color: var(--red);
 }
@@ -1202,6 +1209,11 @@ pre code {
   box-shadow: var(--shadow-md); 
 }
 
+/* ── AI-suggested rating button ──────────────────────────────── */
+.rating-btn.Good.ai-suggested { background: var(--green-dim); font-weight: 700; }
+.rating-btn.Ok.ai-suggested   { background: var(--amber-dim); font-weight: 700; }
+.rating-btn.Hard.ai-suggested { background: var(--red-dim);   font-weight: 700; }
+
 /* ── Code Study Mode: unified card layout ───────────────────── */
 #cardStudyUnit.code-mode {
   border: 1px solid var(--ink-faint);
@@ -1228,6 +1240,10 @@ pre code {
   padding: 1rem 1rem 0.75rem;
   margin-bottom: 0;
 }
+
+#cardStudyUnit.code-mode.result-match { border-color: var(--green); }
+#cardStudyUnit.code-mode.result-ok    { border-color: var(--amber); }
+#cardStudyUnit.code-mode.result-hard  { border-color: var(--red); }
 
 /* ── AI Review Panel ─────────────────────────────────────────── */
 .diff-container.ai-mode {
