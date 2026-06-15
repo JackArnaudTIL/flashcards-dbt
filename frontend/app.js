@@ -620,6 +620,7 @@ async function flip() {
 
     // ── Code Comparison & JSDiff Logic ──
     if (flipped && resultEl) {
+      document.getElementById('hintText').textContent = 'Reviewing…';
       const userCode = codeEditorView ? codeEditorView.state.doc.toString() : "";
       
       // Auto-detect language if not explicitly defined in the card
@@ -758,7 +759,7 @@ async function flip() {
       playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
     } 
     
-    hint.textContent = card.requires_code ? 'Reviewing…' : 'How did you do?';
+    if (!card.requires_code) hint.textContent = 'How did you do?';
     hint.className = 'hint answered';
     ratingRow.style.display = 'flex';
   } else {

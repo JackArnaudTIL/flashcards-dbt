@@ -289,6 +289,11 @@ def review_code(req: func.HttpRequest) -> func.HttpResponse:
         )
 
         raw = message.content[0].text.strip()
+        # Extract JSON robustly — ignore any preamble or markdown code fences
+        start = raw.find('{')
+        end = raw.rfind('}')
+        if start != -1 and end > start:
+            raw = raw[start:end + 1]
         try:
             result = json.loads(raw)
             feedback = result.get("feedback", "").strip()
