@@ -14,7 +14,7 @@ const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
 
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
-let thumbs = [], flags = [], currentDeckName = '', currentCert = null;
+let thumbs = [], flags = [], codeReviews = [], currentDeckName = '', currentCert = null;
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
 let selectedDeckSize = 50; 
 
@@ -434,9 +434,10 @@ function startFiltered() {
   });
   
   deck = filtered.sort(() => Math.random() - 0.5).slice(0, selectedDeckSize || filtered.length);
-  ratings = Array(deck.length).fill(null); 
-  thumbs = Array(deck.length).fill(null); 
+  ratings = Array(deck.length).fill(null);
+  thumbs = Array(deck.length).fill(null);
   flags = Array(deck.length).fill(null);
+  codeReviews = Array(deck.length).fill(null);
   index = 0; 
   flipped = false; 
   
@@ -589,6 +590,9 @@ function autoRate(score) {
 }
 
 async function flip() {
+  // Prevent unflipping code cards — locks the card once the answer is shown
+  if (deck[index] && deck[index].requires_code && flipped) return;
+
   flipped = !flipped;
   
   const cardInner = document.getElementById('cardInner');
@@ -691,56 +695,71 @@ async function flip() {
         if (studyUnit) studyUnit.classList.add('result-match');
         autoRate('Good');
       }
-      // 2. Code differs — ask the AI to score and review
+      // 2. Code differs — use cached review if available, otherwise call API
       else {
-        resultEl.innerHTML = 'Reviewing…';
-        resultEl.className = 'comparison-result';
-        resultEl.style.display = 'flex';
+        const scoreClass = { Good: 'match', Ok: 'ok', Hard: 'hard' };
+        const scoreLabel = { Good: '✓ Good answer', Ok: '~ Partially correct', Hard: '✗ Needs work' };
 
-        if (diffContainer) {
-          diffContainer.classList.add('ai-mode');
-          diffContainer.innerHTML = '<div style="padding:8px 0; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
-          diffContainer.style.display = 'block';
-        }
-
-        let reviewShown = false;
-        try {
-          const reviewRes = await fetch(REVIEW_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_code: normUser, expected_code: normExpected, language: expectedLanguage || 'code' })
-          });
-          if (reviewRes.ok) {
-            const { feedback, score } = await reviewRes.json();
-            if (diffContainer && feedback) {
-              const safeFeedback = feedback.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-              diffContainer.innerHTML = `
-                <div class="ai-review-box">
-                  <div class="ai-review-label">AI Review</div>
-                  <div class="ai-review-text">${safeFeedback}</div>
-                </div>
-              `;
-              reviewShown = true;
-              const scoreClass = { Good: 'match', Ok: 'ok', Hard: 'hard' };
-              const scoreLabel = { Good: '✓ Good answer', Ok: '~ Partially correct', Hard: '✗ Needs work' };
-              resultEl.innerHTML = scoreLabel[score] || '~ Reviewed';
-              resultEl.className = `comparison-result ${scoreClass[score] || 'ok'}`;
-              if (studyUnit) {
-                studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
-                studyUnit.classList.add(score === 'Good' ? 'result-match' : score === 'Hard' ? 'result-hard' : 'result-ok');
-              }
-              autoRate(score || 'Ok');
-            }
+        const applyReview = (score, safeFeedback) => {
+          if (diffContainer) {
+            diffContainer.classList.add('ai-mode');
+            diffContainer.innerHTML = `
+              <div class="ai-review-box">
+                <div class="ai-review-label">AI Review</div>
+                <div class="ai-review-text">${safeFeedback}</div>
+              </div>
+            `;
+            diffContainer.style.display = 'block';
           }
-        } catch (e) {
-          console.warn("AI review unavailable:", e);
-        }
+          resultEl.innerHTML = scoreLabel[score] || '~ Reviewed';
+          resultEl.className = `comparison-result ${scoreClass[score] || 'ok'}`;
+          resultEl.style.display = 'flex';
+          if (studyUnit) {
+            studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
+            studyUnit.classList.add(score === 'Good' ? 'result-match' : score === 'Hard' ? 'result-hard' : 'result-ok');
+          }
+          autoRate(score || 'Ok');
+        };
 
-        if (!reviewShown && diffContainer) {
-          diffContainer.classList.remove('ai-mode');
-          diffContainer.style.display = 'none';
-          resultEl.innerHTML = '~ Could not review';
-          resultEl.className = 'comparison-result ok';
+        if (codeReviews[index]) {
+          applyReview(codeReviews[index].score, codeReviews[index].safeFeedback);
+        } else {
+          resultEl.innerHTML = 'Reviewing…';
+          resultEl.className = 'comparison-result';
+          resultEl.style.display = 'flex';
+
+          if (diffContainer) {
+            diffContainer.classList.add('ai-mode');
+            diffContainer.innerHTML = '<div style="padding:8px 0; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
+            diffContainer.style.display = 'block';
+          }
+
+          let reviewShown = false;
+          try {
+            const reviewRes = await fetch(REVIEW_API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ user_code: normUser, expected_code: normExpected, language: expectedLanguage || 'code' })
+            });
+            if (reviewRes.ok) {
+              const { feedback, score } = await reviewRes.json();
+              if (feedback) {
+                const safeFeedback = feedback.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+                codeReviews[index] = { score, safeFeedback };
+                applyReview(score, safeFeedback);
+                reviewShown = true;
+              }
+            }
+          } catch (e) {
+            console.warn("AI review unavailable:", e);
+          }
+
+          if (!reviewShown && diffContainer) {
+            diffContainer.classList.remove('ai-mode');
+            diffContainer.style.display = 'none';
+            resultEl.innerHTML = '~ Could not review';
+            resultEl.className = 'comparison-result ok';
+          }
         }
       }
     } else {
