@@ -1202,6 +1202,64 @@ pre code {
   box-shadow: var(--shadow-md); 
 }
 
+/* ── Code Study Mode: unified card layout ───────────────────── */
+#cardStudyUnit.code-mode {
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 0.75rem;
+}
+
+#cardStudyUnit.code-mode .scene {
+  margin-bottom: 0;
+}
+
+#cardStudyUnit.code-mode .card-face {
+  border: none;
+  border-bottom: 1px solid var(--ink-faint);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  box-shadow: none;
+  min-height: 180px;
+}
+
+#cardStudyUnit.code-mode .code-input-container {
+  background: var(--card-back);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+  padding: 1rem 1rem 0.75rem;
+  margin-bottom: 0;
+}
+
+/* ── AI Review Panel ─────────────────────────────────────────── */
+.diff-container.ai-mode {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.ai-review-box {
+  background: var(--card);
+  border: 1px solid var(--ink-faint);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.ai-review-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+
+.ai-review-text {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--ink-mid);
+}
+
 /* ── Error ───────────────────────────────────────────────────── */
 .error { 
   text-align: center; 

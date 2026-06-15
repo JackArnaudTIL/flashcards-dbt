@@ -490,6 +490,7 @@ function render() {
   if (diffContainer) {
     diffContainer.style.display = 'none';
     diffContainer.innerHTML = '';
+    diffContainer.classList.remove('ai-mode');
   }
 
   const syntaxErrorContainer = document.getElementById('syntaxErrorContainer');
@@ -498,9 +499,12 @@ function render() {
     syntaxErrorContainer.innerHTML = '';
   }
 
-  if (codeContainer) { 
-    codeContainer.style.display = card.requires_code ? 'block' : 'none'; 
+  if (codeContainer) {
+    codeContainer.style.display = card.requires_code ? 'block' : 'none';
   }
+
+  const studyUnit = document.getElementById('cardStudyUnit');
+  if (studyUnit) studyUnit.classList.toggle('code-mode', !!card.requires_code);
 
   document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
@@ -661,8 +665,8 @@ async function flip() {
       if (normUser === normExpected) {
         resultEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px; vertical-align:text-bottom"><polyline points="20 6 9 17 4 12"></polyline></svg> Perfect Match!';
         resultEl.className = 'comparison-result match';
-        if (diffContainer) diffContainer.style.display = 'none';
-        if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none'; // hide false-positive API errors if it's identical
+        if (diffContainer) { diffContainer.classList.remove('ai-mode'); diffContainer.style.display = 'none'; }
+        if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
       } 
       // 2. If it's NOT a perfect match...
       else {
@@ -671,7 +675,8 @@ async function flip() {
 
         // Show loading state while AI review is in-flight
         if (diffContainer) {
-          diffContainer.innerHTML = '<div style="padding:10px 12px; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
+          diffContainer.classList.add('ai-mode');
+          diffContainer.innerHTML = '<div style="padding:8px 0; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
           diffContainer.style.display = 'block';
         }
 
@@ -688,19 +693,20 @@ async function flip() {
             if (diffContainer && feedback) {
               const safeFeedback = feedback.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
               diffContainer.innerHTML = `
-                <div style="border-left:3px solid #6366f1; padding:10px 14px; background:rgba(99,102,241,0.06); border-radius:0 6px 6px 0;">
-                  <div style="font-size:11px; font-weight:600; letter-spacing:0.05em; color:#6366f1; margin-bottom:6px;">AI REVIEW</div>
-                  <div style="font-size:13px; line-height:1.6; color:var(--ink)">${safeFeedback}</div>
+                <div class="ai-review-box">
+                  <div class="ai-review-label">AI Review</div>
+                  <div class="ai-review-text">${safeFeedback}</div>
                 </div>
               `;
               reviewShown = true;
             }
           }
         } catch (e) {
-          console.warn("AI review unavailable, falling back to diff:", e);
+          console.warn("AI review unavailable:", e);
         }
 
         if (!reviewShown && diffContainer) {
+          diffContainer.classList.remove('ai-mode');
           diffContainer.style.display = 'none';
         }
       }
