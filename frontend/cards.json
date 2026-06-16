@@ -11132,7 +11132,7 @@
             "Data Processing"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Ingestion?",
@@ -11142,7 +11142,7 @@
             "Data Movement"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Cleansing?",
@@ -11152,7 +11152,7 @@
             "Data Processing"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Data Pipeline?",
@@ -11162,7 +11162,7 @@
             "Automation"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Star Schema?",
@@ -11172,7 +11172,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Snowflake Schema?",
@@ -11182,7 +11182,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Data Lakehouse?",
@@ -11192,7 +11192,7 @@
             "Storage"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Lineage?",
@@ -11202,7 +11202,7 @@
             "Observability"
           ],
           "difficulty": "Hard",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Metadata Management?",
@@ -11212,7 +11212,7 @@
             "Management"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Profiling?",
@@ -11222,7 +11222,7 @@
             "Analysis"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Batch Processing?",
@@ -11231,7 +11231,7 @@
             "Data Processing"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Stream Processing?",
@@ -11240,7 +11240,7 @@
             "Data Processing"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Normalization?",
@@ -11250,7 +11250,7 @@
             "Databases"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Denormalization?",
@@ -11260,7 +11260,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Modeling?",
@@ -11269,7 +11269,7 @@
             "Data Modeling"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Fact Table?",
@@ -11279,7 +11279,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Dimension Table?",
@@ -11289,7 +11289,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Data Warehouse?",
@@ -11299,7 +11299,7 @@
             "Architecture"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is a Data Lake?",
@@ -11309,7 +11309,7 @@
             "Architecture"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Governance?",
@@ -11319,7 +11319,7 @@
             "Management"
           ],
           "difficulty": "Medium",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is Data Quality?",
@@ -11329,7 +11329,7 @@
             "Management"
           ],
           "difficulty": "Easy",
-          "category": "Section 1: Data Engineering Fundamentals"
+          "category": "Data Engineering Fundamentals"
         },
         {
           "q": "What is an RDBMS?",
@@ -11339,7 +11339,7 @@
             "RDBMS"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is SQL?",
@@ -11349,7 +11349,7 @@
             "Languages"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Primary Key?",
@@ -11359,7 +11359,7 @@
             "RDBMS"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Foreign Key?",
@@ -11369,7 +11369,7 @@
             "RDBMS"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What are SQL Joins (Inner, Outer, Left, Right)?",
@@ -11379,7 +11379,7 @@
             "SQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What are Indexes in a database?",
@@ -11389,7 +11389,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Query Optimization?",
@@ -11399,7 +11399,7 @@
             "Optimization"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Partitioning?",
@@ -11409,7 +11409,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Sharding?",
@@ -11419,7 +11419,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Materialized View?",
@@ -11429,7 +11429,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a NoSQL Database?",
@@ -11439,7 +11439,7 @@
             "NoSQL"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Document Store Database?",
@@ -11449,7 +11449,7 @@
             "NoSQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Key-Value Store?",
@@ -11459,7 +11459,7 @@
             "NoSQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Wide Column Store?",
@@ -11469,7 +11469,7 @@
             "NoSQL"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is a Graph Database?",
@@ -11479,7 +11479,7 @@
             "NoSQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What are NewSQL Databases?",
@@ -11489,7 +11489,7 @@
             "NewSQL"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is ACID in databases?",
@@ -11499,7 +11499,7 @@
             "Concepts"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is BASE in databases?",
@@ -11509,7 +11509,7 @@
             "Concepts"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is OLTP?",
@@ -11519,7 +11519,7 @@
             "Concepts"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is OLAP?",
@@ -11529,7 +11529,7 @@
             "Concepts"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is PostgreSQL and why would you choose it?",
@@ -11540,7 +11540,7 @@
             "Open-Source"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is MySQL and why would you choose it?",
@@ -11551,7 +11551,7 @@
             "Open-Source"
           ],
           "difficulty": "Easy",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Oracle DB and why would you choose it?",
@@ -11562,7 +11562,7 @@
             "Commercial"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is SQL Server and why would you choose it?",
@@ -11573,7 +11573,7 @@
             "Commercial"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is MongoDB and why would you choose it?",
@@ -11583,7 +11583,7 @@
             "NoSQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Redis and why would you choose it?",
@@ -11594,7 +11594,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Cassandra and why would you choose it?",
@@ -11605,7 +11605,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is DynamoDB and why would you choose it?",
@@ -11616,7 +11616,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Neo4j and why would you choose it?",
@@ -11626,7 +11626,7 @@
             "NoSQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Distributed SQL and why would you choose it?",
@@ -11637,7 +11637,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is CockroachDB and why would you choose it?",
@@ -11648,7 +11648,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is YugabyteDB and why would you choose it?",
@@ -11659,7 +11659,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is DuckDB and why would you choose it?",
@@ -11670,7 +11670,7 @@
             "Data Science"
           ],
           "difficulty": "Medium",
-          "category": "Section 2: Databases"
+          "category": "Databases"
         },
         {
           "q": "What is Hadoop?",
@@ -11680,7 +11680,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Easy",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is HDFS?",
@@ -11690,7 +11690,7 @@
             "Storage"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is YARN?",
@@ -11700,7 +11700,7 @@
             "Distributed Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is MapReduce?",
@@ -11710,7 +11710,7 @@
             "Computation"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Spark?",
@@ -11721,7 +11721,7 @@
             "Query Engines"
           ],
           "difficulty": "Easy",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Hive?",
@@ -11731,7 +11731,7 @@
             "Query Engines"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Impala?",
@@ -11741,7 +11741,7 @@
             "Query Engines"
           ],
           "difficulty": "Hard",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Presto (Trino)?",
@@ -11751,7 +11751,7 @@
             "Query Engines"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Kafka?",
@@ -11761,7 +11761,7 @@
             "Stream Processing"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What are Kafka Streams?",
@@ -11771,7 +11771,7 @@
             "Stream Processing"
           ],
           "difficulty": "Hard",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What are AWS SQS and SNS?",
@@ -11782,7 +11782,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Flink?",
@@ -11792,7 +11792,7 @@
             "Stream Processing"
           ],
           "difficulty": "Hard",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Apache Beam?",
@@ -11802,7 +11802,7 @@
             "Stream Processing"
           ],
           "difficulty": "Hard",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is Amazon Kinesis?",
@@ -11813,7 +11813,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 3: Big Data Technologies"
+          "category": "Big Data Technologies"
         },
         {
           "q": "What is AWS S3?",
@@ -11824,7 +11824,7 @@
             "AWS"
           ],
           "difficulty": "Easy",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is AWS Glue?",
@@ -11835,7 +11835,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is AWS Lambda?",
@@ -11846,7 +11846,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is a VPC (Virtual Private Cloud)?",
@@ -11857,7 +11857,7 @@
             "Security"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is IAM (Identity and Access Management)?",
@@ -11868,7 +11868,7 @@
             "Infrastructure"
           ],
           "difficulty": "Easy",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is a Load Balancer?",
@@ -11879,7 +11879,7 @@
             "Networking"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Amazon EC2?",
@@ -11890,7 +11890,7 @@
             "AWS"
           ],
           "difficulty": "Easy",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Kubernetes?",
@@ -11901,7 +11901,7 @@
             "Infrastructure"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Terraform?",
@@ -11912,7 +11912,7 @@
             "IaC"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Amazon Redshift and why would you choose it?",
@@ -11923,7 +11923,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is AWS RDS (Relational Database Service)?",
@@ -11934,7 +11934,7 @@
             "AWS"
           ],
           "difficulty": "Easy",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Google BigQuery and why would you choose it?",
@@ -11945,7 +11945,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Google Cloud Spanner and why would you choose it?",
@@ -11956,7 +11956,7 @@
             "GCP"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Azure Synapse Analytics and why would you choose it?",
@@ -11967,7 +11967,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Azure Cosmos DB and why would you choose it?",
@@ -11978,7 +11978,7 @@
             "Azure"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Snowflake and why would you choose it?",
@@ -11989,7 +11989,7 @@
             "SaaS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Databricks and why would you choose it?",
@@ -12000,7 +12000,7 @@
             "Spark"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "AWS Comparison: When should you use RDS vs. Redshift?",
@@ -12011,7 +12011,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "GCP Comparison: When should you use Cloud Spanner vs. BigQuery?",
@@ -12022,7 +12022,7 @@
             "GCP"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "Azure Comparison: When should you use Cosmos DB vs. Synapse Analytics?",
@@ -12033,7 +12033,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Amazon Athena and why would you choose it?",
@@ -12044,7 +12044,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Amazon EMR (Elastic MapReduce)?",
@@ -12055,7 +12055,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is AWS Step Functions?",
@@ -12066,7 +12066,7 @@
             "AWS"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "AWS Comparison: When should you use Athena vs. Redshift?",
@@ -12077,7 +12077,7 @@
             "AWS"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is GCP Cloud Storage (GCS)?",
@@ -12088,7 +12088,7 @@
             "GCP"
           ],
           "difficulty": "Easy",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is GCP Dataflow?",
@@ -12099,7 +12099,7 @@
             "GCP"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is GCP Dataproc?",
@@ -12110,7 +12110,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is GCP Pub/Sub?",
@@ -12121,7 +12121,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is GCP Cloud Composer?",
@@ -12132,7 +12132,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Google Cloud Bigtable?",
@@ -12143,7 +12143,7 @@
             "GCP"
           ],
           "difficulty": "Hard",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "GCP Comparison: When should you use Cloud SQL vs. Cloud Spanner?",
@@ -12154,7 +12154,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Azure Data Factory (ADF)?",
@@ -12165,7 +12165,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What is Azure Data Lake Storage Gen2 (ADLS Gen2)?",
@@ -12176,7 +12176,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "What are Azure Event Hubs?",
@@ -12187,7 +12187,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "Azure Comparison: When should you use Data Factory vs. Databricks?",
@@ -12198,7 +12198,7 @@
             "Azure"
           ],
           "difficulty": "Medium",
-          "category": "Section 4: Cloud Computing and Platforms"
+          "category": "Cloud Computing and Platforms"
         },
         {
           "q": "Why is Python widely used in Data Engineering?",
@@ -12209,7 +12209,7 @@
             "Python"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is Scala and why is it important for Data Engineering?",
@@ -12220,7 +12220,7 @@
             "Spark"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is R primarily used for?",
@@ -12231,7 +12231,7 @@
             "Analytics"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is Pandas?",
@@ -12241,7 +12241,7 @@
             "Python Ecosystem"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is NumPy?",
@@ -12251,7 +12251,7 @@
             "Python Ecosystem"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is PySpark?",
@@ -12262,7 +12262,7 @@
             "Spark"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is Apache Airflow?",
@@ -12273,7 +12273,7 @@
             "Orchestration"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is a Jupyter Notebook?",
@@ -12283,7 +12283,7 @@
             "Tools"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "In functional programming, what does the 'Map' function do?",
@@ -12293,7 +12293,7 @@
             "Functional Programming"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "In functional programming, what does the 'Filter' function do?",
@@ -12303,7 +12303,7 @@
             "Functional Programming"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "In functional programming, what does the 'Reduce' function do?",
@@ -12313,7 +12313,7 @@
             "Functional Programming"
           ],
           "difficulty": "Hard",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is a Lambda Function?",
@@ -12323,7 +12323,7 @@
             "Functional Programming"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is the Parquet file format?",
@@ -12333,7 +12333,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is the ORC (Optimized Row Columnar) file format?",
@@ -12343,7 +12343,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Hard",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is the Avro file format?",
@@ -12353,7 +12353,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "Format Comparison: When should you use Parquet vs. Avro?",
@@ -12363,7 +12363,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is JSON (JavaScript Object Notation)?",
@@ -12373,7 +12373,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is CSV (Comma-Separated Values)?",
@@ -12383,7 +12383,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "Comparison: When should you use Pandas vs. PySpark?",
@@ -12394,7 +12394,7 @@
             "Python Ecosystem"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "Comparison: Why might a Data Engineer choose Scala over Python for Apache Spark?",
@@ -12405,7 +12405,7 @@
             "Spark"
           ],
           "difficulty": "Hard",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "Concept: What is the difference between Row-Oriented and Column-Oriented storage?",
@@ -12416,7 +12416,7 @@
             "Serialization Formats"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "Concept: What is the exact difference between Serialization and Deserialization?",
@@ -12426,7 +12426,7 @@
             "Concepts"
           ],
           "difficulty": "Easy",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "In the context of Apache Airflow, what is a DAG?",
@@ -12437,7 +12437,7 @@
             "Orchestration"
           ],
           "difficulty": "Medium",
-          "category": "Section 5: Programming and Data Processing"
+          "category": "Programming and Data Processing"
         },
         {
           "q": "What is Data Encryption?",
@@ -12447,7 +12447,7 @@
             "Cryptography"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Encryption at Rest?",
@@ -12457,7 +12457,7 @@
             "Storage"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Encryption in Transit?",
@@ -12467,7 +12467,7 @@
             "Networking"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is SSL/TLS?",
@@ -12478,7 +12478,7 @@
             "Protocols"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is a CA Certificate (Certificate Authority)?",
@@ -12488,7 +12488,7 @@
             "Networking"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Role-Based Access Control (RBAC)?",
@@ -12498,7 +12498,7 @@
             "Access Management"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is GDPR (General Data Protection Regulation)?",
@@ -12508,7 +12508,7 @@
             "Compliance"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is HIPAA?",
@@ -12518,7 +12518,7 @@
             "Compliance"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Data Anonymization?",
@@ -12528,7 +12528,7 @@
             "Data Processing"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Data Pseudonymization?",
@@ -12538,7 +12538,7 @@
             "Data Processing"
           ],
           "difficulty": "Hard",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "Concept: What is the main difference between Anonymization and Pseudonymization?",
@@ -12548,7 +12548,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is the difference between a Data Controller and a Data Processor under GDPR?",
@@ -12559,7 +12559,7 @@
             "EU/UK Law"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is the UK GDPR?",
@@ -12570,7 +12570,7 @@
             "EU/UK Law"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is the GDPR principle of Data Minimization?",
@@ -12581,7 +12581,7 @@
             "EU/UK Law"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "Under GDPR, what is the 'Right to be Forgotten'?",
@@ -12592,7 +12592,7 @@
             "EU/UK Law"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is the GDPR 72-Hour Rule?",
@@ -12603,7 +12603,7 @@
             "Security Incidents"
           ],
           "difficulty": "Hard",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is the ICO (Information Commissioner's Office)?",
@@ -12614,7 +12614,7 @@
             "EU/UK Law"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What are Standard Contractual Clauses (SCCs)?",
@@ -12625,7 +12625,7 @@
             "Data Movement"
           ],
           "difficulty": "Hard",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Hashing in a security context?",
@@ -12635,7 +12635,7 @@
             "Cryptography"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "Concept: What is the difference between Hashing and Encryption?",
@@ -12645,7 +12645,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "How is Hashing used for PII Masking (Pseudonymization)?",
@@ -12656,7 +12656,7 @@
             "GDPR"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is a 'Salt' in hashing?",
@@ -12666,7 +12666,7 @@
             "Cryptography"
           ],
           "difficulty": "Hard",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is a Deterministic Hash?",
@@ -12676,7 +12676,7 @@
             "Data Engineering"
           ],
           "difficulty": "Medium",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is a Checksum?",
@@ -12686,7 +12686,7 @@
             "Integrity"
           ],
           "difficulty": "Easy",
-          "category": "Section 6: Security and Privacy"
+          "category": "Security and Privacy"
         },
         {
           "q": "What is Docker?",
@@ -12696,7 +12696,7 @@
             "Containerization"
           ],
           "difficulty": "Easy",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Kubernetes (K8s)?",
@@ -12706,7 +12706,7 @@
             "Orchestration"
           ],
           "difficulty": "Hard",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Git?",
@@ -12716,7 +12716,7 @@
             "Version Control"
           ],
           "difficulty": "Easy",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Continuous Integration (CI)?",
@@ -12726,7 +12726,7 @@
             "CI/CD"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Continuous Deployment (CD)?",
@@ -12736,7 +12736,7 @@
             "CI/CD"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Jenkins?",
@@ -12747,7 +12747,7 @@
             "CI/CD"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What are GitHub Actions?",
@@ -12758,7 +12758,7 @@
             "CI/CD"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What are Prometheus and Grafana used for together?",
@@ -12768,7 +12768,7 @@
             "Observability"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is the ELK Stack?",
@@ -12779,7 +12779,7 @@
             "Logging"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is DataOps?",
@@ -12789,7 +12789,7 @@
             "Methodology"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is a Container Registry?",
@@ -12799,7 +12799,7 @@
             "Containerization"
           ],
           "difficulty": "Easy",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is the difference between Infrastructure as Code (IaC) and Configuration Management?",
@@ -12809,7 +12809,7 @@
             "Infrastructure"
           ],
           "difficulty": "Hard",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is a Blue/Green Deployment?",
@@ -12819,7 +12819,7 @@
             "Deployment Strategies"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is a Canary Release?",
@@ -12829,7 +12829,7 @@
             "Deployment Strategies"
           ],
           "difficulty": "Medium",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is the typical progression of environments in a deployment pipeline?",
@@ -12839,7 +12839,7 @@
             "Environments"
           ],
           "difficulty": "Easy",
-          "category": "Section 7: DevOps for Data Engineering"
+          "category": "DevOps for Data Engineering"
         },
         {
           "q": "What is Great Expectations?",
@@ -12850,7 +12850,7 @@
             "Validation"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Monte Carlo (the tool)?",
@@ -12861,7 +12861,7 @@
             "Monitoring"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Datafold?",
@@ -12872,7 +12872,7 @@
             "Testing"
           ],
           "difficulty": "Hard",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What are Column Constraints?",
@@ -12882,7 +12882,7 @@
             "Databases"
           ],
           "difficulty": "Easy",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Null Value Check?",
@@ -12892,7 +12892,7 @@
             "Validation"
           ],
           "difficulty": "Easy",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Outlier Detection in a data pipeline?",
@@ -12903,7 +12903,7 @@
             "Statistics"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "Concept: What is the exact difference between Data Quality and Data Observability?",
@@ -12914,7 +12914,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Data Contract?",
@@ -12924,7 +12924,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Schema Drift?",
@@ -12935,7 +12935,7 @@
             "Failures"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Data Downtime?",
@@ -12945,7 +12945,7 @@
             "Metrics"
           ],
           "difficulty": "Easy",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is Data Freshness?",
@@ -12955,7 +12955,7 @@
             "Metrics"
           ],
           "difficulty": "Easy",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Volume Anomaly check?",
@@ -12966,7 +12966,7 @@
             "Failures"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What does 'Data Completeness' measure?",
@@ -12976,7 +12976,7 @@
             "Metrics"
           ],
           "difficulty": "Easy",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Data Circuit Breaker?",
@@ -12987,7 +12987,7 @@
             "Pipelines"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Data SLA (Service Level Agreement)?",
@@ -12998,7 +12998,7 @@
             "Metrics"
           ],
           "difficulty": "Medium",
-          "category": "Section 8: Data Observability and Quality"
+          "category": "Data Observability and Quality"
         },
         {
           "q": "What is a Business Intelligence (BI) Tool?",
@@ -13008,7 +13008,7 @@
             "Concepts"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Tableau?",
@@ -13019,7 +13019,7 @@
             "BI"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Power BI?",
@@ -13030,7 +13030,7 @@
             "BI"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Redash and its relationship with Databricks?",
@@ -13041,7 +13041,7 @@
             "Databricks"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Looker and its unique 'LookML' language?",
@@ -13052,7 +13052,7 @@
             "GCP"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Omni?",
@@ -13063,7 +13063,7 @@
             "Modern Stack"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is a 'Semantic Layer' in a BI context?",
@@ -13074,7 +13074,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is a 'Semantic Model' in dbt (dbt Semantic Layer)?",
@@ -13085,7 +13085,7 @@
             "dbt"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What are 'Semantic Views' in Snowflake?",
@@ -13096,7 +13096,7 @@
             "Snowflake"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "Comparison: What is the difference between a Semantic Model and a Semantic View?",
@@ -13107,7 +13107,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is the 'Headless BI' movement?",
@@ -13118,7 +13118,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is a SQL Aggregation?",
@@ -13128,7 +13128,7 @@
             "SQL"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is a SQL Window Function?",
@@ -13138,7 +13138,7 @@
             "SQL"
           ],
           "difficulty": "Hard",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "Comparison: What is the main difference between GROUP BY and a Window Function?",
@@ -13149,7 +13149,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is a CTE (Common Table Expression)?",
@@ -13159,7 +13159,7 @@
             "SQL"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Apache Superset?",
@@ -13170,7 +13170,7 @@
             "Open Source"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is Metabase?",
@@ -13181,7 +13181,7 @@
             "Open Source"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is 'Self-Service BI'?",
@@ -13191,7 +13191,7 @@
             "Concepts"
           ],
           "difficulty": "Easy",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "Comparison: What is the difference between a Semantic Layer and a Data Catalog?",
@@ -13202,7 +13202,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 9: Analytics and Visualization"
+          "category": "Analytics and Visualization"
         },
         {
           "q": "What is an Event-Driven Architecture (EDA)?",
@@ -13212,7 +13212,7 @@
             "Event-Driven"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is Event Streaming?",
@@ -13222,7 +13222,7 @@
             "Event-Driven"
           ],
           "difficulty": "Easy",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is Event Sourcing?",
@@ -13232,7 +13232,7 @@
             "Event-Driven"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is a Message Queue?",
@@ -13242,7 +13242,7 @@
             "Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is the Pub/Sub (Publisher/Subscriber) model?",
@@ -13252,7 +13252,7 @@
             "Concepts"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "Comparison: What is the difference between a Message Queue and a Pub/Sub system?",
@@ -13262,7 +13262,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is AWS EventBridge?",
@@ -13273,7 +13273,7 @@
             "Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is a 'Dead Letter Queue' (DLQ)?",
@@ -13283,7 +13283,7 @@
             "Reliability"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "Concept: What is 'At-Least-Once' Delivery?",
@@ -13293,7 +13293,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "Concept: What is 'Exactly-Once' Processing (EoS)?",
@@ -13303,7 +13303,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is Change Data Capture (CDC)?",
@@ -13313,7 +13313,7 @@
             "Data Movement"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "In streaming, what is a 'Tumbling Window'?",
@@ -13323,7 +13323,7 @@
             "Computation"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "In streaming, what is a 'Sliding Window'?",
@@ -13333,7 +13333,7 @@
             "Computation"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is 'Backpressure' in a streaming system?",
@@ -13343,7 +13343,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "Comparison: What is the difference between Event Streaming and Event Messaging?",
@@ -13354,7 +13354,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 10: Event-Driven Architectures"
+          "category": "Event-Driven Architectures"
         },
         {
           "q": "What is a Data Mesh?",
@@ -13364,7 +13364,7 @@
             "Emerging"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is a Data Fabric?",
@@ -13374,7 +13374,7 @@
             "Emerging"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "Comparison: Data Mesh vs. Data Fabric?",
@@ -13384,7 +13384,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is a Vector Database (e.g., Pinecone, Milvus, Weaviate)?",
@@ -13394,7 +13394,7 @@
             "Databases"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Retrieval-Augmented Generation (RAG)?",
@@ -13404,7 +13404,7 @@
             "Emerging"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is a Feature Store?",
@@ -13414,7 +13414,7 @@
             "Emerging"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is 'Zero-ETL'?",
@@ -13424,7 +13424,7 @@
             "Emerging"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is FinOps in the context of Data Engineering?",
@@ -13434,7 +13434,7 @@
             "Modern Data Stack"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is a Multimodal Lakehouse?",
@@ -13444,7 +13444,7 @@
             "AI Infrastructure"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is an AI Data Agent in a 2026 pipeline?",
@@ -13454,7 +13454,7 @@
             "AI-Native"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Evaluation-Driven Development (EDD)?",
@@ -13464,7 +13464,7 @@
             "AI-Native"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Synthetic Data Generation (SDG)?",
@@ -13474,7 +13474,7 @@
             "AI Infrastructure"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "Comparison: Apache Polaris vs. Databricks Unity Catalog?",
@@ -13484,7 +13484,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is GreenOps (Sustainable Data Engineering)?",
@@ -13494,7 +13494,7 @@
             "ESG"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is a Sovereign Cloud (UK/EU context)?",
@@ -13505,7 +13505,7 @@
             "UK/EU"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Context Engineering for LLMs?",
@@ -13515,7 +13515,7 @@
             "RAG"
           ],
           "difficulty": "Hard",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Declarative (YAML-first) Orchestration?",
@@ -13525,7 +13525,7 @@
             "Modern Data Stack"
           ],
           "difficulty": "Medium",
-          "category": "Section 11: Emerging Topics"
+          "category": "Emerging Topics"
         },
         {
           "q": "What is Binary (Base-2) and why is it used?",
@@ -13535,7 +13535,7 @@
             "Binary"
           ],
           "difficulty": "Easy",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is a Bit?",
@@ -13545,7 +13545,7 @@
             "Binary"
           ],
           "difficulty": "Easy",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is a Byte?",
@@ -13555,7 +13555,7 @@
             "Storage"
           ],
           "difficulty": "Easy",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is Hexadecimal (Base-16) and where is it commonly seen?",
@@ -13565,7 +13565,7 @@
             "Notation"
           ],
           "difficulty": "Medium",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "Concept: What is the difference between an Integer and a Floating-Point number?",
@@ -13575,7 +13575,7 @@
             "Data Types"
           ],
           "difficulty": "Medium",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is ASCII vs. UTF-8 Encoding?",
@@ -13585,7 +13585,7 @@
             "Encoding"
           ],
           "difficulty": "Medium",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is 'Endianness' (Big-Endian vs. Little-Endian)?",
@@ -13595,7 +13595,7 @@
             "Storage"
           ],
           "difficulty": "Hard",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "Why is 'Quantization' (e.g., FP32 to INT8) important in 2026 data engineering?",
@@ -13605,7 +13605,7 @@
             "Optimization"
           ],
           "difficulty": "Hard",
-          "category": "Section 12: Low-Level Data Concepts"
+          "category": "Low-Level Data Concepts"
         },
         {
           "q": "What is Scratch Space in data processing?",
@@ -13615,7 +13615,7 @@
             "Systems"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is Temporary Space (Temp Space)?",
@@ -13625,7 +13625,7 @@
             "Systems"
           ],
           "difficulty": "Easy",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a Cache?",
@@ -13635,7 +13635,7 @@
             "Performance"
           ],
           "difficulty": "Easy",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is Memory Paging?",
@@ -13645,7 +13645,7 @@
             "Memory"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a File System (e.g., NTFS, ext4, HDFS)?",
@@ -13655,7 +13655,7 @@
             "OS"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Concept: What is the 'Memory Hierarchy'?",
@@ -13665,7 +13665,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Concept: What is 'Storage Tiering' (Hot, Cool, Archive)?",
@@ -13676,7 +13676,7 @@
             "FinOps"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Comparison: RAM vs. SSD Latency?",
@@ -13687,7 +13687,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Concept: What is the difference between Volatile and Non-Volatile Memory?",
@@ -13697,7 +13697,7 @@
             "Systems"
           ],
           "difficulty": "Easy",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Comparison: Block Storage vs. Object Storage?",
@@ -13708,7 +13708,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a 'Buffer' and how does it differ from a 'Cache'?",
@@ -13718,7 +13718,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What are IOPS (Input/Output Operations Per Second)?",
@@ -13728,7 +13728,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "How does 'The Shuffle' impact storage in distributed systems?",
@@ -13739,7 +13739,7 @@
             "Spark"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is HDFS (Hadoop Distributed File System)?",
@@ -13750,7 +13750,7 @@
             "Big Data"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a POSIX-compliant File System (e.g., ext4, NTFS)?",
@@ -13760,7 +13760,7 @@
             "File Systems"
           ],
           "difficulty": "Medium",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "Comparison: Object Storage (S3) vs. POSIX File Systems (EBS/ext4)?",
@@ -13770,7 +13770,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a Network File System (NFS)?",
@@ -13781,7 +13781,7 @@
             "Cloud"
           ],
           "difficulty": "Easy",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is a Parallel File System (e.g., Lustre, GPFS)?",
@@ -13792,7 +13792,7 @@
             "AI Infrastructure"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is JuiceFS?",
@@ -13802,7 +13802,7 @@
             "Modern Tools"
           ],
           "difficulty": "Hard",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is the difference between ext4 and NTFS?",
@@ -13812,7 +13812,7 @@
             "OS"
           ],
           "difficulty": "Easy",
-          "category": "Section 13: Storage and Memory Concepts"
+          "category": "Storage and Memory Concepts"
         },
         {
           "q": "What is Threading?",
@@ -13822,7 +13822,7 @@
             "Concepts"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is Parallelism?",
@@ -13832,7 +13832,7 @@
             "Concepts"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "Comparison: Concurrency vs. Parallelism?",
@@ -13842,7 +13842,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a Lock in computation?",
@@ -13852,7 +13852,7 @@
             "Reliability"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a Deadlock?",
@@ -13862,7 +13862,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a Race Condition?",
@@ -13872,7 +13872,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a Queue (FIFO)?",
@@ -13882,7 +13882,7 @@
             "Data Structures"
           ],
           "difficulty": "Easy",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is 'Context Switching'?",
@@ -13892,7 +13892,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is the GIL (Global Interpreter Lock) in Python?",
@@ -13902,7 +13902,7 @@
             "Python"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is Vectorization (SIMD)?",
@@ -13912,7 +13912,7 @@
             "Performance"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a 'Livelock' and how does it differ from a 'Deadlock'?",
@@ -13922,7 +13922,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is 'Atomicity' in concurrent computation?",
@@ -13932,7 +13932,7 @@
             "Reliability"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a 'Thread Pool' and why use one?",
@@ -13942,7 +13942,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "Comparison: The 'Task' model vs. the 'Actor' model?",
@@ -13953,7 +13953,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is 'Event-Driven Asynchronous' (Async/Await) programming?",
@@ -13964,7 +13964,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is a 'Critical Section'?",
@@ -13974,7 +13974,7 @@
             "Reliability"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "What is 'Resource Contention' in a compute cluster?",
@@ -13985,7 +13985,7 @@
             "FinOps"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "How does 'GPU vs. CPU' computation differ for data tasks?",
@@ -13996,7 +13996,7 @@
             "AI Infrastructure"
           ],
           "difficulty": "Medium",
-          "category": "Section 14: Computation Concepts"
+          "category": "Computation Concepts"
         },
         {
           "q": "Comparison: Library vs. Framework?",
@@ -14006,7 +14006,7 @@
             "Concepts"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is Poetry in the Python ecosystem?",
@@ -14017,7 +14017,7 @@
             "Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is Black (or Ruff) Formatting?",
@@ -14028,7 +14028,7 @@
             "Tooling"
           ],
           "difficulty": "Easy",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is the 'Command Line Interface' (CLI) and why do DEs use it?",
@@ -14038,7 +14038,7 @@
             "CLI"
           ],
           "difficulty": "Easy",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is the Python 'Click' library?",
@@ -14049,7 +14049,7 @@
             "CLI"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is Unit Testing (Pytest)?",
@@ -14059,7 +14059,7 @@
             "Testing"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is 'Dependency Drift'?",
@@ -14069,7 +14069,7 @@
             "Maintenance"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is 'Type Hinting' in Python?",
@@ -14079,7 +14079,7 @@
             "Python"
           ],
           "difficulty": "Medium",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "Concept: What is 'DRY' (Don't Repeat Yourself)?",
@@ -14089,7 +14089,7 @@
             "Principles"
           ],
           "difficulty": "Easy",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "How are 'ls', 'grep', 'awk', and 'sed' used in Data Engineering?",
@@ -14100,7 +14100,7 @@
             "Linux"
           ],
           "difficulty": "Hard",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is a 'Custom Library' in a Data Team?",
@@ -14110,7 +14110,7 @@
             "Best Practices"
           ],
           "difficulty": "Easy",
-          "category": "Section 15: Software Engineering Basics"
+          "category": "Software Engineering Basics"
         },
         {
           "q": "What is the 'Small File Problem' in Data Engineering?",
@@ -14120,7 +14120,7 @@
             "Optimization"
           ],
           "difficulty": "Medium",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "Comparison: Splittable vs. Non-Splittable Compression?",
@@ -14130,7 +14130,7 @@
             "Performance"
           ],
           "difficulty": "Hard",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "Comparison: Avro vs. Parquet (Row vs. Column)?",
@@ -14140,7 +14140,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "What is Zstandard (Zstd)?",
@@ -14150,7 +14150,7 @@
             "Modern Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "What is Apache Arrow and 'Zero-Copy' Serialization?",
@@ -14160,7 +14160,7 @@
             "Performance"
           ],
           "difficulty": "Hard",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "What is Dictionary Encoding in Parquet?",
@@ -14170,7 +14170,7 @@
             "Optimization"
           ],
           "difficulty": "Hard",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "What is a 'Manifest File'?",
@@ -14180,7 +14180,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 16: File Management and Optimization"
+          "category": "File Management and Optimization"
         },
         {
           "q": "What is the Kernel?",
@@ -14190,7 +14190,7 @@
             "OS"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a Process?",
@@ -14200,7 +14200,7 @@
             "Execution"
           ],
           "difficulty": "Easy",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a Daemon?",
@@ -14210,7 +14210,7 @@
             "Execution"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What are Environment Variables?",
@@ -14220,7 +14220,7 @@
             "Configuration"
           ],
           "difficulty": "Easy",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is the Actor Model of Concurrency?",
@@ -14230,7 +14230,7 @@
             "Concurrency"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is an Event Loop?",
@@ -14240,7 +14240,7 @@
             "Concurrency"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "Comparison: Process vs. Thread?",
@@ -14250,7 +14250,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a 'Zombie' or 'Orphan' Process?",
@@ -14260,7 +14260,7 @@
             "Execution"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a System Call (syscall)?",
@@ -14270,7 +14270,7 @@
             "Kernel"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "Comparison: SIGTERM vs. SIGKILL?",
@@ -14281,7 +14281,7 @@
             "Reliability"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a 'Graceful Shutdown' and why is it critical for DEs?",
@@ -14291,7 +14291,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is 'User Space' vs. 'Kernel Space'?",
@@ -14301,7 +14301,7 @@
             "OS"
           ],
           "difficulty": "Hard",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "Comparison: Environment Variables vs. Config Files (YAML/JSON)?",
@@ -14311,7 +14311,7 @@
             "Best Practices"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "Comparison: Environment Variables vs. Secrets Managers (AWS Secrets Manager / Vault)?",
@@ -14321,7 +14321,7 @@
             "Security"
           ],
           "difficulty": "Medium",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is a 'Standard Stream' (stdin, stdout, stderr)?",
@@ -14331,7 +14331,7 @@
             "CLI"
           ],
           "difficulty": "Easy",
-          "category": "Section 17: System-Level Concepts"
+          "category": "System-Level Concepts"
         },
         {
           "q": "What is an Airflow DAG (Directed Acyclic Graph)?",
@@ -14341,7 +14341,7 @@
             "Airflow"
           ],
           "difficulty": "Easy",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is an Airflow Operator vs. a Task?",
@@ -14351,7 +14351,7 @@
             "Airflow"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is 'Idempotency' in a DAG task?",
@@ -14361,7 +14361,7 @@
             "Airflow"
           ],
           "difficulty": "Hard",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What are 'Expectations' in Great Expectations (GX)?",
@@ -14371,7 +14371,7 @@
             "Data Quality"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is a 'Data Doc' in Great Expectations?",
@@ -14381,7 +14381,7 @@
             "Data Quality"
           ],
           "difficulty": "Easy",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is Schema Evolution?",
@@ -14391,7 +14391,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "Comparison: Backward vs. Forward Schema Compatibility?",
@@ -14401,7 +14401,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is a 'Schema Registry'?",
@@ -14411,7 +14411,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is 'Data Lineage' in an observability tool?",
@@ -14421,7 +14421,7 @@
             "Observability"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What are the '5 Pillars of Data Observability'?",
@@ -14431,7 +14431,7 @@
             "Observability"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is 'Data Downtime'?",
@@ -14441,7 +14441,7 @@
             "Observability"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is the Airflow TaskFlow API (@task)?",
@@ -14451,7 +14451,7 @@
             "Airflow"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is an Airflow Sensor?",
@@ -14461,7 +14461,7 @@
             "Airflow"
           ],
           "difficulty": "Easy",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is a Deferrable Operator in Airflow?",
@@ -14472,7 +14472,7 @@
             "Optimization"
           ],
           "difficulty": "Hard",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is 'Data Diffing' (e.g., Datafold)?",
@@ -14482,7 +14482,7 @@
             "Data Quality"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is Dynamic Task Mapping in Airflow?",
@@ -14492,7 +14492,7 @@
             "Airflow"
           ],
           "difficulty": "Hard",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is an XCom in Airflow?",
@@ -14502,7 +14502,7 @@
             "Airflow"
           ],
           "difficulty": "Medium",
-          "category": "Section 18: Data Engineering-Specific Tools"
+          "category": "Data Engineering-Specific Tools"
         },
         {
           "q": "What is a Trace Log (and how does it differ from a standard Log)?",
@@ -14512,7 +14512,7 @@
             "Debugging"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is an Audit Trail?",
@@ -14522,7 +14522,7 @@
             "Compliance"
           ],
           "difficulty": "Easy",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is Profiling (e.g., Memory vs. CPU Profiling)?",
@@ -14532,7 +14532,7 @@
             "Performance"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is OpenTelemetry (OTel)?",
@@ -14542,7 +14542,7 @@
             "Modern Tools"
           ],
           "difficulty": "Hard",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "Comparison: Log vs. Audit Trail?",
@@ -14552,7 +14552,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is 'Replayability' in a debugging context?",
@@ -14562,7 +14562,7 @@
             "Streaming"
           ],
           "difficulty": "Hard",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is Automated Root Cause Analysis (AIOps)?",
@@ -14572,7 +14572,7 @@
             "AI-Native"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "Comparison: Tracing vs. Profiling?",
@@ -14582,7 +14582,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is 'Data Diffing' (e.g., Datafold, dbt-audit-helper)?",
@@ -14592,7 +14592,7 @@
             "Data Quality"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is a 'Shadow Deployment' (or Shadow Pipeline)?",
@@ -14602,7 +14602,7 @@
             "Debugging"
           ],
           "difficulty": "Hard",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is 'Small Data' Debugging (Subsetting)?",
@@ -14612,7 +14612,7 @@
             "Efficiency"
           ],
           "difficulty": "Easy",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "Comparison: Time-Travel (Data Lake) vs. Time-Travel Debugging (CS)?",
@@ -14622,7 +14622,7 @@
             "Comparisons"
           ],
           "difficulty": "Hard",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is 'Mocking' in a Data Pipeline test?",
@@ -14632,7 +14632,7 @@
             "Debugging"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is 'Binary Search Debugging' for Data?",
@@ -14642,7 +14642,7 @@
             "Tactics"
           ],
           "difficulty": "Medium",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is a 'Contract Test' for Data?",
@@ -14652,7 +14652,7 @@
             "Architecture"
           ],
           "difficulty": "Hard",
-          "category": "Section 19: Debugging and Auditing"
+          "category": "Debugging and Auditing"
         },
         {
           "q": "What is Shell Scripting (Bash/Zsh)?",
@@ -14662,7 +14662,7 @@
             "Automation"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is a Cron Job?",
@@ -14672,7 +14672,7 @@
             "Scheduling"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "Comparison: Cron vs. Airflow?",
@@ -14682,7 +14682,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is an Exit Code (Status Code)?",
@@ -14692,7 +14692,7 @@
             "Systems"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is 'uv run' (The 2026 Scripting Standard)?",
@@ -14702,7 +14702,7 @@
             "Modern Tools"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is a Shebang (`#!`) in a script?",
@@ -14712,7 +14712,7 @@
             "Systems"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is 'Idempotency' in Automation?",
@@ -14722,7 +14722,7 @@
             "Automation"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is the 'Shebang' line (#!/bin/bash) and why is it first?",
@@ -14732,7 +14732,7 @@
             "Basics"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How do you make a script executable in Linux?",
@@ -14742,7 +14742,7 @@
             "Commands"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What do 'set -e', 'set -u', and 'set -o pipefail' do in a script?",
@@ -14752,7 +14752,7 @@
             "Reliability"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is the difference between '$VAR' and '${VAR}' in Bash?",
@@ -14762,7 +14762,7 @@
             "Syntax"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How do you pass arguments to a shell script (e.g., $1, $2, $@)?",
@@ -14772,7 +14772,7 @@
             "Arguments"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What makes 'uv' different from standard 'pip'?",
@@ -14782,7 +14782,7 @@
             "Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How does 'uv run' handle script dependencies in 2026?",
@@ -14792,7 +14792,7 @@
             "Automation"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is 'uvx' (or 'uv tool run')?",
@@ -14802,7 +14802,7 @@
             "CLI"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is a 'Lockfile' in the context of uv (uv.lock)?",
@@ -14812,7 +14812,7 @@
             "Stability"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How do you use 'xargs' to parallelize a task?",
@@ -14822,7 +14822,7 @@
             "Parallelism"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is 'jq' and why is it essential for 2026 Data Engineers?",
@@ -14832,7 +14832,7 @@
             "Data Tools"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How do you use 'sed' to perform a find-and-replace across 1,000 files?",
@@ -14842,7 +14842,7 @@
             "Commands"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is the 'Pipe' (|) and 'Redirection' (> and >>)?",
@@ -14852,7 +14852,7 @@
             "Basics"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "How should you run shell commands from Python (subprocess.run)?",
@@ -14862,7 +14862,7 @@
             "Systems"
           ],
           "difficulty": "Hard",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is an 'AI Shell Alias' (e.g., GitHub Copilot CLI)?",
@@ -14872,7 +14872,7 @@
             "CLI"
           ],
           "difficulty": "Easy",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "Why is 'Dry Run' mode important in automation?",
@@ -14882,7 +14882,7 @@
             "Safety"
           ],
           "difficulty": "Medium",
-          "category": "Section 20: Advanced Scripting and Automation"
+          "category": "Advanced Scripting and Automation"
         },
         {
           "q": "What is the difference between Latency and Throughput in a 2026 pipeline?",
@@ -14891,7 +14891,7 @@
             "Metrics"
           ],
           "difficulty": "Easy",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is 'I/O Wait' and why does it kill performance?",
@@ -14900,7 +14900,7 @@
             "Hardware"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is 'Backpressure' in a data stream?",
@@ -14909,7 +14909,7 @@
             "Streaming"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is a 'Cold Start' in modern Serverless computing?",
@@ -14918,7 +14918,7 @@
             "Cloud"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "Comparison: Vertical Scaling (Scaling Up) vs. Horizontal Scaling (Scaling Out)?",
@@ -14927,7 +14927,7 @@
             "Scaling"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is 'Linear Scalability'?",
@@ -14936,7 +14936,7 @@
             "Scaling"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is 'Resource Contention'?",
@@ -14945,7 +14945,7 @@
             "Systems"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is Amdahl’s Law?",
@@ -14954,7 +14954,7 @@
             "Laws"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "Formula: How do you express Amdahl's Law?",
@@ -14963,7 +14963,7 @@
             "Laws"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is the CAP Theorem?",
@@ -14972,7 +14972,7 @@
             "Laws"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "Why is 'Partition Tolerance' (P) non-negotiable in the cloud?",
@@ -14981,7 +14981,7 @@
             "Laws"
           ],
           "difficulty": "Hard",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "Why is 'Data Locality' a key 2026 performance strategy?",
@@ -14990,7 +14990,7 @@
             "Networking"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is 'Egress' and why does it matter for 2026 FinOps?",
@@ -15000,7 +15000,7 @@
             "Networking"
           ],
           "difficulty": "Medium",
-          "category": "Section 21: General Computing Concepts"
+          "category": "General Computing Concepts"
         },
         {
           "q": "What is the difference between a Fact Table and a Dimension Table?",
@@ -15010,7 +15010,7 @@
             "Fundamentals"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is the 'Grain' of a table and why is it critical?",
@@ -15020,7 +15020,7 @@
             "Design"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "Comparison: Star Schema vs. Snowflake Schema?",
@@ -15030,7 +15030,7 @@
             "Comparisons"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a Surrogate Key vs. a Natural Key?",
@@ -15040,7 +15040,7 @@
             "Design"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is SCD Type 1?",
@@ -15050,7 +15050,7 @@
             "SCD"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is SCD Type 2?",
@@ -15060,7 +15060,7 @@
             "SCD"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is SCD Type 3?",
@@ -15070,7 +15070,7 @@
             "SCD"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is SCD Type 6 (1+2+3)?",
@@ -15080,7 +15080,7 @@
             "SCD"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 3rd Normal Form (3NF)?",
@@ -15090,7 +15090,7 @@
             "Normalization"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 'One Big Table' (OBT) modeling?",
@@ -15100,7 +15100,7 @@
             "Modern Data Stack"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a 'Junk Dimension'?",
@@ -15110,7 +15110,7 @@
             "Advanced"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 1st Normal Form (1NF)?",
@@ -15120,7 +15120,7 @@
             "Normalization"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 2nd Normal Form (2NF)?",
@@ -15130,7 +15130,7 @@
             "Normalization"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "Concept: What is a Partial Functional Dependency?",
@@ -15140,7 +15140,7 @@
             "Concepts"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "Why do we denormalize data for Analytics?",
@@ -15150,7 +15150,7 @@
             "Strategy"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is the Medallion Architecture?",
@@ -15160,7 +15160,7 @@
             "Medallion"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is the Bronze Layer (Raw)?",
@@ -15170,7 +15170,7 @@
             "Medallion"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is the Silver Layer (Cleaned/Enriched)?",
@@ -15180,7 +15180,7 @@
             "Medallion"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is the Gold Layer (Curated/Aggregated)?",
@@ -15190,7 +15190,7 @@
             "Medallion"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "Why is the Medallion Architecture better than a traditional 'Landing to Warehouse' approach?",
@@ -15200,7 +15200,7 @@
             "Strategy"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is Data Vault 2.0 (Hubs, Links, Satellites)?",
@@ -15210,7 +15210,7 @@
             "Data Vault"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a Bridge Table and when do you use it?",
@@ -15220,7 +15220,7 @@
             "Design"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a 'Conformed Dimension'?",
@@ -15230,7 +15230,7 @@
             "Architecture"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a 'Degenerate Dimension'?",
@@ -15240,7 +15240,7 @@
             "Design"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "How do you model a 'Parent-Child' Hierarchy (Self-Referencing)?",
@@ -15250,7 +15250,7 @@
             "Design"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 'Role-Playing Dimensions'?",
@@ -15260,7 +15260,7 @@
             "Design"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is 'Sparse Data' and how do you model it?",
@@ -15270,7 +15270,7 @@
             "Strategy"
           ],
           "difficulty": "Hard",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "What is a Semantic Layer (or Metric Store)?",
@@ -15280,7 +15280,7 @@
             "Modern Data Stack"
           ],
           "difficulty": "Medium",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         },
         {
           "q": "Comparison: Physical vs. Logical Data Modeling?",
@@ -15290,7 +15290,7 @@
             "Fundamentals"
           ],
           "difficulty": "Easy",
-          "category": "Section 22: Data Modelling"
+          "category": "Data Modelling"
         }
       ]
     },
@@ -16053,10 +16053,10 @@
           "q": "Write a minimal dbt model that selects all columns from a source table named 'orders' in the 'stripe' source.",
           "a": "```sql\nSELECT *\nFROM {{ source('stripe', 'orders') }}\n```",
           "group": [
-            "Code – Models"
+            "Models"
           ],
           "difficulty": "Easy",
-          "category": "Code – Models",
+          "category": "Models",
           "requires_code": true,
           "explanation": "The `SELECT *` retrieves every column from the source table without needing to name them individually. The `{{ source('stripe', 'orders') }}` is a dbt Jinja macro that references a source defined in your `sources.yml` file, where 'stripe' is the source name and 'orders' is the table name—dbt resolves this to the actual database schema and table at compile time. Using the `source()` macro instead of hardcoding the table name allows dbt to track data lineage, validate that the source exists, and easily swap databases or schemas without changing your model code. This is the minimal pattern for creating a dbt model that simply exposes a raw source table.",
           "module": "dbt 102"
@@ -16065,10 +16065,10 @@
           "q": "Write a `{{ config() }}` block that sets a model to materialise as a table and adds the tag 'nightly'.",
           "a": "```sql\n{{ config(\n    materialized='table',\n    tags=['nightly']\n) }}\n```",
           "group": [
-            "Code – Config"
+            "Configuration"
           ],
           "difficulty": "Easy",
-          "category": "Code – Config",
+          "category": "Configuration",
           "requires_code": true,
           "explanation": "The `config()` macro is a dbt function that allows you to specify model-level configurations directly in your SQL file. The `materialized='table'` parameter tells dbt to build this model as a physical table in your database rather than a view, which is useful when the query is computationally expensive or frequently queried. The `tags=['nightly']` parameter assigns a label to this model that you can use to selectively run groups of models—for example, running `dbt run --select tag:nightly` will execute only models with this tag, which is ideal for scheduling specific models to run at particular times. Tags are passed as a list even when there's only one tag, maintaining consistency with dbt's configuration syntax.",
           "module": "dbt 102"
@@ -16077,10 +16077,10 @@
           "q": "Write a `{{ config() }}` block for an incremental model. The unique key is 'order_id'.",
           "a": "```sql\n{{ config(\n    materialized='incremental',\n    unique_key='order_id'\n) }}\n```",
           "group": [
-            "Code – Config"
+            "Configuration"
           ],
           "difficulty": "Easy",
-          "category": "Code – Config",
+          "category": "Configuration",
           "requires_code": true,
           "explanation": "This config block tells dbt to build an incremental materialization instead of a full table refresh, which means on subsequent runs dbt will only insert or update new rows rather than rebuilding the entire table from scratch. The `materialized='incremental'` parameter enables this behavior. The `unique_key='order_id'` parameter designates `order_id` as the column dbt should use to identify which existing records to update when it detects duplicate keys in the new data—without this, dbt wouldn't know how to match incoming rows to existing ones and would just append everything. This combination is essential for efficiency in models that process high-volume append-only or slowly-changing data, since dbt can now perform intelligent upserts based on the unique key rather than recreating everything every time.",
           "module": "dbt 102"
@@ -16089,10 +16089,10 @@
           "q": "Write a staging model for the 'raw_orders' source table. Rename 'id' to 'order_id' and 'amt' to 'amount'. Select no other columns.",
           "a": "```sql\nSELECT\n    id  AS order_id,\n    amt AS amount\nFROM {{ source('raw', 'raw_orders') }}\n```",
           "group": [
-            "Code – Models"
+            "Models"
           ],
           "difficulty": "Easy",
-          "category": "Code – Models",
+          "category": "Models",
           "requires_code": true,
           "explanation": "The `SELECT` statement explicitly names only the two columns needed: `id` and `amt` from the raw source table, renamed to more descriptive aliases `order_id` and `amount`. The `FROM` clause uses dbt's `source()` function with two arguments—the source name `'raw'` and the table name `'raw_orders'`—which references the source definition in your `sources.yml` file, enabling lineage tracking and source freshness monitoring. By selecting just these two columns with aliases rather than using `SELECT *`, you ensure the staging model serves as a documented transformation layer that explicitly declares which raw fields are relevant downstream, making dependencies clear and preventing unexpected column additions if the raw table structure changes.",
           "module": "dbt 102"
@@ -16101,10 +16101,10 @@
           "q": "Write a dbt model using CTEs that selects 'order_id' and 'order_date' from 'stg_orders', keeping only rows where status = 'placed'.",
           "a": "```sql\nWITH source AS (\n    SELECT * FROM {{ ref('stg_orders') }}\n),\nfiltered AS (\n    SELECT order_id, order_date\n    FROM source\n    WHERE status = 'placed'\n)\nSELECT * FROM filtered\n```",
           "group": [
-            "Code – Models"
+            "Models"
           ],
           "difficulty": "Easy",
-          "category": "Code – Models",
+          "category": "Models",
           "requires_code": true,
           "explanation": "This dbt model uses Common Table Expressions (CTEs) to organize logic into discrete, readable steps. The `source` CTE references the upstream `stg_orders` model using `{{ ref('stg_orders') }}`, which creates a dependency and allows dbt to build the lineage graph. The `filtered` CTE then selects only the two required columns (`order_id` and `order_date`) from the source and applies the `WHERE status = 'placed'` filter to exclude unwanted rows. Finally, the outer `SELECT * FROM filtered` returns all columns from the filtered CTE—which in this case is just the two selected columns. This structure is preferred in dbt because it makes the query easier to debug, test at each stage, and modify later as requirements change.",
           "module": "dbt 102"
@@ -16113,10 +16113,10 @@
           "q": "Write the Jinja `{% if is_incremental() %}` block that filters a model to only load rows where 'updated_at' is greater than the maximum value already in the table.",
           "a": "```sql\n{% if is_incremental() %}\nWHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})\n{% endif %}\n```",
           "group": [
-            "Code – Incremental"
+            "Incremental Models"
           ],
           "difficulty": "Easy",
-          "category": "Code – Incremental",
+          "category": "Incremental Models",
           "requires_code": true,
           "explanation": "The `is_incremental()` function returns true only when dbt runs the model in incremental mode (after the first full refresh), so this WHERE clause only executes on subsequent runs. The `{{ this }}` variable references the actual table name in the database, allowing the query to query itself. The subquery `SELECT MAX(updated_at) FROM {{ this }}` finds the most recent timestamp already loaded in the table, and the WHERE clause filters incoming rows to only those with timestamps greater than that maximum. This ensures each incremental run only processes new or updated records since the last load, avoiding duplicate data and improving performance by reducing the volume of data processed.",
           "module": "dbt 102"
@@ -16125,10 +16125,10 @@
           "q": "Write a sources.yml that declares a source named 'stripe' in the 'raw' schema, with one table called 'charges'.",
           "a": "```yaml\nsources:\n  - name: stripe\n    schema: raw\n    tables:\n      - name: charges\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "This YAML structure declares a dbt source that points to an existing table in your data warehouse. The `sources` key is a top-level list that contains source definitions, and each source object needs a `name` ('stripe') and `schema` ('raw') to tell dbt where to find the upstream data. The `tables` list underneath specifies which tables within that schema are being tracked; in this case, just the 'charges' table. Once declared this way, you can reference the table in your dbt models using the `source()` function (e.g., `{{ source('stripe', 'charges') }}`), which creates proper lineage documentation and allows dbt to test the source data quality.",
           "module": "dbt 102"
@@ -16137,10 +16137,10 @@
           "q": "Write a schema.yml entry for a model named 'stg_orders'. Add not_null and unique tests to the 'order_id' column.",
           "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: order_id\n        data_tests:\n          - not_null\n          - unique\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "The `models` key declares that you're defining one or more dbt models. Under `name: stg_orders`, you specify which model this configuration applies to. The `columns` section lists individual columns you want to document and test, and `name: order_id` identifies the specific column being configured. The `data_tests` key tells dbt to run validation checks on that column—`not_null` ensures every row has a value in `order_id`, while `unique` ensures no two rows share the same `order_id` value. This YAML structure allows dbt to automatically generate SQL queries that execute these tests when you run `dbt test`, catching data quality issues early in your pipeline.",
           "module": "dbt 102"
@@ -16149,10 +16149,10 @@
           "q": "Add an accepted_values test to the 'status' column in a schema.yml for 'stg_orders'. Valid values are 'placed', 'shipped', and 'returned'.",
           "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: status\n        data_tests:\n          - accepted_values:\n              values: ['placed', 'shipped', 'returned']\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "The `accepted_values` test validates that all values in the `status` column belong to the specified allowed list. The `data_tests` key is a dbt-specific YAML construct that attaches data quality tests to individual columns within your model definition. The `accepted_values` test is a built-in dbt test that will fail the test run if any row contains a value outside the provided list. The `values` parameter takes an array of strings representing each valid status, and dbt will generate SQL that counts rows where the status does NOT match any of these values—if that count is greater than zero, the test fails. This approach catches data quality issues early in your pipeline by ensuring downstream transformations only work with expected categorical values.",
           "module": "dbt 102"
@@ -16161,10 +16161,10 @@
           "q": "Write a relationships test in schema.yml that checks every 'customer_id' in 'stg_orders' exists as a 'customer_id' in 'stg_customers'.",
           "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: customer_id\n        data_tests:\n          - relationships:\n              to: ref('stg_customers')\n              field: customer_id\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "The `relationships` test enforces referential integrity by verifying that every value in the `customer_id` column of `stg_orders` has a matching value in the `customer_id` column of `stg_customers`. The `to: ref('stg_customers')` parameter specifies the target model being referenced, using `ref()` to ensure dbt tracks the dependency between these models. The `field: customer_id` parameter explicitly names which column in the target model to match against, allowing cases where the source and target column names differ. This test will fail if any orphaned records exist in `stg_orders`—that is, orders with `customer_id` values that don't exist in the customers table—alerting you to data quality issues before they propagate downstream.",
           "module": "dbt 102"
@@ -16173,10 +16173,10 @@
           "q": "Write a model that joins 'stg_orders' and 'stg_customers' on customer_id. Select order_id, order_date, and customer_name.",
           "a": "```sql\nWITH orders AS (\n    SELECT * FROM {{ ref('stg_orders') }}\n),\ncustomers AS (\n    SELECT * FROM {{ ref('stg_customers') }}\n)\nSELECT\n    o.order_id,\n    o.order_date,\n    c.customer_name\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\n```",
           "group": [
-            "Code – Models"
+            "Models"
           ],
           "difficulty": "Easy",
-          "category": "Code – Models",
+          "category": "Models",
           "requires_code": true,
           "explanation": "This dbt model uses CTEs (Common Table Expressions) to organize the join logic clearly. The `{{ ref() }}` function establishes dependencies on the upstream `stg_orders` and `stg_customers` models, ensuring dbt knows the lineage and runs them first. The WITH clauses create named result sets that are easier to reference and maintain than inline subqueries. The JOIN connects the two tables on the `customer_id` column, which must exist in both tables, while the SELECT statement picks only the three required columns with table aliases (`o` and `c`) to avoid ambiguity. This structure is dbt best practice because it makes the query readable, the dependencies explicit, and the model reusable downstream.",
           "module": "dbt 102"
@@ -16185,10 +16185,10 @@
           "q": "Write the dbt_project.yml config block that sets all models inside the 'staging' folder to materialise as views.",
           "a": "```yaml\nmodels:\n  my_project:\n    staging:\n      +materialized: view\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "This configuration uses dbt's hierarchical model directory structure to apply materialization settings at the folder level. The `models:` key opens the model configuration section, `my_project:` references your specific project name, and `staging:` targets the staging subdirectory within your models folder. The `+materialized: view` property (note the `+` prefix, which means \"apply recursively to this folder and all subfolders\") explicitly sets every model file within staging to materialize as a view rather than the default table. This approach is cleaner than configuring each model individually, and the `+` prefix ensures that even deeply nested models in subfolders of staging will inherit this setting unless they override it with their own config.",
           "module": "dbt 102"
@@ -16197,10 +16197,10 @@
           "q": "Add source freshness checks to the 'charges' source table. Warn if data is older than 12 hours; error if older than 24 hours. The timestamp column is 'loaded_at'.",
           "a": "```yaml\nsources:\n  - name: stripe\n    tables:\n      - name: charges\n        loaded_at_field: loaded_at\n        freshness:\n          warn_after: {count: 12, period: hour}\n          error_after: {count: 24, period: hour}\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "The `freshness` block defines how recently data must arrive to meet quality standards. The `loaded_at_field` specifies which column dbt checks to determine the data's age—it compares the current time against the `loaded_at` timestamp. The `warn_after` parameter triggers a warning if data hasn't been refreshed within 12 hours, allowing pipelines to continue but alerting you to potential staleness. The `error_after` parameter fails the freshness check entirely if data is older than 24 hours, preventing downstream consumption of significantly outdated information. The `{count: X, period: unit}` syntax pairs a numeric threshold with a time unit (hour, day, etc.), giving you precise control over acceptable lag windows. This two-tier approach balances operational flexibility—you can tolerate minor delays—while enforcing a hard boundary for data reliability.",
           "module": "dbt 102"
@@ -16209,10 +16209,10 @@
           "q": "Write a dbt macro named 'cents_to_dollars' that accepts a column name and returns it divided by 100, cast to DECIMAL(10,2).",
           "a": "```sql\n{% macro cents_to_dollars(column_name) %}\n    CAST({{ column_name }} / 100.0 AS DECIMAL(10, 2))\n{% endmacro %}\n```",
           "group": [
-            "Code – Macros"
+            "Macros"
           ],
           "difficulty": "Easy",
-          "category": "Code – Macros",
+          "category": "Macros",
           "requires_code": true,
           "explanation": "This macro defines a reusable transformation that converts a cents value to dollars by dividing by 100 and formatting it as currency. The `{% macro %}` tags tell dbt this is a templated function that can be called elsewhere in your project. The `column_name` parameter is a placeholder that accepts the actual column reference when the macro is invoked. Inside the macro, `{{ column_name }}` is Jinja interpolation syntax that inserts the passed-in column name directly into the SQL. Dividing by `100.0` (rather than `100`) ensures floating-point arithmetic instead of integer division, preventing rounding errors. Finally, `CAST(... AS DECIMAL(10, 2))` explicitly converts the result to a decimal type with 10 total digits and 2 decimal places, which is the standard precision for monetary values.",
           "module": "dbt 102"
@@ -16221,10 +16221,10 @@
           "q": "Write a model that uses a project variable named 'start_date' to filter rows where 'created_at' is on or after that date.",
           "a": "```sql\nSELECT *\nFROM {{ ref('stg_events') }}\nWHERE created_at >= '{{ var(\"start_date\") }}'\n```",
           "group": [
-            "Code – Jinja"
+            "Jinja"
           ],
           "difficulty": "Easy",
-          "category": "Code – Jinja",
+          "category": "Jinja",
           "requires_code": true,
           "explanation": "This model retrieves all columns from the `stg_events` staging table and filters to include only rows where the `created_at` timestamp is on or after a specified date. The `{{ ref('stg_events') }}` function creates a dependency on that upstream model and ensures dbt compiles it first. The `{{ var(\"start_date\") }}` expression retrieves the project variable named `start_date` at compile time and injects its value directly into the SQL query as a string. By using `>=` instead of `>`, the filter includes rows created on the exact start date as well as any date after it. This approach allows you to parameterize your model so that different users can run the same query with different start dates by passing `--vars '{\"start_date\": \"2024-01-01\"}'` at the command line, without needing to hardcode the date into the model.",
           "module": "dbt 102"
@@ -16233,10 +16233,10 @@
           "q": "Use dbt_utils.generate_surrogate_key() to create a column named 'surrogate_key' from 'order_id' and 'line_item_id'.",
           "a": "```sql\nSELECT\n    {{ dbt_utils.generate_surrogate_key(['order_id', 'line_item_id']) }} AS surrogate_key,\n    order_id,\n    line_item_id\nFROM {{ ref('stg_order_items') }}\n```",
           "group": [
-            "Code – Macros"
+            "Macros"
           ],
           "difficulty": "Easy",
-          "category": "Code – Macros",
+          "category": "Macros",
           "requires_code": true,
           "explanation": "The `dbt_utils.generate_surrogate_key()` macro accepts a list of column names and generates a deterministic hash value by concatenating and hashing those columns together. The double curly braces `{{ }}` indicate Jinja templating, which tells dbt to execute this macro during parsing and inject the resulting SQL code into the query. By passing `['order_id', 'line_item_id']` as a list, you're specifying which columns should be combined to create a unique identifier that will be consistent across runs—if the same order_id and line_item_id combination appears again, it will always produce the same surrogate key. The `AS surrogate_key` clause names the resulting hashed column, while `{{ ref('stg_order_items') }}` ensures dbt properly tracks the dependency on the upstream staging table and enables lineage tracking. This approach is cleaner than manually writing hash functions and abstracts away database-specific hashing logic, making the code more portable across different SQL dialects.",
           "module": "dbt 102"
@@ -16245,10 +16245,10 @@
           "q": "Write a minimal dbt snapshot definition for a 'customers' source table using the timestamp strategy on 'updated_at'. Unique key is 'customer_id'. Target schema is 'snapshots'.",
           "a": "```sql\n{% snapshot customers_snapshot %}\n\n{{ config(\n    target_schema='snapshots',\n    unique_key='customer_id',\n    strategy='timestamp',\n    updated_at='updated_at'\n) }}\n\nSELECT * FROM {{ source('app', 'customers') }}\n\n{% endsnapshot %}\n```",
           "group": [
-            "Code – Snapshots"
+            "Snapshots"
           ],
           "difficulty": "Easy",
-          "category": "Code – Snapshots",
+          "category": "Snapshots",
           "requires_code": true,
           "explanation": "A dbt snapshot is defined using the `{% snapshot %}` block, which wraps a query and configuration to track historical changes to dimension tables. The `config()` macro sets four essential parameters: `target_schema` directs the snapshot table to the 'snapshots' schema, `unique_key` identifies each row uniquely by 'customer_id' so dbt knows which records to compare across runs, `strategy='timestamp'` tells dbt to detect changes by comparing the `updated_at` column rather than hashing entire rows, and `updated_at` specifies which column contains the change timestamp. The `SELECT * FROM {{ source('app', 'customers') }}` queries the source table, where `source()` is a dbt function that references the externally defined 'customers' table in the 'app' source, providing lineage and validation. On each snapshot execution, dbt compares the `updated_at` values to identify new or changed records, automatically adding `dbt_valid_from` and `dbt_valid_to` columns to track when each version of a customer record was active.",
           "module": "dbt 102"
@@ -16257,10 +16257,10 @@
           "q": "Write a config() block that applies the tags 'finance' and 'daily', and places the model in a custom schema named 'reporting'.",
           "a": "```sql\n{{ config(\n    tags=['finance', 'daily'],\n    schema='reporting'\n) }}\n```",
           "group": [
-            "Code – Config"
+            "Configuration"
           ],
           "difficulty": "Easy",
-          "category": "Code – Config",
+          "category": "Configuration",
           "requires_code": true,
           "explanation": "The `config()` macro is a dbt Jinja function that sets model-level configurations at the top of a SQL file. The `tags` parameter accepts a list of string values that allow you to organize and selectively run models—here, both 'finance' and 'daily' tags enable filtering by business domain and execution frequency. The `schema` parameter overrides the default schema defined in your profiles.yml, placing this model in a custom 'reporting' schema instead of the project's base schema. When dbt parses this file, it reads these configurations before executing the SQL and applies them to the model's metadata and build behavior. This approach is cleaner than setting schema at the directory level because it keeps schema logic with the model itself, making it explicit and easy to audit.",
           "module": "dbt 102"
@@ -16269,10 +16269,10 @@
           "q": "Write a dbt expression using env_var() that reads the warehouse username from an environment variable called 'DBT_USER', falling back to 'readonly' if not set.",
           "a": "```sql\n{{ env_var('DBT_USER', 'readonly') }}\n```",
           "group": [
-            "Code – Jinja"
+            "Jinja"
           ],
           "difficulty": "Easy",
-          "category": "Code – Jinja",
+          "category": "Jinja",
           "requires_code": true,
           "explanation": "The `env_var()` function is a dbt Jinja macro that retrieves environment variables at parse time. The first argument `'DBT_USER'` specifies the exact name of the environment variable to read, while the second argument `'readonly'` serves as a default fallback value if that variable doesn't exist in the runtime environment. This two-argument pattern makes your code resilient—if `DBT_USER` is set, dbt uses that value; if it's not set or is empty, `'readonly'` is substituted instead. This is commonly used in profiles.yml or model configurations to inject dynamic credentials or settings without hardcoding them, allowing the same dbt project to work across different environments (development, staging, production) with different authentication requirements.",
           "module": "dbt 102"
@@ -16281,10 +16281,10 @@
           "q": "Write a packages.yml that installs dbt-labs/dbt_utils at version 1.3.0.",
           "a": "```yaml\npackages:\n  - package: dbt-labs/dbt_utils\n    version: 1.3.0\n```",
           "group": [
-            "Code – YAML"
+            "YAML"
           ],
           "difficulty": "Easy",
-          "category": "Code – YAML",
+          "category": "YAML",
           "requires_code": true,
           "explanation": "The `packages` key is a top-level list in dbt's packages.yml file that declares all external dbt packages your project depends on. Each item in this list is a package object with at least two required fields: `package` specifies the source using the format `namespace/package-name`, and `version` pins the exact version to install. In this case, `dbt-labs/dbt_utils` identifies the popular utilities package maintained by dbt Labs, while `1.3.0` ensures reproducibility by locking to that specific release. When you run `dbt deps`, dbt reads this file and downloads the specified package and its dependencies into your project's `dbt_packages` directory, making all macros and models from dbt_utils available for use in your project.",
           "module": "dbt 102"
