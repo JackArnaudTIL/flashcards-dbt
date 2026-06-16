@@ -394,7 +394,7 @@ function buildFilterChips() {
   if (deck.modules_ordered) {
     modSec.style.display = 'block';
     document.getElementById('moduleChips').innerHTML = deck.modules_ordered.map(mod => `
-      <div class="chip${selectedModules.has(mod) ? ' selected' : ''}" onclick="toggleModule('${CSS.escape(mod)}')">${mod}</div>
+      <div class="chip${selectedModules.has(mod) ? ' selected' : ''}" data-mod="${mod.replace(/"/g, '&quot;')}" onclick="toggleModule(this.dataset.mod)">${mod}</div>
     `).join('');
     if (selectedModules.size > 0) cards = cards.filter(c => selectedModules.has(c.module));
   } else {
@@ -411,21 +411,21 @@ function buildFilterChips() {
   const diffs = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
 
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
-    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
+    <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" data-cat="${cat.replace(/"/g, '&quot;')}" onclick="toggleCategory(this.dataset.cat)">${categoryLabel(cat)}</div>
   `).join('');
 
   const grpSec = document.getElementById('groupSection');
   if (selectedCategories.size > 0 && groups.length > 1) {
     grpSec.style.display = 'block';
     document.getElementById('groupChips').innerHTML = groups.map(g => `
-      <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">${g} <span class="chip-count">${groupCounts[g]}</span></div>
+      <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" data-grp="${g.replace(/"/g, '&quot;')}" onclick="toggleGroup(this.dataset.grp)">${g} <span class="chip-count">${groupCounts[g]}</span></div>
     `).join('');
   } else {
     grpSec.style.display = 'none';
   }
 
   document.getElementById('difficultyChips').innerHTML = diffs.map(d => `
-    <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" onclick="toggleDifficulty('${CSS.escape(d)}')">${d}</div>
+    <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" data-diff="${d}" onclick="toggleDifficulty(this.dataset.diff)">${d}</div>
   `).join('');
 
   updateFilterCount();
@@ -447,8 +447,11 @@ function updateFilterCount() {
   });
   
   const count = filtered.length;
-  document.getElementById('heroCountDisplay').textContent = `${selectedDeckSize !== null && selectedDeckSize < count ? selectedDeckSize : count} cards`;
-  document.getElementById('filterCount').innerHTML = `<span>${count}</span> of ${all.length} cards match filters`;
+  const sessionCount = selectedDeckSize !== null && selectedDeckSize < count ? selectedDeckSize : count;
+  document.getElementById('heroCountDisplay').textContent = `${count} cards`;
+  document.getElementById('filterCount').innerHTML = selectedDeckSize !== null && selectedDeckSize < count
+    ? `Studying <span>${sessionCount}</span> of <span>${count}</span> matching cards`
+    : `<span>${count}</span> of ${all.length} cards match filters`;
   
   const row = document.getElementById('deckSizeRow'); row.innerHTML = '';
   [null, 10, 20, 50, 100].filter(s => s === null || s < count).forEach(s => {
