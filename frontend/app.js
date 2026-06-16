@@ -14,7 +14,7 @@ const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
 
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
-let thumbs = [], flags = [], codeReviews = [], currentDeckName = '', currentCert = null;
+let thumbs = [], flags = [], codeReviews = [], currentDeckName = '', currentCert = null, currentExplanation = '';
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set(), selectedModules = new Set();
 let selectedDeckSize = 50; 
 
@@ -514,6 +514,13 @@ function render() {
     resultEl.className = 'comparison-result';
   }
 
+  // clear glow and close overlay when moving to a new card
+  const studyUnitEl = document.getElementById('cardStudyUnit');
+  if (studyUnitEl) studyUnitEl.classList.remove('result-reviewing', 'result-match', 'result-ok', 'result-hard');
+  currentExplanation = '';
+  const explOverlay = document.getElementById('explanationOverlay');
+  if (explOverlay) explOverlay.style.display = 'none';
+
   if (diffContainer) {
     diffContainer.style.display = 'none';
     diffContainer.innerHTML = '';
@@ -535,7 +542,7 @@ function render() {
   const studyUnit = document.getElementById('cardStudyUnit');
   if (studyUnit) {
     studyUnit.classList.toggle('code-mode', !!card.requires_code);
-    studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
+    studyUnit.classList.remove('result-reviewing', 'result-match', 'result-ok', 'result-hard');
   }
 
   document.getElementById('cardInner').classList.remove('flipped');
@@ -711,23 +718,25 @@ async function flip() {
       const normUser = userCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       const normExpected = expectedCode.replace(/\r\n/g, '\n').replace(/\t/g, '    ').split('\n').map(l => l.trimEnd()).join('\n').trim();
       
+      // helper: set glow class, restarting CSS animation via reflow
+      const setGlow = (cls) => {
+        if (!studyUnit) return;
+        studyUnit.classList.remove('result-reviewing', 'result-match', 'result-ok', 'result-hard');
+        void studyUnit.offsetWidth; // force reflow so animation restarts
+        if (cls) studyUnit.classList.add(cls);
+      };
+
       // 1. Perfect match — auto-rate Good, no AI call needed
       if (normUser === normExpected) {
-        resultEl.innerHTML = '✓ Perfect match';
-        resultEl.className = 'comparison-result match';
-        resultEl.style.display = 'flex';
         if (diffContainer) { diffContainer.classList.remove('ai-mode'); diffContainer.style.display = 'none'; }
         if (syntaxErrorContainer) syntaxErrorContainer.style.display = 'none';
-        if (studyUnit) studyUnit.classList.add('result-match');
+        setGlow('result-match');
         autoRate('Good');
       }
       // 2. Code differs — use cached review if available, otherwise call API
       else {
-        const scoreClass = { Good: 'match', Ok: 'ok', Hard: 'hard' };
-        const scoreLabel = { Good: '✓ Good answer', Ok: '~ Partially correct', Hard: '✗ Needs work' };
-
         const storedExplanation = (card.explanation || '').trim();
-        const safeStoredExplanation = storedExplanation
+        currentExplanation = storedExplanation
           .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
 
         const applyReview = (score, safeFeedback) => {
@@ -737,32 +746,23 @@ async function flip() {
               <div class="ai-review-box">
                 <div class="ai-review-label">AI Review</div>
                 <div class="ai-review-text">${safeFeedback}</div>
-                ${safeStoredExplanation ? `
-                <div class="ai-review-divider"></div>
-                <div class="ai-review-label">How it works</div>
-                <div class="ai-review-text ai-review-explanation">${safeStoredExplanation}</div>
+                ${currentExplanation ? `
+                <button class="how-it-works-btn" onclick="showExplanationOverlay()">How it works ↗</button>
                 ` : ''}
               </div>
             `;
             diffContainer.style.display = 'block';
           }
-          resultEl.innerHTML = scoreLabel[score] || '~ Reviewed';
-          resultEl.className = `comparison-result ${scoreClass[score] || 'ok'}`;
-          resultEl.style.display = 'flex';
-          if (studyUnit) {
-            studyUnit.classList.remove('result-match', 'result-ok', 'result-hard');
-            studyUnit.classList.add(score === 'Good' ? 'result-match' : score === 'Hard' ? 'result-hard' : 'result-ok');
-          }
+          const glowMap = { Good: 'result-match', Ok: 'result-ok', Hard: 'result-hard' };
+          setGlow(glowMap[score] || 'result-ok');
           autoRate(score || 'Ok');
         };
 
         if (codeReviews[index]) {
           applyReview(codeReviews[index].score, codeReviews[index].safeFeedback);
         } else {
-          resultEl.innerHTML = 'Reviewing…';
-          resultEl.className = 'comparison-result';
-          resultEl.style.display = 'flex';
-
+          // show reviewing state
+          setGlow('result-reviewing');
           if (diffContainer) {
             diffContainer.classList.add('ai-mode');
             diffContainer.innerHTML = '<div style="padding:8px 0; color:var(--ink-soft); font-size:13px;">Reviewing your code…</div>';
@@ -792,8 +792,7 @@ async function flip() {
           if (!reviewShown && diffContainer) {
             diffContainer.classList.remove('ai-mode');
             diffContainer.style.display = 'none';
-            resultEl.innerHTML = '~ Could not review';
-            resultEl.className = 'comparison-result ok';
+            setGlow(null);
           }
         }
       }
@@ -963,6 +962,22 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// ── Explanation overlay ──────────────────────────────────────────────────────
+function showExplanationOverlay() {
+  const overlay = document.getElementById('explanationOverlay');
+  const body    = document.getElementById('explanationSheetBody');
+  if (!overlay || !body) return;
+  body.innerHTML = currentExplanation || '';
+  overlay.style.display = 'flex';
+}
+
+function hideExplanationOverlay(e) {
+  // called by backdrop click (e supplied) or close button (no e)
+  if (e && e.target !== document.getElementById('explanationOverlay')) return;
+  const overlay = document.getElementById('explanationOverlay');
+  if (overlay) overlay.style.display = 'none';
+}
+
 // Since we're using a module, bind necessary UI hooks to the window so HTML onclicks work:
 window.submitCode = submitCode;
 window.flip = flip;
@@ -982,3 +997,5 @@ window.prev = prev;
 window.next = next;
 window.restart = restart;
 window.exportFlags = exportFlags;
+window.showExplanationOverlay = showExplanationOverlay;
+window.hideExplanationOverlay = hideExplanationOverlay;

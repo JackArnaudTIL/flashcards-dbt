@@ -224,5 +224,16 @@
 
 </div>
 <script type="module" src="app.js"></script>
+
+<!-- How it works — bottom sheet overlay -->
+<div id="explanationOverlay" class="explanation-overlay" style="display:none" onclick="hideExplanationOverlay(event)">
+  <div class="explanation-sheet" onclick="event.stopPropagation()">
+    <div class="explanation-sheet-header">
+      <span class="explanation-sheet-title">How it works</span>
+      <button class="explanation-sheet-close" onclick="hideExplanationOverlay()">✕</button>
+    </div>
+    <div class="explanation-sheet-body" id="explanationSheetBody"></div>
+  </div>
+</div>
 </body>
 </html>
