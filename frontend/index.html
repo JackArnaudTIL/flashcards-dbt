@@ -65,19 +65,19 @@
         <button class="start-btn hero-start" id="startBtn" onclick="startFiltered()">Start Study</button>
     </div>
 
+    <div class="filter-section" id="moduleSection" style="display:none">
+      <div class="filter-heading">Module</div>
+      <div class="filter-scroll-wrapper">
+        <div class="filter-chips horizontal-scroll" id="moduleChips"></div>
+      </div>
+    </div>
+
     <div class="customize-toggle" onclick="toggleCustomization()">
         <span>Customize Session</span>
         <svg id="customChevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
     </div>
 
     <div id="customizationPanel" style="display:none">
-        <div class="filter-section" id="moduleSection" style="display:none">
-          <div class="filter-heading">Module</div>
-          <div class="filter-scroll-wrapper">
-            <div class="filter-chips horizontal-scroll" id="moduleChips"></div>
-          </div>
-        </div>
-
         <div class="filter-section" id="categorySection">
           <div class="filter-heading">Category</div>
           <div class="filter-scroll-wrapper">

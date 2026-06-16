@@ -481,8 +481,12 @@ pre code {
 }
 
 /* ── Filter picker ───────────────────────────────────────────── */
-.filter-section { 
-  margin-bottom: 1.75rem; 
+.filter-section {
+  margin-bottom: 1.75rem;
+}
+
+#moduleSection {
+  margin-top: 1.5rem;
 }
 
 .filter-heading {

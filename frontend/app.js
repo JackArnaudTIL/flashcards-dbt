@@ -189,7 +189,16 @@ fetch('cards.json')
   })
   .then(data => { 
     if (!data || !data.decks) throw new Error("cards.json is missing the 'decks' object.");
-    DECKS = data.decks; 
+    DECKS = data.decks;
+    // Normalise difficulty to Title Case so filters match regardless of source format
+    Object.values(DECKS).forEach(deck => {
+      deck.cards.forEach(card => {
+        if (card.difficulty) {
+          const d = card.difficulty.toLowerCase();
+          card.difficulty = d.charAt(0).toUpperCase() + d.slice(1);
+        }
+      });
+    });
     buildDeckGrid(); 
   })
   .catch((err) => {
@@ -349,8 +358,16 @@ function filterBack() {
 function showFilterPicker() {
   const label = currentCert ? `${currentDeckName} · ${currentCert}` : currentDeckName;
   document.getElementById('filterDeckTitle').textContent = label;
-  document.getElementById('customizationPanel').style.display = 'none';
-  document.getElementById('customChevron').classList.remove('rotated');
+  const hasModules = !!DECKS[currentDeckName]?.modules_ordered;
+  const panel = document.getElementById('customizationPanel');
+  const chevron = document.getElementById('customChevron');
+  if (hasModules) {
+    panel.style.display = 'block';
+    chevron.classList.add('rotated');
+  } else {
+    panel.style.display = 'none';
+    chevron.classList.remove('rotated');
+  }
   buildFilterChips();
   showOnly('filterPicker');
 }
