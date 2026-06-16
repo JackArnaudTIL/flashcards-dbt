@@ -341,6 +341,7 @@ function selectDeck(name) {
 
 // ── Screen 3: Filter picker ──────────────────────────────────
 function filterBack() {
+  if (DECKS[currentDeckName].modules_ordered) { showOnly('deckPicker'); return; }
   const certs = [...new Set(DECKS[currentDeckName].cards.map(c => c.certification).filter(Boolean))];
   certs.length > 0 ? showOnly('certPicker') : showOnly('deckPicker');
 }

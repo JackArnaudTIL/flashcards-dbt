@@ -816,12 +816,13 @@ pre code {
 }
 
 .card-text {
-  font-size: 1.2rem; 
-  color: var(--ink); 
-  line-height: 1.6; 
-  font-weight: 400; 
+  font-size: 1.2rem;
+  color: var(--ink);
+  line-height: 1.6;
+  font-weight: 400;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  width: 100%;
 }
 
 @media (max-width: 480px) {
