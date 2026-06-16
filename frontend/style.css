@@ -292,7 +292,7 @@ pre code {
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 2rem 1.5rem 4rem;
+  padding: 3rem 1.5rem 4rem;
 }
 
 .landing-wrap {
@@ -300,24 +300,49 @@ pre code {
   max-width: 560px;
   display: flex;
   flex-direction: column;
-  gap: 2.5rem;
-  padding-top: 3rem;
+  gap: 2.25rem;
 }
 
-.landing-header {
+/* Icon + wordmark stacked, left-aligned */
+.landing-visual {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.landing-lockup {
-  height: 56px;
-  width: auto;
+.landing-hero-img {
+  /* icon SVG viewBox is 96×96; front card rect starts at x=26.
+     At 180px wide (scale 1.875), that's ~49px of left whitespace —
+     pull it back so the card edge aligns with the text below. */
+  width: 180px;
+  height: auto;
+  margin-left: -49px;
+}
+
+.landing-brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.landing-brand-name {
+  font-size: 2.75rem;
+  font-weight: 500;
+  letter-spacing: -1px;
+  color: #26201F;
+}
+
+.landing-brand-sub {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: #D4537E;
+  margin-top: 0.2rem;
 }
 
 .landing-hero {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.875rem;
 }
 
 .landing-tagline {
