@@ -286,6 +286,57 @@ pre code {
   box-shadow: var(--shadow-md);
 }
 
+/* ── Sign-in screen ──────────────────────────────────────────── */
+#signinScreen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.signin-card {
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+.signin-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin: 0 0 0.5rem;
+  color: var(--ink);
+}
+
+.signin-sub {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+
+.signin-google-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--ink-faint);
+  background: var(--card);
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.signin-google-btn:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--ink);
+}
+
 /* ── Auth area ───────────────────────────────────────────────── */
 .auth-area {
   display: flex;

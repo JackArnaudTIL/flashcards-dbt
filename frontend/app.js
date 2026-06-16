@@ -11,7 +11,7 @@ import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { jinja2 } from "@codemirror/legacy-modes/mode/jinja2";
 import { recordRating, getDeckProgress, deckStats, loadUserProgress, clearCache, mergeLocalToFirestore } from './progress.js';
 import { auth } from './firebase.js';
-import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
@@ -196,12 +196,12 @@ function renderAuthArea(user) {
       <button class="auth-btn" onclick="signOutUser()">Sign out</button>
     `;
   } else {
-    el.innerHTML = `<button class="auth-btn auth-btn-signin" onclick="signInUser()">Sign in with Google</button>`;
+    el.innerHTML = '';
   }
 }
 
 function signInUser() {
-  signInWithPopup(auth, new GoogleAuthProvider()).catch(err => console.error('Sign in failed:', err));
+  signInWithRedirect(auth, new GoogleAuthProvider());
 }
 
 async function signOutUser() {
@@ -212,20 +212,25 @@ async function signOutUser() {
 
 let _pendingMergeUid = null;
 
+getRedirectResult(auth).catch(err => console.error('Redirect sign-in failed:', err));
+
 onAuthStateChanged(auth, async user => {
   if (user) {
     const local = JSON.parse(localStorage.getItem('fc_progress') || '{}');
     const hasLocal = Object.keys(local).length > 0;
     await loadUserProgress(user.uid);
+    document.getElementById('signinScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
     renderAuthArea(user);
     if (hasLocal) {
       _pendingMergeUid = user.uid;
       document.getElementById('mergeOverlay').style.display = 'flex';
     }
-    // Refresh filter stats if the filter screen is open
     if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
   } else {
     clearCache();
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('signinScreen').style.display = 'flex';
     renderAuthArea(null);
   }
 });
