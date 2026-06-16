@@ -303,40 +303,18 @@ pre code {
   gap: 2.25rem;
 }
 
-/* Icon + wordmark stacked, left-aligned */
+/* Large stacked logo */
 .landing-visual {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .landing-hero-img {
-  /* icon SVG viewBox is 96×96; front card rect starts at x=26.
-     At 180px wide (scale 1.875), that's ~49px of left whitespace —
-     pull it back so the card edge aligns with the text below. */
-  width: 180px;
+  /* stacked SVG is 260×212; content is centred within it.
+     Scale it large, pull left so the icon visually aligns with
+     the left text margin below. */
+  width: min(340px, 90vw);
   height: auto;
-  margin-left: -49px;
-}
-
-.landing-brand {
-  display: flex;
-  flex-direction: column;
-  line-height: 1;
-}
-
-.landing-brand-name {
-  font-size: 2.75rem;
-  font-weight: 500;
-  letter-spacing: -1px;
-  color: #26201F;
-}
-
-.landing-brand-sub {
-  font-size: 1.35rem;
-  font-weight: 500;
-  color: #D4537E;
-  margin-top: 0.2rem;
+  margin-left: -24px;
 }
 
 .landing-hero {
