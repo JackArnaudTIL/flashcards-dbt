@@ -327,7 +327,28 @@ pre code {
   border-color: var(--ink-faint);
 }
 
-.deck-tile-name { 
+.deck-tile-icon {
+  width: 36px;
+  height: 36px;
+  margin-bottom: 0.75rem;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.deck-tile-icon svg {
+  width: 36px;
+  height: 36px;
+  display: block;
+}
+.deck-tile-icon img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  display: block;
+}
+
+.deck-tile-name {
   font-size: 14px; 
   font-weight: 600; 
   color: var(--ink); 

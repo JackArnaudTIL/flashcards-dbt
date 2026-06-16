@@ -287,9 +287,16 @@ function buildDeckGrid() {
 
     sections[section].sort((a, b) => a.localeCompare(b)).forEach(name => {
       const cards = DECKS[name].cards;
+      const icon  = DECKS[name].icon;
+      const iconHtml = icon
+        ? String(icon).trimStart().startsWith('<')
+          ? `<div class="deck-tile-icon">${icon}</div>`
+          : `<div class="deck-tile-icon"><img src="${icon}" alt=""></div>`
+        : '';
       const tile  = document.createElement('div');
       tile.className = 'deck-tile';
       tile.innerHTML = `
+        ${iconHtml}
         <div class="deck-tile-name">${name}</div>
         <div class="deck-tile-count">${cards.length} cards</div>
       `;
