@@ -337,6 +337,15 @@ pre code {
   border-color: var(--ink);
 }
 
+.signin-privacy-link {
+  display: block;
+  margin-top: 1.25rem;
+  font-size: 12px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.signin-privacy-link:hover { text-decoration: underline; }
+
 /* ── Auth area ───────────────────────────────────────────────── */
 .auth-area {
   display: flex;
