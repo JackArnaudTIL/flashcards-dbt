@@ -23080,6 +23080,1189 @@
           "category": "Domain 13: Snapshot Architecture"
         }
       ]
+    },
+    "dbt Modeling": {
+      "section": "Professional Development",
+      "cards": [
+        {
+          "q": "Write a complete staging model for `source('stripe', 'payments')`. Rename `customerid` → `customer_id` and `orderid` → `order_id`, cast `amount` from cents to dollars, filter deleted rows (`_fivetran_deleted = false`), and deduplicate on `payment_id` keeping the latest `updated_at`.",
+          "a": "```sql\nwith source as (\n\n    select * from {{ source('stripe', 'payments') }}\n\n),\n\ndeduped as (\n\n    select\n        *,\n        row_number() over (\n            partition by id\n            order by updated_at desc\n        ) as rn\n    from source\n    where not _fivetran_deleted\n\n),\n\nrenamed as (\n\n    select\n        id              as payment_id,\n        customerid      as customer_id,\n        orderid         as order_id,\n        amount / 100.0  as amount,\n        status,\n        created_at,\n        updated_at\n    from deduped\n    where rn = 1\n\n)\n\nselect * from renamed\n```",
+          "group": [
+            "Complete Models"
+          ],
+          "difficulty": "Hard",
+          "category": "Complete Models",
+          "requires_code": true,
+          "explanation": "This staging model uses a three-step CTE pattern to transform raw Stripe payment data. The `source` CTE pulls directly from the Stripe source table using dbt's `source()` function, which provides lineage tracking and freshness checks. The `deduped` CTE adds a `row_number()` window function partitioned by the payment's unique identifier and ordered by `updated_at` descending, so each payment gets ranked with the most recent record as `rn = 1`; the `where not _fivetran_deleted` clause filters out soft-deleted rows before deduplication to avoid keeping stale copies. The `renamed` CTE selects only the columns needed for downstream models, dividing `amount` by 100.0 to convert from cents to dollars (using 100.0 ensures floating-point division in SQL), and renames the snake_case versions of customer and order IDs to match dbt naming conventions. Finally, `where rn = 1` keeps only the most recent record per payment, ensuring no duplicates reach the final output. This layered approach makes the transformation logic readable and debuggable, with each CTE handling one clear responsibility."
+        },
+        {
+          "q": "Write a complete `fct_monthly_revenue` incremental model. Source from `ref('stg_orders')`. Aggregate `total_revenue` (sum of amount) and `order_count` per `customer_id` per `order_month` (date-truncated from `order_date`). Use `merge` with a composite unique key. Orders can arrive up to 3 days late — apply a 4-day lookback in the incremental filter.",
+          "a": "```jinja\n{{ config(\n    materialized='incremental',\n    unique_key=['customer_id', 'order_month'],\n    incremental_strategy='merge'\n) }}\n\nwith orders as (\n\n    select * from {{ ref('stg_orders') }}\n\n    {% if is_incremental() %}\n    where order_date >= (\n        select dateadd(day, -4, max(order_month)) from {{ this }}\n    )\n    {% endif %}\n\n),\n\naggregated as (\n\n    select\n        customer_id,\n        date_trunc('month', order_date)  as order_month,\n        sum(amount)                       as total_revenue,\n        count(*)                          as order_count\n    from orders\n    group by 1, 2\n\n)\n\nselect * from aggregated\n```",
+          "group": [
+            "Complete Models"
+          ],
+          "difficulty": "Hard",
+          "category": "Complete Models",
+          "requires_code": true,
+          "explanation": "This incremental model uses a composite unique key and merge strategy to handle late-arriving orders in a monthly revenue fact table. The `config` block establishes that `customer_id` and `order_month` together form the unique identifier, which ensures duplicate records are updated rather than inserted. The incremental logic uses `is_incremental()` to conditionally apply a 4-day lookback filter only on subsequent runs—`dateadd(day, -4, max(order_month))` retrieves the oldest month already loaded and subtracts 4 days, capturing any orders that may have arrived late for that period. The aggregation groups by customer and month (using `date_trunc` to bucket dates) and sums amounts while counting orders. Since merge strategy matches on the unique key, any new late orders will upsert existing rows for that customer-month combination rather than creating duplicates, keeping the fact table accurate and efficient."
+        },
+        {
+          "q": "Write a complete dbt Snapshot for `source('salesforce', 'accounts')`. Use the `timestamp` strategy on `updated_at`, with `account_id` as the unique key. Target schema: `snapshots`.",
+          "a": "```jinja\n{% snapshot accounts_snapshot %}\n\n{{ config(\n    target_schema='snapshots',\n    unique_key='account_id',\n    strategy='timestamp',\n    updated_at='updated_at'\n) }}\n\nselect * from {{ source('salesforce', 'accounts') }}\n\n{% endsnapshot %}\n```",
+          "group": [
+            "Complete Models"
+          ],
+          "difficulty": "Medium",
+          "category": "Complete Models",
+          "requires_code": true,
+          "explanation": "This dbt snapshot captures historical changes to the Salesforce accounts table by creating a slowly-changing dimension. The `{% snapshot %}` block wraps the query and applies snapshot-specific configuration through the `config()` macro. The `target_schema='snapshots'` parameter tells dbt to materialize this snapshot in a dedicated schema rather than the default target schema. The `unique_key='account_id'` identifies which column uniquely identifies each account record, allowing dbt to track changes for the same account across multiple snapshot runs. The `strategy='timestamp'` and `updated_at='updated_at'` work together to instruct dbt to compare the `updated_at` column between snapshot runs—when a timestamp changes, dbt knows a record has been updated and will add new rows with `dbt_valid_from` and `dbt_valid_to` timestamp columns to maintain the historical record. The simple `select *` query pulls all columns from the source, and dbt automatically adds its tracking columns to enable time-travel analysis of account data changes."
+        },
+        {
+          "q": "Write the complete `schema.yml` block for a model named `stg_orders` with a model description, `not_null` + `unique` on `order_id`, `accepted_values` on `status` (placed, shipped, completed, returned), and a `relationships` test on `customer_id` back to `stg_customers`.",
+          "a": "```yaml\nmodels:\n  - name: stg_orders\n    description: \"One row per order from the Stripe source, cleaned and typed.\"\n    columns:\n      - name: order_id\n        description: \"Primary key.\"\n        data_tests:\n          - not_null\n          - unique\n      - name: status\n        data_tests:\n          - accepted_values:\n              values: ['placed', 'shipped', 'completed', 'returned']\n      - name: customer_id\n        data_tests:\n          - relationships:\n              to: ref('stg_customers')\n              field: customer_id\n```",
+          "group": [
+            "Complete Models"
+          ],
+          "difficulty": "Medium",
+          "category": "Complete Models",
+          "requires_code": true,
+          "explanation": "The `models` key anchors all model definitions in the schema file. Each model requires a `name` and optional `description` that documents the table's purpose. The `columns` block defines individual fields and attaches data quality tests to them. `not_null` and `unique` tests are specified as simple list items under `data_tests` since they require no arguments. The `accepted_values` test uses YAML's mapping syntax to pass a `values` parameter containing the allowed statuses as a list. The `relationships` test requires two arguments: `to` uses `ref('stg_customers')` to reference another dbt model (creating a lineage dependency), and `field` specifies which column in the target table to match against—in this case `customer_id` on both sides of the relationship. Tests run as separate SELECT queries during `dbt test` and fail the pipeline if any rows violate the constraints."
+        },
+        {
+          "q": "Your `fct_revenue` model aggregates orders by customer and month. Orders arrive up to 72 hours late. Write the `config()` block and `{% if is_incremental() %}` filter that correctly handles late arrivals with a safe buffer.",
+          "a": "```jinja\n{{ config(\n    materialized='incremental',\n    unique_key=['customer_id', 'order_month'],\n    incremental_strategy='merge'\n) }}\n\n{% if is_incremental() %}\n\n    where order_date >= (\n        select dateadd(day, -4, max(order_month)) from {{ this }}\n    )\n\n{% endif %}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "The `config()` block establishes this as an incremental model using the merge strategy, which allows updates to existing rows rather than appending duplicates—essential since late-arriving orders might belong to previously closed months. The `unique_key` tells dbt which rows to match when merging, ensuring that if an order arrives late for a customer-month combination that already exists, it updates rather than duplicates. The `{% if is_incremental() %}` filter activates only on incremental runs, adding a WHERE clause that looks back 4 days from the maximum month in the existing table to create a safety buffer for the stated 72-hour (3-day) late arrival window. This overlap region recalculates those months completely, capturing any orders that arrived after the previous run but belong to earlier periods. The `dateadd(day, -4, ...)` explicitly adds one extra day of cushion beyond 72 hours, protecting against edge cases where orders arrive exactly at the boundary or where the previous dbt run occurred slightly before the current one."
+        },
+        {
+          "q": "Write the config block for a BigQuery incremental model that replaces entire date partitions using `insert_overwrite`, partitioned by an `event_date` date column.",
+          "a": "```jinja\n{{ config(\n    materialized='incremental',\n    incremental_strategy='insert_overwrite',\n    partition_by={\n        'field': 'event_date',\n        'data_type': 'date'\n    }\n) }}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "The `materialized='incremental'` parameter tells dbt to build this model incrementally, loading only new or changed data rather than rebuilding the entire table each run. The `incremental_strategy='insert_overwrite'` directive instructs BigQuery to replace entire date partitions rather than appending rows, which is essential for handling late-arriving or corrected data without creating duplicates. The `partition_by` object configures the partitioning scheme by specifying `'field': 'event_date'` to identify which column contains the partition key and `'data_type': 'date'` to define its data type, ensuring BigQuery correctly organizes and prunes data by date. Together, these settings allow the model to efficiently update historical partitions while maintaining the benefits of incremental processing."
+        },
+        {
+          "q": "Write the config block for a Snowflake incremental `merge` model on `order_id`, clustered on `customer_id` and `order_date`, using a dedicated warehouse named `TRANSFORMING`.",
+          "a": "```jinja\n{{ config(\n    materialized='incremental',\n    incremental_strategy='merge',\n    unique_key='order_id',\n    cluster_by=['customer_id', 'order_date'],\n    snowflake_warehouse='TRANSFORMING'\n) }}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "This config block sets up an incremental model that only processes new or changed rows for efficiency. The `materialized='incremental'` parameter tells dbt to build the table incrementally rather than from scratch each run, while `incremental_strategy='merge'` specifies that dbt should use Snowflake's MERGE command to insert new rows and update existing ones based on matches. The `unique_key='order_id'` identifies which column dbt should use to determine whether a row already exists in the target table—this is essential for the merge logic to know what to match on. The `cluster_by=['customer_id', 'order_date']` physically organizes the table's data on disk by these columns, which speeds up queries that filter on customer or date ranges. Finally, `snowflake_warehouse='TRANSFORMING'` routes the model's execution to a specific warehouse resource, letting you isolate this transformation workload on dedicated compute infrastructure separate from ad-hoc queries."
+        },
+        {
+          "q": "Write the config block for an append-only events table that must never be dropped and rebuilt, even when `dbt run --full-refresh` is passed.",
+          "a": "```jinja\n{{ config(\n    materialized='incremental',\n    incremental_strategy='append',\n    full_refresh=false\n) }}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "The `materialized='incremental'` setting tells dbt to treat this model as an incremental table, meaning it only processes new data rather than rebuilding from scratch. The `incremental_strategy='append'` explicitly configures the incremental strategy to simply add new rows without attempting to merge or delete existing records, which is the safest approach for immutable event logs. The `full_refresh=false` parameter is the critical safeguard—it overrides the `--full-refresh` command-line flag for this specific model, preventing dbt from ever dropping and recreating the table even when a user runs a full refresh on the entire project. This combination ensures your events table grows monotonically and protects against accidental data loss from a global refresh operation, while still allowing incremental loads on subsequent runs."
+        },
+        {
+          "q": "Write an incremental filter that uses the dbt variable `min_date` (default `'2020-01-01'`) for full runs, but filters on `max(created_at)` from `{{ this }}` when running incrementally.",
+          "a": "```jinja\n{% if is_incremental() %}\n\n    where created_at > (select max(created_at) from {{ this }})\n\n{% else %}\n\n    where created_at >= '{{ var(\"min_date\", \"2020-01-01\") }}'\n\n{% endif %}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "This conditional Jinja block adapts the WHERE clause based on whether dbt is running incrementally or doing a full refresh. The `is_incremental()` function checks if the model already exists in the database — if true, it queries the maximum `created_at` value from the existing table (referenced as `{{ this }}`) and only loads rows created after that timestamp, making the run efficient by skipping historical data. When `is_incremental()` returns false (full run or first-time build), it falls back to the `var()` function to retrieve the `min_date` variable, which defaults to `'2020-01-01'` if not explicitly provided, establishing the starting point for the initial load. The `>=` operator on the full run ensures the boundary date itself is included, while the `>` operator on incremental runs avoids re-processing the last synced record."
+        },
+        {
+          "q": "Write the `{% if is_incremental() %}` filter for a Kafka events model that processes only events from the last 2 hours when running incrementally, using `event_timestamp`.",
+          "a": "```jinja\n{% if is_incremental() %}\n\n    where event_timestamp >= (\n        select max(event_timestamp) - interval '2 hours'\n        from {{ this }}\n    )\n\n{% endif %}\n```",
+          "group": [
+            "Incremental Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Incremental Models",
+          "requires_code": true,
+          "explanation": "The `is_incremental()` Jinja function checks whether dbt is running in incremental mode, allowing different logic for full refreshes versus incremental runs. Inside this conditional block, the WHERE clause filters events to only those from the last 2 hours by subtracting a 2-hour interval from the maximum event_timestamp already in the table. The `{{ this }}` variable references the current model's existing table, so the subquery finds the most recent timestamp that's already been loaded and only processes events newer than 2 hours before that point. This approach ensures that incremental runs capture any late-arriving or updated events within the window while avoiding reprocessing old data. When dbt runs with `--full-refresh`, this entire WHERE clause is skipped and all events are processed, which is the desired behavior since `is_incremental()` returns false during full refreshes."
+        },
+        {
+          "q": "Write a surrogate key expression for a payments staging model where the natural key is `order_id` + `payment_method`. It must work identically on Snowflake and BigQuery.",
+          "a": "```sql\n{{ dbt_utils.generate_surrogate_key(['order_id', 'payment_method']) }}\n```",
+          "group": [
+            "Staging Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Staging Patterns",
+          "requires_code": true,
+          "explanation": "The `dbt_utils.generate_surrogate_key()` macro creates a consistent hash-based surrogate key from one or more columns by concatenating them with a delimiter and applying a hash function. By passing a list containing `order_id` and `payment_method`, you're defining the natural key components that uniquely identify each payment record. The macro automatically handles database-specific hash functions—it uses MD5 on Snowflake and FARM_FINGERPRINT on BigQuery—so the same dbt code produces identical key values across both platforms without manual conditional logic. This approach is superior to manual concatenation because it prevents collisions from delimiter conflicts (for example, if order_id were '12|3' and payment_method were 'card', manual concatenation could collide with order_id '12' and payment_method '3|card'). The resulting surrogate key is deterministic, meaning the same input values always produce the same key, which is essential for incremental models and record matching."
+        },
+        {
+          "q": "Write a `deduped` CTE that deduplicates a `source` CTE on `payment_id`, keeping the row with the most recent `updated_at`. Include the subsequent filter in a `final` CTE.",
+          "a": "```sql\ndeduped as (\n\n    select\n        *,\n        row_number() over (\n            partition by payment_id\n            order by updated_at desc\n        ) as rn\n    from source\n\n),\n\nfinal as (\n\n    select * from deduped where rn = 1\n\n)\n```",
+          "group": [
+            "Staging Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Staging Patterns",
+          "requires_code": true,
+          "explanation": "The `deduped` CTE uses `row_number()` as a window function to assign a sequential number to each row within groups partitioned by `payment_id`, ordered by `updated_at` in descending order so the most recent record gets `rn = 1`. This window function evaluates all rows without filtering, allowing every duplicate payment to be ranked. The `final` CTE then filters to keep only rows where `rn = 1`, which selects the single most recent record for each `payment_id`. By structuring it this way—calculating the row number first, then filtering in a separate CTE—the logic remains readable and the deduplication is explicit and maintainable."
+        },
+        {
+          "q": "Write a `renamed` CTE that: casts `amount` from integer cents to a float in dollars, casts `created_at` to timestamp, converts integer `is_active` (0/1) to boolean, and coalesces `discount` to 0.",
+          "a": "```sql\nrenamed as (\n\n    select\n        id                              as payment_id,\n        amount / 100.0                  as amount,\n        cast(created_at as timestamp)   as created_at,\n        is_active = 1                   as is_active,\n        coalesce(discount, 0)           as discount\n    from source\n\n)\n```",
+          "group": [
+            "Staging Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Staging Patterns",
+          "requires_code": true,
+          "explanation": "This CTE transforms raw source data into the correct data types and business logic. The `amount / 100.0` division converts integer cents to dollars by dividing by 100 as a float (the `.0` ensures float division rather than integer division). The `cast(created_at as timestamp)` explicitly converts the timestamp column to the proper timestamp type for temporal operations. The `is_active = 1` condition creates a boolean by comparing the integer against 1, returning true when the value equals 1 and false otherwise—this is more readable than casting. The `coalesce(discount, 0)` replaces any null discount values with 0, ensuring consistent numeric output for calculations. Finally, aliasing `id` to `payment_id` clarifies the column's semantic meaning in downstream models."
+        },
+        {
+          "q": "Write a `unioned` CTE that combines `source('app_db', 'orders_eu')` and `source('app_db', 'orders_us')` with a `region` column identifying the source of each row.",
+          "a": "```sql\nunioned as (\n\n    select *, 'EU' as region\n    from {{ source('app_db', 'orders_eu') }}\n\n    union all\n\n    select *, 'US' as region\n    from {{ source('app_db', 'orders_us') }}\n\n)\n```",
+          "group": [
+            "Staging Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Staging Patterns",
+          "requires_code": true,
+          "explanation": "This CTE uses `union all` to combine two source tables while preserving their row counts and adding source identification. The `{{ source() }}\n\n }}` function references dbt sources defined in your `sources.yml`, ensuring lineage tracking and making the code maintainable if table locations change. Each `select *` pulls all existing columns from its respective table, then adds a hardcoded `region` column—'EU' for the first source and 'US' for the second—so downstream models can distinguish which table each row came from. `union all` is chosen over `union` because it's faster; since the tables have different regions, there's no risk of duplicates, so the deduplication overhead of `union` is unnecessary. This pattern is common in dbt for consolidating geographically or functionally split source tables into a single normalized dataset."
+        },
+        {
+          "q": "Write a null-safe LEFT JOIN between an `orders` CTE and a `promotions` CTE on `promotion_id`, where `promotion_id` may be NULL in orders.",
+          "a": "```sql\nleft join promotions\n    on orders.promotion_id = promotions.promotion_id\n    and orders.promotion_id is not null\n```",
+          "group": [
+            "Staging Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Staging Patterns",
+          "requires_code": true,
+          "explanation": "The LEFT JOIN preserves all rows from `orders` while matching rows from `promotions` based on the `promotion_id` column. The critical addition is the `and orders.promotion_id is not null` condition in the ON clause, which prevents NULL values in `orders.promotion_id` from matching against NULL values in `promotions.promotion_id`. Without this check, SQL would treat all NULLs as equal to each other, causing unintended matches and inflating your result set. By explicitly filtering out NULL promotion IDs before the join logic executes, you ensure that only orders with valid promotion IDs get matched to promotion records, while orders with NULL promotion IDs remain unmatched but still appear in the result (with NULL values for all promotion columns)."
+        },
+        {
+          "q": "Write the CTE skeleton for a `fct_orders` mart that joins `ref('stg_orders')` with `ref('stg_customers')` to add `customer_country`. Use source CTEs, a `joined` CTE, and a final SELECT.",
+          "a": "```sql\nwith orders as (\n\n    select * from {{ ref('stg_orders') }}\n\n),\n\ncustomers as (\n\n    select * from {{ ref('stg_customers') }}\n\n),\n\njoined as (\n\n    select\n        orders.*,\n        customers.country as customer_country\n    from orders\n    left join customers using (customer_id)\n\n)\n\nselect * from joined\n```",
+          "group": [
+            "Mart Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Mart Patterns",
+          "requires_code": true,
+          "explanation": "This dbt model uses a multi-CTE structure to build a fact table by staging and joining related dimensions. The first two CTEs (`orders` and `customers`) pull in the staging tables via `ref()`, which establishes lineage dependencies and ensures dbt rebuilds this model when upstream tables change. The `joined` CTE performs a left join on `customer_id`, preserving all orders while adding the `customer_country` field from the customer dimension—a left join is appropriate here because every order should exist in the source, but you want to keep orders even if customer lookup data is missing. The `select *` from both orders and customers in the source CTEs makes all available columns accessible downstream, giving flexibility to the joined layer. Finally, the main SELECT statement returns the complete joined result set, which is the standard pattern for fact table models that prioritize readability and maintainability by separating concerns (source retrieval, transformation logic, final output) into distinct CTEs."
+        },
+        {
+          "q": "Write a SELECT that adds a `running_revenue` column showing the cumulative sum of `amount` ordered by `order_date` within each `customer_id` partition, using explicit frame syntax.",
+          "a": "```sql\nselect\n    *,\n    sum(amount) over (\n        partition by customer_id\n        order by order_date\n        rows between unbounded preceding and current row\n    ) as running_revenue\nfrom orders\n```",
+          "group": [
+            "Mart Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Mart Patterns",
+          "requires_code": true,
+          "explanation": "This query uses a window function to calculate a running total of revenue for each customer. The `sum(amount) over (...)` creates a window that aggregates the `amount` column, and the `partition by customer_id` ensures each customer's running total is calculated independently without mixing data from other customers. The `order by order_date` establishes the sequence in which rows are processed, so the running sum grows chronologically. The explicit frame clause `rows between unbounded preceding and current row` is the key detail here—it tells SQL to sum from the very first row in the partition all the way through the current row being evaluated, which produces the cumulative effect. This frame is actually the default behavior for ordered window functions, but writing it explicitly makes the intent crystal clear and ensures the query behaves consistently across different database systems."
+        },
+        {
+          "q": "Write a SELECT aggregating orders by `customer_id` that produces `completed_orders` (count where status = 'completed') and `completed_revenue` (sum of amount where status = 'completed') using conditional aggregation.",
+          "a": "```sql\nselect\n    customer_id,\n    count(case when status = 'completed' then 1 end)    as completed_orders,\n    sum(case when status = 'completed' then amount end)  as completed_revenue\nfrom orders\ngroup by 1\n```",
+          "group": [
+            "Mart Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Mart Patterns",
+          "requires_code": true,
+          "explanation": "The query groups all orders by `customer_id` and calculates two metrics for only the completed orders. The `count(case when status = 'completed' then 1 end)` expression returns 1 for each completed order and NULL for non-completed orders, so COUNT ignores the NULLs and counts only completed rows. Similarly, `sum(case when status = 'completed' then amount end)` returns the amount for completed orders and NULL otherwise, allowing SUM to total only those amounts while ignoring the rest. The `group by 1` references the first column (customer_id) in the SELECT list, a shorthand that groups results so each customer appears once with their aggregated metrics. This conditional aggregation approach is more efficient than filtering with WHERE because it processes all rows in one pass rather than requiring separate queries for each metric."
+        },
+        {
+          "q": "Write a `date_spine` CTE using `dbt_utils.date_spine` to generate a complete sequence of daily dates from `'2020-01-01'` to today.",
+          "a": "```sql\ndate_spine as (\n\n    {{ dbt_utils.date_spine(\n        datepart='day',\n        start_date=cast('2020-01-01' as date),\n        end_date=cast(current_date as date)\n    ) }}\n\n)\n```",
+          "group": [
+            "Mart Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Mart Patterns",
+          "requires_code": true,
+          "explanation": "The `dbt_utils.date_spine` macro generates a table of sequential dates by accepting three key parameters. The `datepart='day'` argument specifies that you want daily granularity rather than monthly or yearly intervals. The `start_date` and `end_date` parameters define the range, with both values explicitly cast to the `date` type to ensure type consistency—`'2020-01-01'` is a hardcoded start point while `current_date` dynamically captures today's date so the spine updates whenever the model runs. This macro is wrapped in Jinja delimiters `{{ }}` because it's a dbt macro that compiles into actual SQL, and the result is stored in a CTE named `date_spine` that you can reference in downstream queries to join against event data and fill gaps in your time series."
+        },
+        {
+          "q": "Write a Jinja block that generates a pivot: for each status in `['placed', 'shipped', 'completed']`, produce a `count(case when ...)` column named `{status}_orders`, grouped by `customer_id`.",
+          "a": "```jinja\n{% set statuses = ['placed', 'shipped', 'completed'] %}\n\nselect\n    customer_id,\n{% for status in statuses %}\n    count(case when status = '{{ status }}' then 1 end)\n        as {{ status }}_orders{% if not loop.last %},{% endif %}\n{% endfor %}\nfrom orders\ngroup by 1\n```",
+          "group": [
+            "Mart Patterns"
+          ],
+          "difficulty": "Hard",
+          "category": "Mart Patterns",
+          "requires_code": true,
+          "explanation": "This Jinja template generates a pivot table by looping through a predefined list of order statuses and creating a conditional count column for each one. The `{% set statuses = [...] %}` block defines the list once at the top, making it reusable and easy to maintain. Inside the `select` statement, the `{% for status in statuses %}` loop iterates through each status value, and for each iteration it renders a `count(case when status = '{{ status }}' then 1 end)` expression that counts only orders matching that specific status, aliasing the result as `{status}_orders`. The `{% if not loop.last %},{% endif %}` conditional adds a comma after each column except the last one, ensuring valid SQL syntax without a trailing comma. When dbt processes this template, it compiles into a standard SQL query with three separate count-case columns, one for each status, all grouped by customer_id. This approach eliminates manual repetition and makes it trivial to add or remove statuses by simply modifying the list."
+        },
+        {
+          "q": "Write a SELECT that returns only the current (active) rows from `ref('accounts_snapshot')` — i.e., rows that have not yet been superseded.",
+          "a": "```sql\nselect *\nfrom {{ ref('accounts_snapshot') }}\nwhere dbt_valid_to is null\n```",
+          "group": [
+            "Snapshot Patterns"
+          ],
+          "difficulty": "Easy",
+          "category": "Snapshots",
+          "requires_code": true,
+          "explanation": "This query retrieves the active snapshot records by filtering on the `dbt_valid_to` column. In dbt's snapshot tables, each row has a `dbt_valid_to` timestamp that marks when that version of a record became outdated; when a record is updated, the previous version gets a `dbt_valid_to` value and a new current row is inserted with `dbt_valid_to` set to null. By selecting only rows where `dbt_valid_to is null`, you're retrieving exactly the current, non-superseded version of each tracked entity. The `{{ ref() }}` macro ensures the query references the snapshot table correctly within your dbt project."
+        },
+        {
+          "q": "Write a SELECT that reconstructs the state of all accounts as they existed on `'2024-06-01'` from `ref('accounts_snapshot')`.",
+          "a": "```sql\nselect *\nfrom {{ ref('accounts_snapshot') }}\nwhere dbt_valid_from <= '2024-06-01'\n  and (dbt_valid_to > '2024-06-01' or dbt_valid_to is null)\n```",
+          "group": [
+            "Snapshot Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Snapshots",
+          "requires_code": true,
+          "explanation": "This query uses dbt's snapshot table structure to retrieve the account state at a specific point in time. The `dbt_valid_from` condition ensures you only get records that were already active on June 1st (their validity started on or before that date). The second condition with `dbt_valid_to` captures records that were still valid on that date—either their end date was after June 1st, or they have a null end date, meaning they're still current. Together, these two conditions isolate exactly one version of each account per day: the record that was \"live\" during that specific moment in time."
+        },
+        {
+          "q": "Write the snapshot config block for a source table with no `updated_at` column. Check only the `status` and `tier` columns for changes, with `customer_id` as the unique key.",
+          "a": "```jinja\n{{ config(\n    target_schema='snapshots',\n    unique_key='customer_id',\n    strategy='check',\n    check_cols=['status', 'tier']\n) }}\n```",
+          "group": [
+            "Snapshot Patterns"
+          ],
+          "difficulty": "Medium",
+          "category": "Snapshots",
+          "requires_code": true,
+          "explanation": "The `config()` macro accepts snapshot-specific settings as key-value pairs. `target_schema` specifies where the snapshot table will be created in your warehouse. `unique_key` identifies which column(s) uniquely identify each row—dbt uses this to match records across snapshot runs and detect which rows are new or modified. `strategy='check'` tells dbt to use the check strategy instead of timestamp strategy, which is necessary when there's no `updated_at` column available. `check_cols` explicitly lists which columns dbt should monitor for changes; dbt will create a new snapshot record only when these column values differ from the previous run, ignoring any other columns that might have changed."
+        },
+        {
+          "q": "Write a `config()` block that materialises the model as a `table` in production (`target.name == 'prod'`) and a `view` in all other environments.",
+          "a": "```jinja\n{{ config(\n    materialized='table' if target.name == 'prod' else 'view'\n) }}\n```",
+          "group": [
+            "Advanced Jinja"
+          ],
+          "difficulty": "Easy",
+          "category": "Advanced Jinja & Config",
+          "requires_code": true,
+          "explanation": "The `config()` macro uses a Jinja conditional expression to dynamically set the `materialized` parameter based on the deployment environment. The `target.name` variable evaluates to the name of the active dbt target (like 'prod', 'dev', or 'staging'), allowing you to branch logic at parse time. When `target.name == 'prod'` is true, the model materializes as a `table`, which is optimal for production performance since the data is pre-computed and stored; otherwise, it defaults to a `view`, which is lightweight and ideal for development where you want flexibility and faster runs. This pattern is a best practice because it balances performance in production with resource efficiency in other environments without requiring multiple model files or manual configuration changes per environment."
+        },
+        {
+          "q": "Write a `config()` block that sets the schema using the `DBT_SCHEMA_PREFIX` environment variable (defaulting to an empty string) concatenated with the string `'marketing'`.",
+          "a": "```jinja\n{{ config(\n    schema=env_var('DBT_SCHEMA_PREFIX', '') ~ 'marketing'\n) }}\n```",
+          "group": [
+            "Advanced Jinja"
+          ],
+          "difficulty": "Medium",
+          "category": "Advanced Jinja & Config",
+          "requires_code": true,
+          "explanation": "The `config()` block uses the `env_var()` Jinja function to retrieve the `DBT_SCHEMA_PREFIX` environment variable, with an empty string as the default fallback if that variable isn't set. The `~` operator concatenates the retrieved value with the literal string `'marketing'`, allowing flexible schema naming—for example, if `DBT_SCHEMA_PREFIX` is `'stg_'`, the resulting schema becomes `'stg_marketing'`, or if unset, it defaults to just `'marketing'`. This pattern is useful for parameterizing environments where you might want different schema prefixes across dev, staging, and production without hardcoding them into your dbt models."
+        },
+        {
+          "q": "Write the config block and SELECT for an `ephemeral` model named `int_active_customers` that filters `ref('stg_customers')` to only active customers.",
+          "a": "```jinja\n{{ config(materialized='ephemeral') }}\n\nselect *\nfrom {{ ref('stg_customers') }}\nwhere is_active = true\n```",
+          "group": [
+            "Advanced Jinja"
+          ],
+          "difficulty": "Easy",
+          "category": "Advanced Jinja & Config",
+          "requires_code": true,
+          "explanation": "The `config()` macro at the top sets `materialized='ephemeral'`, which tells dbt to treat this model as a temporary query fragment rather than creating a physical table or view in the database. This is ideal for intermediate transformations you want to reuse across multiple models without storing redundant data. The `ref('stg_customers')` function creates a dependency on the `stg_customers` model and automatically resolves to the correct schema, ensuring dbt knows the lineage and runs models in the correct order. The `where is_active = true` filter selects only rows where the `is_active` column equals true, reducing the dataset to active customers only. Since this is ephemeral, the SQL is inlined into any model that calls `ref('int_active_customers')`, meaning the filtering happens as part of the downstream query rather than as a separate execution step."
+        },
+        {
+          "q": "Write a Jinja block that selects columns from a list `['order_id', 'customer_id', 'amount', 'status']` using a `for` loop, with correct comma placement.",
+          "a": "```jinja\n{% set cols = ['order_id', 'customer_id', 'amount', 'status'] %}\n\nselect\n{% for col in cols %}\n    {{ col }}{% if not loop.last %},{% endif %}\n{% endfor %}\nfrom orders\n```",
+          "group": [
+            "Advanced Jinja"
+          ],
+          "difficulty": "Medium",
+          "category": "Advanced Jinja & Config",
+          "requires_code": true,
+          "explanation": "The code defines a Jinja set variable `cols` containing a list of column names, then iterates through each column in a `select` statement using a `for` loop. The `{{ col }}` outputs each column name into the SQL, and the conditional `{% if not loop.last %},{% endif %}` adds a comma after every column *except* the last one—this prevents a trailing comma that would break SQL syntax. The `loop.last` is a built-in Jinja variable that evaluates to `true` only on the final iteration, making it the cleanest way to handle comma separation in loops. This pattern is especially useful in dbt when you have a dynamic list of columns that might change, since you only need to update the list rather than rewriting the entire select statement."
+        }
+      ]
+    },
+    "dbt 101": {
+      "section": "Professional Development",
+      "cards": [
+        {
+          "q": "What is dbt?",
+          "a": "dbt (data build tool) is an open-source transformation framework that lets analysts and engineers write modular SQL SELECT statements, which dbt compiles and runs against a data warehouse to build and test tables and views.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What problem does dbt solve?",
+          "a": "It brings software engineering best practices (version control, testing, documentation, modularity) to data transformation. Before dbt, transformations were often scattered across stored procedures, BI tools, and ad-hoc scripts with no lineage or tests.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt model?",
+          "a": "A single SQL SELECT statement saved as a .sql file in the models/ directory. When dbt runs a model it wraps the SELECT in a CREATE TABLE or CREATE VIEW statement and executes it in the data warehouse.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What does dbt NOT do?",
+          "a": "dbt does not extract or load data. It only transforms data that already exists in your warehouse. The EL (Extract, Load) step is handled by separate tools like Fivetran, Airbyte, or custom pipelines.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt source?",
+          "a": "A declaration in a sources.yml file that tells dbt where your raw data lives — the database, schema, and table name. Using source() instead of direct table references lets dbt track lineage and test freshness.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What does the `ref()` function do?",
+          "a": "It references another dbt model by name (e.g., ref('stg_orders')). dbt replaces it with the actual compiled relation at runtime, automatically builds a dependency graph, and ensures models run in the right order.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What does the `source()` function do?",
+          "a": "It references a raw source table declared in sources.yml (e.g., source('stripe', 'payments')). This lets dbt track lineage from raw sources, and enables freshness checks on those tables.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is the difference between `ref()` and `source()`?",
+          "a": "ref() references another dbt model (something you built). source() references a raw table loaded by an external pipeline (something you didn't build). Both generate the correct relation name and track lineage.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt seed?",
+          "a": "A CSV file in the seeds/ directory that dbt loads into the warehouse as a table. Useful for small, static lookup data (e.g., country codes, cost centres) that changes infrequently.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt snapshot?",
+          "a": "A dbt feature that captures the historical state of a mutable source table over time (Type 2 SCD). dbt adds dbt_valid_from / dbt_valid_to columns so you can query what data looked like at any point in time.",
+          "group": "Core Concepts",
+          "difficulty": "medium",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt macro?",
+          "a": "A reusable block of Jinja-templated SQL or logic defined in the macros/ directory. Macros work like functions — you call them from models or other macros and they return SQL text at compile time.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is a dbt package?",
+          "a": "A reusable collection of models, macros, and tests published as a standalone dbt project (e.g., dbt_utils, dbt_expectations). Install packages via packages.yml and run dbt deps to download them.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is the DAG in dbt?",
+          "a": "The Directed Acyclic Graph — dbt's internal representation of how models depend on each other. Built from ref() and source() calls, it determines the order models are built and is visualised in dbt's lineage graph.",
+          "group": "Core Concepts",
+          "difficulty": "medium",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is Jinja in the context of dbt?",
+          "a": "A templating language that dbt embeds in SQL files. It lets you use variables ({{ }}), logic blocks ({% %}), and macros to make SQL dynamic — e.g., {{ ref('my_model') }}, {% if is_incremental() %}, {{ config(...) }}.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is the difference between dbt Core and dbt Cloud?",
+          "a": "dbt Core is the open-source CLI tool — free, runs anywhere, but you manage your own environment. dbt Cloud is a managed SaaS platform built on top of Core — adds a web IDE, job scheduling, CI/CD, lineage explorer, and collaboration features.",
+          "group": "Core Concepts",
+          "difficulty": "easy",
+          "category": "Core Concepts"
+        },
+        {
+          "q": "What is the purpose of `dbt_project.yml`?",
+          "a": "The main project configuration file. It sets the project name, model paths, materialization defaults, variable definitions, and folder-level config (e.g., all models in staging/ use +schema: staging). Every dbt project must have one.",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What is `profiles.yml` and where does it live?",
+          "a": "Contains connection credentials for each dbt target environment (dev, prod) — warehouse type, host, database, schema, credentials. Lives at ~/.dbt/profiles.yml (local) and is NOT committed to source control. dbt Cloud manages this separately.",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What is `schema.yml` used for in dbt?",
+          "a": "YAML files (commonly named schema.yml, but any .yml file works) in the models/ directory where you document models and columns, and define data tests. Also used to declare sources (sources.yml) and exposures.",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What is the standard dbt project folder structure?",
+          "a": "models/ (SQL models), seeds/ (CSV files), snapshots/ (snapshot SQL), macros/ (Jinja macros), tests/ (singular tests), analyses/ (ad-hoc SQL), dbt_project.yml (project config), packages.yml (package dependencies).",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What is the recommended layer structure for dbt models?",
+          "a": "Staging (stg_) — one-to-one with source tables, light cleaning only. Intermediate (int_) — joins and business logic. Marts (fct_, dim_) — final models consumed by BI tools. This separation makes the project easier to navigate and test.",
+          "group": "Project Structure",
+          "difficulty": "medium",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What naming convention do dbt projects typically follow?",
+          "a": "stg_ prefix for staging models, int_ for intermediate, fct_ for fact tables, dim_ for dimension tables. Seeds use plain names. Snapshots often end in _snapshot. Consistent naming makes lineage and model purpose immediately clear.",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What is `packages.yml` and what command reads it?",
+          "a": "A file listing external dbt packages your project depends on (e.g., dbt-labs/dbt_utils). Run `dbt deps` to download and install them into the dbt_packages/ directory.",
+          "group": "Project Structure",
+          "difficulty": "easy",
+          "category": "Project Structure"
+        },
+        {
+          "q": "What are the four core dbt materializations?",
+          "a": "view — creates a database view (default). table — creates a physical table, rebuilt each run. ephemeral — no database object created; inlined as a CTE wherever it's referenced. incremental — creates a table and only processes new/changed rows on subsequent runs.",
+          "group": "Materializations",
+          "difficulty": "easy",
+          "category": "Materializations"
+        },
+        {
+          "q": "What is the default dbt materialization and when should you change it?",
+          "a": "The default is 'view'. Change to 'table' when the view is slow to query (complex transformations). Change to 'incremental' when the model processes large datasets where rebuilding is too expensive.",
+          "group": "Materializations",
+          "difficulty": "easy",
+          "category": "Materializations"
+        },
+        {
+          "q": "When should you use `materialized='table'` over `materialized='view'`?",
+          "a": "When the model is expensive to compute and queried frequently. A table stores the result physically, so each query reads pre-computed data. A view re-runs the SQL on every query.",
+          "group": "Materializations",
+          "difficulty": "easy",
+          "category": "Materializations"
+        },
+        {
+          "q": "When should you use an ephemeral model?",
+          "a": "For simple helper logic that is only used once by a single downstream model — like a CTE you'd rather keep in a separate file for readability. Ephemeral models create no database object and are inlined at compile time.",
+          "group": "Materializations",
+          "difficulty": "medium",
+          "category": "Materializations"
+        },
+        {
+          "q": "What is an incremental model and what problem does it solve?",
+          "a": "An incremental model only processes rows that are new or changed since the last run, rather than rebuilding the entire table. This makes large-table transformations (billions of rows) practical to run on a schedule.",
+          "group": "Materializations",
+          "difficulty": "medium",
+          "category": "Materializations"
+        },
+        {
+          "q": "What does `dbt run --full-refresh` do to an incremental model?",
+          "a": "Drops and recreates the incremental model from scratch, processing all rows. Use this when the model's logic changes or when you suspect the table has drifted from what a clean build would produce.",
+          "group": "Materializations",
+          "difficulty": "medium",
+          "category": "Materializations"
+        },
+        {
+          "q": "How does dbt know what rows to skip in an incremental model?",
+          "a": "It doesn't automatically — you write a `{% if is_incremental() %}` Jinja block in the model with a WHERE clause that filters for new rows (e.g., where updated_at > max(updated_at) from the existing table).",
+          "group": "Materializations",
+          "difficulty": "medium",
+          "category": "Materializations"
+        },
+        {
+          "q": "What does `dbt run` do?",
+          "a": "Compiles all selected SQL models and executes them against the data warehouse, creating or replacing the corresponding views or tables. Does not run tests.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt test` do?",
+          "a": "Runs all data tests defined in schema.yml (and singular tests in tests/) against the existing tables. Returns a non-zero exit code if any test fails.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt build` do, and how is it different from `dbt run` + `dbt test`?",
+          "a": "dbt build runs models, seeds, snapshots, and tests in DAG order — it runs a model's tests before building downstream models that depend on it. dbt run + dbt test runs everything first, then all tests — tests cannot gate downstream builds.",
+          "group": "Commands",
+          "difficulty": "medium",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt compile` do?",
+          "a": "Renders all Jinja in your SQL files and writes the compiled SQL to the target/ directory, but does NOT execute anything in the warehouse. Useful for inspecting what SQL dbt will actually run.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt debug` do?",
+          "a": "Tests your database connection and validates your profiles.yml and dbt_project.yml configuration. Run it first when setting up a new project or troubleshooting connection errors.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt deps` do?",
+          "a": "Reads packages.yml and downloads all declared package dependencies into the dbt_packages/ directory. Must be run after adding or updating a package.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt seed` do?",
+          "a": "Loads CSV files from the seeds/ directory into the data warehouse as tables. Useful for small static lookup tables (e.g., country codes, cost centres).",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt snapshot` do?",
+          "a": "Runs all snapshot definitions, comparing current source data to the existing snapshot table and inserting new records for any changed rows, with dbt_valid_from/dbt_valid_to populated.",
+          "group": "Commands",
+          "difficulty": "medium",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt docs generate` do?",
+          "a": "Builds a documentation website for your project by compiling model descriptions, column descriptions, test definitions, and the DAG lineage graph into a set of static files in the target/ directory.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt docs serve` do?",
+          "a": "Launches a local web server to view the documentation website generated by dbt docs generate. Opens the lineage graph and all model/column documentation in your browser.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt source freshness` do?",
+          "a": "Queries the loaded_at_field of each declared source table and compares the most recent timestamp against warn_after and error_after thresholds. Exits with a non-zero code if any source is stale.",
+          "group": "Commands",
+          "difficulty": "medium",
+          "category": "Commands"
+        },
+        {
+          "q": "What does `dbt ls` (list) do?",
+          "a": "Prints the names of all nodes that match a given --select expression, without running them. Useful for validating selection syntax before running an expensive job.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "How do you run only a single model in dbt?",
+          "a": "dbt run --select model_name — the --select flag (or -s) accepts model names, folder paths, tags, and other selectors to limit what dbt runs.",
+          "group": "Commands",
+          "difficulty": "easy",
+          "category": "Commands"
+        },
+        {
+          "q": "What does the `+` suffix mean in dbt node selection? e.g. `dbt run --select stg_orders+`",
+          "a": "Selects the model AND all its downstream dependents (children, grandchildren…). A prefix (+stg_orders) selects the model AND all its upstream ancestors. Both (+stg_orders+) selects the full lineage.",
+          "group": "Commands",
+          "difficulty": "medium",
+          "category": "Commands"
+        },
+        {
+          "q": "What are the four built-in generic tests in dbt?",
+          "a": "not_null — no NULLs in the column. unique — all values are distinct. accepted_values — only specified values appear. relationships — every value exists in another model's column (referential integrity).",
+          "group": "Testing",
+          "difficulty": "easy",
+          "category": "Testing"
+        },
+        {
+          "q": "Where do you define generic tests in dbt?",
+          "a": "In a YAML file (e.g., schema.yml) alongside the model, under the columns section: data_tests: [not_null, unique, ...]. dbt compiles each test into a SQL query that returns failing rows.",
+          "group": "Testing",
+          "difficulty": "easy",
+          "category": "Testing"
+        },
+        {
+          "q": "How does dbt determine whether a test passes or fails?",
+          "a": "dbt runs each test as a SQL query that returns failing rows. If the query returns 0 rows, the test passes. If it returns any rows, the test fails. You never need to write assertions — just a SELECT of bad rows.",
+          "group": "Testing",
+          "difficulty": "easy",
+          "category": "Testing"
+        },
+        {
+          "q": "What is a singular test in dbt?",
+          "a": "A custom SQL file saved in the tests/ directory. It returns rows that fail the test — if it returns any rows, the test fails. Use for complex assertions that can't be expressed as a generic test (e.g., cross-table comparisons).",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "What is the difference between a generic test and a singular test?",
+          "a": "Generic tests (defined in YAML) are reusable across many models. Singular tests (SQL files in tests/) are one-off assertions. Both fail if they return rows, but generic tests accept parameters while singular tests are self-contained.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "What happens to downstream models if an upstream test fails during `dbt build`?",
+          "a": "dbt build stops and skips all downstream nodes that depend on the failed model. This prevents bad data from propagating downstream — unlike dbt run + dbt test, which runs everything before testing.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "What does test severity: warn do?",
+          "a": "Instead of failing the build when a test returns rows, dbt logs a warning and continues. The run completes but is flagged as having warnings. Useful for checks you want to monitor without blocking deployment.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "How do you add a description to a dbt model?",
+          "a": "In schema.yml, add a 'description:' field under the model name. You can also add descriptions at the column level. These appear in dbt docs and dbt Explorer.",
+          "group": "Documentation",
+          "difficulty": "easy",
+          "category": "Documentation"
+        },
+        {
+          "q": "What is dbt Explorer?",
+          "a": "A dbt Cloud feature that provides an interactive, always-up-to-date view of your project's lineage graph, model metadata, test results, and column-level documentation. Replaces the self-hosted dbt docs site for dbt Cloud users.",
+          "group": "Documentation",
+          "difficulty": "easy",
+          "category": "Documentation"
+        },
+        {
+          "q": "What is a doc block in dbt and when would you use one?",
+          "a": "A named block of markdown text defined in a .md file using {% docs block_name %}...{% enddocs %}. Reference it in schema.yml with {{ doc('block_name') }}. Use it when descriptions are long enough to deserve their own file.",
+          "group": "Documentation",
+          "difficulty": "medium",
+          "category": "Documentation"
+        },
+        {
+          "q": "What is a dbt Cloud environment?",
+          "a": "A named configuration that maps to a dbt target — it specifies the warehouse connection, dbt version, and environment variables. You typically have at least two: Development and Production.",
+          "group": "dbt Cloud",
+          "difficulty": "easy",
+          "category": "dbt Cloud"
+        },
+        {
+          "q": "What is a dbt Cloud job?",
+          "a": "A configured set of dbt commands (e.g., dbt build) that runs in a specific environment on a schedule or trigger. Jobs produce run artifacts (manifest.json, run_results.json) visible in the run history.",
+          "group": "dbt Cloud",
+          "difficulty": "easy",
+          "category": "dbt Cloud"
+        },
+        {
+          "q": "What is Slim CI in dbt Cloud?",
+          "a": "A CI pattern that only builds and tests models that changed in a pull request, using `dbt build --select state:modified+ --defer`. This dramatically reduces CI run time and cost compared to rebuilding the full project.",
+          "group": "dbt Cloud",
+          "difficulty": "medium",
+          "category": "dbt Cloud"
+        },
+        {
+          "q": "What is the dbt Cloud IDE?",
+          "a": "A browser-based SQL and Jinja editor inside dbt Cloud. Lets developers write, preview, compile, and run dbt models without installing anything locally. Connects directly to the warehouse and shows a live lineage graph.",
+          "group": "dbt Cloud",
+          "difficulty": "easy",
+          "category": "dbt Cloud"
+        },
+        {
+          "q": "What is a dbt Cloud service token used for?",
+          "a": "A machine-readable API credential (not tied to a user account) used to trigger dbt Cloud jobs programmatically — from CI/CD systems, orchestrators, or external tools. Scoped to specific permissions.",
+          "group": "dbt Cloud",
+          "difficulty": "medium",
+          "category": "dbt Cloud"
+        },
+        {
+          "q": "Why should you always use `source()` to reference raw tables instead of hardcoding schema.table?",
+          "a": "source() registers the dependency in dbt's DAG (enabling lineage), allows freshness checks, and makes it easy to swap schemas between environments. Hardcoded references bypass all of this.",
+          "group": "Best Practices",
+          "difficulty": "easy",
+          "category": "Best Practices"
+        },
+        {
+          "q": "Why should staging models only reference sources, not other models?",
+          "a": "Staging models are a 1:1 mapping with source tables — their job is to clean and type raw data. Referencing other models in staging breaks this contract and makes it harder to trace issues back to raw data.",
+          "group": "Best Practices",
+          "difficulty": "medium",
+          "category": "Best Practices"
+        },
+        {
+          "q": "What is the recommended SQL style for dbt models?",
+          "a": "Use CTEs (WITH clauses) instead of nested subqueries. Name CTEs after what they represent (source, renamed, filtered, final). This makes models easier to read, test, and debug.",
+          "group": "Best Practices",
+          "difficulty": "easy",
+          "category": "Best Practices"
+        },
+        {
+          "q": "Why should you avoid using `SELECT *` in dbt models?",
+          "a": "SELECT * makes the model's output schema unpredictable — new columns added upstream will silently appear downstream. Explicit column selection documents the model's schema and prevents unexpected changes.",
+          "group": "Best Practices",
+          "difficulty": "easy",
+          "category": "Best Practices"
+        },
+        {
+          "q": "What is the purpose of the staging layer in a dbt project?",
+          "a": "To provide a clean, consistent view of each raw source table — renaming columns to a standard convention, casting data types, filtering deleted rows, and deduplicating. All downstream models build on staging, never on raw sources directly.",
+          "group": "Best Practices",
+          "difficulty": "easy",
+          "category": "Best Practices"
+        },
+        {
+          "q": "When should you materialise a staging model as a table vs. a view?",
+          "a": "Start with view (default) — staging models are simple and views avoid storage cost. Switch to table if the staging model is expensive (large source, complex deduplication) or queried very frequently by many downstream models.",
+          "group": "Best Practices",
+          "difficulty": "medium",
+          "category": "Best Practices"
+        },
+        {
+          "q": "What is the purpose of adding descriptions to models and columns in dbt?",
+          "a": "Descriptions become part of the project's self-documenting lineage in dbt docs / Explorer. They help teammates (and your future self) understand what a model represents without reading the SQL.",
+          "group": "Best Practices",
+          "difficulty": "easy",
+          "category": "Best Practices"
+        }
+      ]
+    },
+    "dbt 102": {
+      "section": "Professional Development",
+      "cards": [
+        {
+          "q": "What are the three Jinja delimiter types used in dbt SQL files?",
+          "a": "{{ expression }} — outputs a value (e.g. {{ ref('model') }}). {% block %} — executes logic with no output (e.g. {% if %}, {% for %}, {% set %}). {# comment #} — comment that is stripped before the SQL is sent to the warehouse.",
+          "group": "Jinja Basics",
+          "difficulty": "easy",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "What does `{% set my_var = 'value' %}` do in a dbt model?",
+          "a": "Defines a Jinja variable local to that file. Unlike dbt variables (var()), it exists only at compile time and is not accessible from the command line or dbt_project.yml.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "What does `{{ this }}` refer to inside a dbt model?",
+          "a": "A special dbt variable that resolves to the fully-qualified database relation for the current model (e.g. my_db.my_schema.my_model). Mainly used inside incremental models to self-reference the existing table.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "What does `{{ run_started_at }}` return in dbt?",
+          "a": "The UTC timestamp of when the current dbt run began. Useful for stamping audit columns (e.g. dbt_loaded_at) consistently across all models in a run, even if individual models finish at different times.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "What is `env_var()` in dbt and when would you use it?",
+          "a": "A dbt Jinja function that reads an OS environment variable: {{ env_var('MY_VAR') }}. Accepts an optional default: {{ env_var('MY_VAR', 'default') }}. Used to inject secrets or environment-specific values (e.g. schemas, credentials) without hardcoding them.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "What is the difference between `var()` and `env_var()` in dbt?",
+          "a": "var() reads a dbt project variable defined in dbt_project.yml or passed with --vars on the CLI — it is dbt-aware and version-controllable. env_var() reads an OS environment variable set outside dbt — used for secrets or infrastructure values that must not be committed to source control.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "How do you pass a variable to a dbt run from the command line?",
+          "a": "dbt run --vars '{my_var: my_value}'. Multiple variables: --vars '{var1: val1, var2: val2}'. CLI variables override defaults set in dbt_project.yml.",
+          "group": "Jinja Basics",
+          "difficulty": "medium",
+          "category": "Jinja Basics"
+        },
+        {
+          "q": "In what three places can you configure a dbt model, and what is the order of precedence?",
+          "a": "1. dbt_project.yml (lowest precedence — project-wide defaults by folder). 2. A config() block at the top of the model file. 3. A config block in a schema.yml (config: key). Model-level config always wins over project-level defaults.",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What columns does dbt automatically manage in an incremental model?",
+          "a": "None — dbt does not add any automatic columns. You are responsible for any audit columns you want (e.g. dbt_loaded_at, dbt_updated_at). The is_incremental() macro and {{ this }} are provided as tools, but column management is entirely in your SQL.",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What is `unique_key` in an incremental model config and what does it control?",
+          "a": "A column (or list of columns) used to identify a row uniquely. When dbt runs incrementally and unique_key is set, it deletes or merges existing rows with matching keys before inserting new ones — preventing duplicates. Without unique_key, dbt only appends rows.",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What is the `on_schema_change` config for incremental models?",
+          "a": "Controls behaviour when upstream columns are added or removed. Options: 'ignore' (default — new columns are silently dropped), 'fail' (error on any schema change), 'append_new_columns' (add new columns, keep old ones), 'sync_all_columns' (keep in sync, dropping removed columns).",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What is the `schema` config on a model and how does it interact with the target schema?",
+          "a": "Sets a custom schema suffix for the model: config(schema='reporting') makes dbt build the model in <target_schema>_reporting (by default). You can override the generate_schema_name macro to change this concatenation behaviour.",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What is the `alias` config on a dbt model?",
+          "a": "Sets the name of the database object dbt creates, independently of the model's filename. config(alias='final_orders') builds a table/view called final_orders regardless of the .sql filename.",
+          "group": "Config & Materializations",
+          "difficulty": "medium",
+          "category": "Config & Materializations"
+        },
+        {
+          "q": "What is `loaded_at_field` in a dbt source definition?",
+          "a": "The name of the timestamp column in the source table that records when each row was loaded. dbt uses this column in `dbt source freshness` to determine whether the source data is fresh enough.",
+          "group": "Sources",
+          "difficulty": "medium",
+          "category": "Sources"
+        },
+        {
+          "q": "What does `dbt source freshness` exit with if a source is stale?",
+          "a": "Exit code 1 (error) if any source exceeds its error_after threshold. Sources that exceed only warn_after produce a warning but exit 0. Sources with no freshness config are not checked.",
+          "group": "Sources",
+          "difficulty": "medium",
+          "category": "Sources"
+        },
+        {
+          "q": "Can you apply data tests to a source in dbt?",
+          "a": "Yes. Define tests under the source table's columns in sources.yml the same way you would for a model — not_null, unique, accepted_values, relationships all work on source columns.",
+          "group": "Sources",
+          "difficulty": "medium",
+          "category": "Sources"
+        },
+        {
+          "q": "What is a `source override` in dbt (dbt_project.yml)?",
+          "a": "You can set config for all tables in a source at the source level (e.g. +tags, +meta) in sources.yml. This avoids repeating the config on every table. Individual tables can still override source-level config.",
+          "group": "Sources",
+          "difficulty": "medium",
+          "category": "Sources"
+        },
+        {
+          "q": "How do you make a generic test only warn instead of fail?",
+          "a": "Set severity: warn in the test config in schema.yml: data_tests: [{not_null: {config: {severity: warn}}}]. The test runs but dbt continues and exits 0 if only warnings occurred.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "What is `store_failures: true` for dbt tests?",
+          "a": "When set in the test config (or globally in dbt_project.yml), dbt saves the rows that fail each test into a table in the warehouse. Useful for debugging — you can query the failure table to see exactly which records failed.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "How do you add a custom generic test in dbt?",
+          "a": "Create a macro in macros/ named test_<test_name>(model, column_name, ...) that returns a SELECT of failing rows. Then reference it in schema.yml by its name (without the test_ prefix).",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "What is `dbt_expectations` and what does it add?",
+          "a": "A popular dbt package (from Calogica) that adds 50+ data quality tests modelled after the Great Expectations library — e.g. expect_column_values_to_be_between, expect_table_row_count_to_be_between. Install via packages.yml.",
+          "group": "Testing",
+          "difficulty": "medium",
+          "category": "Testing"
+        },
+        {
+          "q": "How do you apply a tag to every model in a subdirectory using `dbt_project.yml`?",
+          "a": "Use folder-level config in dbt_project.yml: under models: > project_name: > staging:, add +tags: ['staging']. The + prefix means the config applies to all nodes at and below that path.",
+          "group": "Tags & Selection",
+          "difficulty": "medium",
+          "category": "Tags & Selection"
+        },
+        {
+          "q": "What does the `--exclude` flag do in dbt?",
+          "a": "Removes nodes from the set selected by --select. dbt run --select staging+ --exclude stg_payments runs everything downstream of staging/ except stg_payments and its descendants.",
+          "group": "Tags & Selection",
+          "difficulty": "medium",
+          "category": "Tags & Selection"
+        },
+        {
+          "q": "What selector syntax targets all models in a specific directory?",
+          "a": "Use a path selector: dbt run --select models/staging/ or dbt run --select staging.*. The path selector matches any model whose file path contains that string.",
+          "group": "Tags & Selection",
+          "difficulty": "medium",
+          "category": "Tags & Selection"
+        },
+        {
+          "q": "What does the `state:modified` selector do?",
+          "a": "Selects only models whose compiled SQL or upstream dependency has changed compared to a previous run's manifest.json. Used in Slim CI: dbt build --select state:modified+ --state path/to/previous/target",
+          "group": "Tags & Selection",
+          "difficulty": "medium",
+          "category": "Tags & Selection"
+        },
+        {
+          "q": "What is `dbt_utils.generate_surrogate_key()` and when would you use it?",
+          "a": "A macro that hashes a list of column values to produce a deterministic surrogate key: {{ dbt_utils.generate_surrogate_key(['order_id', 'line_item_id']) }}. Use it when a natural unique key spans multiple columns or when upstream IDs may not be stable.",
+          "group": "Packages",
+          "difficulty": "medium",
+          "category": "Packages"
+        },
+        {
+          "q": "What is `dbt_utils.star()` and when is it useful?",
+          "a": "A macro that generates SELECT col1, col2, ... for all columns in a relation, with optional exclusions: {{ dbt_utils.star(from=ref('stg_orders'), except=['pii_column']) }}. Useful in staging models where you want all columns minus a few.",
+          "group": "Packages",
+          "difficulty": "medium",
+          "category": "Packages"
+        },
+        {
+          "q": "What is `dbt_utils.date_spine()` used for?",
+          "a": "Generates a table of sequential dates between two endpoints — useful for building calendar/date dimension tables or filling gaps in time-series data without relying on existing data to have every date.",
+          "group": "Packages",
+          "difficulty": "medium",
+          "category": "Packages"
+        },
+        {
+          "q": "Write a minimal dbt model that selects all columns from a source table named 'orders' in the 'stripe' source.",
+          "a": "```sql\nSELECT *\nFROM {{ source('stripe', 'orders') }}\n```",
+          "group": [
+            "Code – Models"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Models",
+          "requires_code": true,
+          "explanation": "The `SELECT *` retrieves every column from the source table without needing to name them individually. The `{{ source('stripe', 'orders') }}` is a dbt Jinja macro that references a source defined in your `sources.yml` file, where 'stripe' is the source name and 'orders' is the table name—dbt resolves this to the actual database schema and table at compile time. Using the `source()` macro instead of hardcoding the table name allows dbt to track data lineage, validate that the source exists, and easily swap databases or schemas without changing your model code. This is the minimal pattern for creating a dbt model that simply exposes a raw source table."
+        },
+        {
+          "q": "Write a `{{ config() }}` block that sets a model to materialise as a table and adds the tag 'nightly'.",
+          "a": "```sql\n{{ config(\n    materialized='table',\n    tags=['nightly']\n) }}\n```",
+          "group": [
+            "Code – Config"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Config",
+          "requires_code": true,
+          "explanation": "The `config()` macro is a dbt function that allows you to specify model-level configurations directly in your SQL file. The `materialized='table'` parameter tells dbt to build this model as a physical table in your database rather than a view, which is useful when the query is computationally expensive or frequently queried. The `tags=['nightly']` parameter assigns a label to this model that you can use to selectively run groups of models—for example, running `dbt run --select tag:nightly` will execute only models with this tag, which is ideal for scheduling specific models to run at particular times. Tags are passed as a list even when there's only one tag, maintaining consistency with dbt's configuration syntax."
+        },
+        {
+          "q": "Write a `{{ config() }}` block for an incremental model. The unique key is 'order_id'.",
+          "a": "```sql\n{{ config(\n    materialized='incremental',\n    unique_key='order_id'\n) }}\n```",
+          "group": [
+            "Code – Config"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Config",
+          "requires_code": true,
+          "explanation": "This config block tells dbt to build an incremental materialization instead of a full table refresh, which means on subsequent runs dbt will only insert or update new rows rather than rebuilding the entire table from scratch. The `materialized='incremental'` parameter enables this behavior. The `unique_key='order_id'` parameter designates `order_id` as the column dbt should use to identify which existing records to update when it detects duplicate keys in the new data—without this, dbt wouldn't know how to match incoming rows to existing ones and would just append everything. This combination is essential for efficiency in models that process high-volume append-only or slowly-changing data, since dbt can now perform intelligent upserts based on the unique key rather than recreating everything every time."
+        },
+        {
+          "q": "Write a staging model for the 'raw_orders' source table. Rename 'id' to 'order_id' and 'amt' to 'amount'. Select no other columns.",
+          "a": "```sql\nSELECT\n    id  AS order_id,\n    amt AS amount\nFROM {{ source('raw', 'raw_orders') }}\n```",
+          "group": [
+            "Code – Models"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Models",
+          "requires_code": true,
+          "explanation": "The `SELECT` statement explicitly names only the two columns needed: `id` and `amt` from the raw source table, renamed to more descriptive aliases `order_id` and `amount`. The `FROM` clause uses dbt's `source()` function with two arguments—the source name `'raw'` and the table name `'raw_orders'`—which references the source definition in your `sources.yml` file, enabling lineage tracking and source freshness monitoring. By selecting just these two columns with aliases rather than using `SELECT *`, you ensure the staging model serves as a documented transformation layer that explicitly declares which raw fields are relevant downstream, making dependencies clear and preventing unexpected column additions if the raw table structure changes."
+        },
+        {
+          "q": "Write a dbt model using CTEs that selects 'order_id' and 'order_date' from 'stg_orders', keeping only rows where status = 'placed'.",
+          "a": "```sql\nWITH source AS (\n    SELECT * FROM {{ ref('stg_orders') }}\n),\nfiltered AS (\n    SELECT order_id, order_date\n    FROM source\n    WHERE status = 'placed'\n)\nSELECT * FROM filtered\n```",
+          "group": [
+            "Code – Models"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Models",
+          "requires_code": true,
+          "explanation": "This dbt model uses Common Table Expressions (CTEs) to organize logic into discrete, readable steps. The `source` CTE references the upstream `stg_orders` model using `{{ ref('stg_orders') }}`, which creates a dependency and allows dbt to build the lineage graph. The `filtered` CTE then selects only the two required columns (`order_id` and `order_date`) from the source and applies the `WHERE status = 'placed'` filter to exclude unwanted rows. Finally, the outer `SELECT * FROM filtered` returns all columns from the filtered CTE—which in this case is just the two selected columns. This structure is preferred in dbt because it makes the query easier to debug, test at each stage, and modify later as requirements change."
+        },
+        {
+          "q": "Write the Jinja `{% if is_incremental() %}` block that filters a model to only load rows where 'updated_at' is greater than the maximum value already in the table.",
+          "a": "```sql\n{% if is_incremental() %}\nWHERE updated_at > (SELECT MAX(updated_at) FROM {{ this }})\n{% endif %}\n```",
+          "group": [
+            "Code – Incremental"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Incremental",
+          "requires_code": true,
+          "explanation": "The `is_incremental()` function returns true only when dbt runs the model in incremental mode (after the first full refresh), so this WHERE clause only executes on subsequent runs. The `{{ this }}` variable references the actual table name in the database, allowing the query to query itself. The subquery `SELECT MAX(updated_at) FROM {{ this }}` finds the most recent timestamp already loaded in the table, and the WHERE clause filters incoming rows to only those with timestamps greater than that maximum. This ensures each incremental run only processes new or updated records since the last load, avoiding duplicate data and improving performance by reducing the volume of data processed."
+        },
+        {
+          "q": "Write a sources.yml that declares a source named 'stripe' in the 'raw' schema, with one table called 'charges'.",
+          "a": "```yaml\nsources:\n  - name: stripe\n    schema: raw\n    tables:\n      - name: charges\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "This YAML structure declares a dbt source that points to an existing table in your data warehouse. The `sources` key is a top-level list that contains source definitions, and each source object needs a `name` ('stripe') and `schema` ('raw') to tell dbt where to find the upstream data. The `tables` list underneath specifies which tables within that schema are being tracked; in this case, just the 'charges' table. Once declared this way, you can reference the table in your dbt models using the `source()` function (e.g., `{{ source('stripe', 'charges') }}`), which creates proper lineage documentation and allows dbt to test the source data quality."
+        },
+        {
+          "q": "Write a schema.yml entry for a model named 'stg_orders'. Add not_null and unique tests to the 'order_id' column.",
+          "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: order_id\n        data_tests:\n          - not_null\n          - unique\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "The `models` key declares that you're defining one or more dbt models. Under `name: stg_orders`, you specify which model this configuration applies to. The `columns` section lists individual columns you want to document and test, and `name: order_id` identifies the specific column being configured. The `data_tests` key tells dbt to run validation checks on that column—`not_null` ensures every row has a value in `order_id`, while `unique` ensures no two rows share the same `order_id` value. This YAML structure allows dbt to automatically generate SQL queries that execute these tests when you run `dbt test`, catching data quality issues early in your pipeline."
+        },
+        {
+          "q": "Add an accepted_values test to the 'status' column in a schema.yml for 'stg_orders'. Valid values are 'placed', 'shipped', and 'returned'.",
+          "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: status\n        data_tests:\n          - accepted_values:\n              values: ['placed', 'shipped', 'returned']\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "The `accepted_values` test validates that all values in the `status` column belong to the specified allowed list. The `data_tests` key is a dbt-specific YAML construct that attaches data quality tests to individual columns within your model definition. The `accepted_values` test is a built-in dbt test that will fail the test run if any row contains a value outside the provided list. The `values` parameter takes an array of strings representing each valid status, and dbt will generate SQL that counts rows where the status does NOT match any of these values—if that count is greater than zero, the test fails. This approach catches data quality issues early in your pipeline by ensuring downstream transformations only work with expected categorical values."
+        },
+        {
+          "q": "Write a relationships test in schema.yml that checks every 'customer_id' in 'stg_orders' exists as a 'customer_id' in 'stg_customers'.",
+          "a": "```yaml\nmodels:\n  - name: stg_orders\n    columns:\n      - name: customer_id\n        data_tests:\n          - relationships:\n              to: ref('stg_customers')\n              field: customer_id\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "The `relationships` test enforces referential integrity by verifying that every value in the `customer_id` column of `stg_orders` has a matching value in the `customer_id` column of `stg_customers`. The `to: ref('stg_customers')` parameter specifies the target model being referenced, using `ref()` to ensure dbt tracks the dependency between these models. The `field: customer_id` parameter explicitly names which column in the target model to match against, allowing cases where the source and target column names differ. This test will fail if any orphaned records exist in `stg_orders`—that is, orders with `customer_id` values that don't exist in the customers table—alerting you to data quality issues before they propagate downstream."
+        },
+        {
+          "q": "Write a model that joins 'stg_orders' and 'stg_customers' on customer_id. Select order_id, order_date, and customer_name.",
+          "a": "```sql\nWITH orders AS (\n    SELECT * FROM {{ ref('stg_orders') }}\n),\ncustomers AS (\n    SELECT * FROM {{ ref('stg_customers') }}\n)\nSELECT\n    o.order_id,\n    o.order_date,\n    c.customer_name\nFROM orders o\nJOIN customers c ON o.customer_id = c.customer_id\n```",
+          "group": [
+            "Code – Models"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Models",
+          "requires_code": true,
+          "explanation": "This dbt model uses CTEs (Common Table Expressions) to organize the join logic clearly. The `{{ ref() }}` function establishes dependencies on the upstream `stg_orders` and `stg_customers` models, ensuring dbt knows the lineage and runs them first. The WITH clauses create named result sets that are easier to reference and maintain than inline subqueries. The JOIN connects the two tables on the `customer_id` column, which must exist in both tables, while the SELECT statement picks only the three required columns with table aliases (`o` and `c`) to avoid ambiguity. This structure is dbt best practice because it makes the query readable, the dependencies explicit, and the model reusable downstream."
+        },
+        {
+          "q": "Write the dbt_project.yml config block that sets all models inside the 'staging' folder to materialise as views.",
+          "a": "```yaml\nmodels:\n  my_project:\n    staging:\n      +materialized: view\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "This configuration uses dbt's hierarchical model directory structure to apply materialization settings at the folder level. The `models:` key opens the model configuration section, `my_project:` references your specific project name, and `staging:` targets the staging subdirectory within your models folder. The `+materialized: view` property (note the `+` prefix, which means \"apply recursively to this folder and all subfolders\") explicitly sets every model file within staging to materialize as a view rather than the default table. This approach is cleaner than configuring each model individually, and the `+` prefix ensures that even deeply nested models in subfolders of staging will inherit this setting unless they override it with their own config."
+        },
+        {
+          "q": "Add source freshness checks to the 'charges' source table. Warn if data is older than 12 hours; error if older than 24 hours. The timestamp column is 'loaded_at'.",
+          "a": "```yaml\nsources:\n  - name: stripe\n    tables:\n      - name: charges\n        loaded_at_field: loaded_at\n        freshness:\n          warn_after: {count: 12, period: hour}\n          error_after: {count: 24, period: hour}\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "The `freshness` block defines how recently data must arrive to meet quality standards. The `loaded_at_field` specifies which column dbt checks to determine the data's age—it compares the current time against the `loaded_at` timestamp. The `warn_after` parameter triggers a warning if data hasn't been refreshed within 12 hours, allowing pipelines to continue but alerting you to potential staleness. The `error_after` parameter fails the freshness check entirely if data is older than 24 hours, preventing downstream consumption of significantly outdated information. The `{count: X, period: unit}` syntax pairs a numeric threshold with a time unit (hour, day, etc.), giving you precise control over acceptable lag windows. This two-tier approach balances operational flexibility—you can tolerate minor delays—while enforcing a hard boundary for data reliability."
+        },
+        {
+          "q": "Write a dbt macro named 'cents_to_dollars' that accepts a column name and returns it divided by 100, cast to DECIMAL(10,2).",
+          "a": "```sql\n{% macro cents_to_dollars(column_name) %}\n    CAST({{ column_name }} / 100.0 AS DECIMAL(10, 2))\n{% endmacro %}\n```",
+          "group": [
+            "Code – Macros"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Macros",
+          "requires_code": true,
+          "explanation": "This macro defines a reusable transformation that converts a cents value to dollars by dividing by 100 and formatting it as currency. The `{% macro %}` tags tell dbt this is a templated function that can be called elsewhere in your project. The `column_name` parameter is a placeholder that accepts the actual column reference when the macro is invoked. Inside the macro, `{{ column_name }}` is Jinja interpolation syntax that inserts the passed-in column name directly into the SQL. Dividing by `100.0` (rather than `100`) ensures floating-point arithmetic instead of integer division, preventing rounding errors. Finally, `CAST(... AS DECIMAL(10, 2))` explicitly converts the result to a decimal type with 10 total digits and 2 decimal places, which is the standard precision for monetary values."
+        },
+        {
+          "q": "Write a model that uses a project variable named 'start_date' to filter rows where 'created_at' is on or after that date.",
+          "a": "```sql\nSELECT *\nFROM {{ ref('stg_events') }}\nWHERE created_at >= '{{ var(\"start_date\") }}'\n```",
+          "group": [
+            "Code – Jinja"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Jinja",
+          "requires_code": true,
+          "explanation": "This model retrieves all columns from the `stg_events` staging table and filters to include only rows where the `created_at` timestamp is on or after a specified date. The `{{ ref('stg_events') }}` function creates a dependency on that upstream model and ensures dbt compiles it first. The `{{ var(\"start_date\") }}` expression retrieves the project variable named `start_date` at compile time and injects its value directly into the SQL query as a string. By using `>=` instead of `>`, the filter includes rows created on the exact start date as well as any date after it. This approach allows you to parameterize your model so that different users can run the same query with different start dates by passing `--vars '{\"start_date\": \"2024-01-01\"}'` at the command line, without needing to hardcode the date into the model."
+        },
+        {
+          "q": "Use dbt_utils.generate_surrogate_key() to create a column named 'surrogate_key' from 'order_id' and 'line_item_id'.",
+          "a": "```sql\nSELECT\n    {{ dbt_utils.generate_surrogate_key(['order_id', 'line_item_id']) }} AS surrogate_key,\n    order_id,\n    line_item_id\nFROM {{ ref('stg_order_items') }}\n```",
+          "group": [
+            "Code – Macros"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Macros",
+          "requires_code": true,
+          "explanation": "The `dbt_utils.generate_surrogate_key()` macro accepts a list of column names and generates a deterministic hash value by concatenating and hashing those columns together. The double curly braces `{{ }}` indicate Jinja templating, which tells dbt to execute this macro during parsing and inject the resulting SQL code into the query. By passing `['order_id', 'line_item_id']` as a list, you're specifying which columns should be combined to create a unique identifier that will be consistent across runs—if the same order_id and line_item_id combination appears again, it will always produce the same surrogate key. The `AS surrogate_key` clause names the resulting hashed column, while `{{ ref('stg_order_items') }}` ensures dbt properly tracks the dependency on the upstream staging table and enables lineage tracking. This approach is cleaner than manually writing hash functions and abstracts away database-specific hashing logic, making the code more portable across different SQL dialects."
+        },
+        {
+          "q": "Write a minimal dbt snapshot definition for a 'customers' source table using the timestamp strategy on 'updated_at'. Unique key is 'customer_id'. Target schema is 'snapshots'.",
+          "a": "```sql\n{% snapshot customers_snapshot %}\n\n{{ config(\n    target_schema='snapshots',\n    unique_key='customer_id',\n    strategy='timestamp',\n    updated_at='updated_at'\n) }}\n\nSELECT * FROM {{ source('app', 'customers') }}\n\n{% endsnapshot %}\n```",
+          "group": [
+            "Code – Snapshots"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Snapshots",
+          "requires_code": true,
+          "explanation": "A dbt snapshot is defined using the `{% snapshot %}` block, which wraps a query and configuration to track historical changes to dimension tables. The `config()` macro sets four essential parameters: `target_schema` directs the snapshot table to the 'snapshots' schema, `unique_key` identifies each row uniquely by 'customer_id' so dbt knows which records to compare across runs, `strategy='timestamp'` tells dbt to detect changes by comparing the `updated_at` column rather than hashing entire rows, and `updated_at` specifies which column contains the change timestamp. The `SELECT * FROM {{ source('app', 'customers') }}` queries the source table, where `source()` is a dbt function that references the externally defined 'customers' table in the 'app' source, providing lineage and validation. On each snapshot execution, dbt compares the `updated_at` values to identify new or changed records, automatically adding `dbt_valid_from` and `dbt_valid_to` columns to track when each version of a customer record was active."
+        },
+        {
+          "q": "Write a config() block that applies the tags 'finance' and 'daily', and places the model in a custom schema named 'reporting'.",
+          "a": "```sql\n{{ config(\n    tags=['finance', 'daily'],\n    schema='reporting'\n) }}\n```",
+          "group": [
+            "Code – Config"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Config",
+          "requires_code": true,
+          "explanation": "The `config()` macro is a dbt Jinja function that sets model-level configurations at the top of a SQL file. The `tags` parameter accepts a list of string values that allow you to organize and selectively run models—here, both 'finance' and 'daily' tags enable filtering by business domain and execution frequency. The `schema` parameter overrides the default schema defined in your profiles.yml, placing this model in a custom 'reporting' schema instead of the project's base schema. When dbt parses this file, it reads these configurations before executing the SQL and applies them to the model's metadata and build behavior. This approach is cleaner than setting schema at the directory level because it keeps schema logic with the model itself, making it explicit and easy to audit."
+        },
+        {
+          "q": "Write a dbt expression using env_var() that reads the warehouse username from an environment variable called 'DBT_USER', falling back to 'readonly' if not set.",
+          "a": "```sql\n{{ env_var('DBT_USER', 'readonly') }}\n```",
+          "group": [
+            "Code – Jinja"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – Jinja",
+          "requires_code": true,
+          "explanation": "The `env_var()` function is a dbt Jinja macro that retrieves environment variables at parse time. The first argument `'DBT_USER'` specifies the exact name of the environment variable to read, while the second argument `'readonly'` serves as a default fallback value if that variable doesn't exist in the runtime environment. This two-argument pattern makes your code resilient—if `DBT_USER` is set, dbt uses that value; if it's not set or is empty, `'readonly'` is substituted instead. This is commonly used in profiles.yml or model configurations to inject dynamic credentials or settings without hardcoding them, allowing the same dbt project to work across different environments (development, staging, production) with different authentication requirements."
+        },
+        {
+          "q": "Write a packages.yml that installs dbt-labs/dbt_utils at version 1.3.0.",
+          "a": "```yaml\npackages:\n  - package: dbt-labs/dbt_utils\n    version: 1.3.0\n```",
+          "group": [
+            "Code – YAML"
+          ],
+          "difficulty": "Easy",
+          "category": "Code – YAML",
+          "requires_code": true,
+          "explanation": "The `packages` key is a top-level list in dbt's packages.yml file that declares all external dbt packages your project depends on. Each item in this list is a package object with at least two required fields: `package` specifies the source using the format `namespace/package-name`, and `version` pins the exact version to install. In this case, `dbt-labs/dbt_utils` identifies the popular utilities package maintained by dbt Labs, while `1.3.0` ensures reproducibility by locking to that specific release. When you run `dbt deps`, dbt reads this file and downloads the specified package and its dependencies into your project's `dbt_packages` directory, making all macros and models from dbt_utils available for use in your project."
+        }
+      ]
     }
   }
 }
