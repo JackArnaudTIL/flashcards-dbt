@@ -213,19 +213,24 @@ async function signOutUser() {
 
 let _pendingMergeUid = null;
 
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(auth, user => {
   if (user) {
-    const local = JSON.parse(localStorage.getItem('fc_progress') || '{}');
-    const hasLocal = Object.keys(local).length > 0;
-    await loadUserProgress(user.uid);
+    // Show app immediately using localStorage data, load Firestore in background
     document.getElementById('signinScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     renderAuthArea(user);
-    if (hasLocal) {
+
+    const local = JSON.parse(localStorage.getItem('fc_progress') || '{}');
+    if (Object.keys(local).length > 0) {
       _pendingMergeUid = user.uid;
       document.getElementById('mergeOverlay').style.display = 'flex';
     }
-    if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
+
+    loadUserProgress(user.uid)
+      .then(() => {
+        if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
+      })
+      .catch(err => console.warn('Could not load Firestore progress:', err));
   } else {
     clearCache();
     document.getElementById('app').style.display = 'none';
