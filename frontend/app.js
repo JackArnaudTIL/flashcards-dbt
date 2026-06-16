@@ -15,7 +15,7 @@ const DECK_SIZES = [10, 20, 50, 100];
 
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], codeReviews = [], currentDeckName = '', currentCert = null;
-let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set();
+let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set(), selectedModules = new Set();
 let selectedDeckSize = 50; 
 
 // ── Global IDE & Audio Controllers ───────────────────────────────────────
@@ -299,12 +299,19 @@ function showPicker() {
 function selectDeck(name) {
   currentDeckName = name;
   currentCert     = null;
-  selectedCategories.clear(); 
-  selectedGroups.clear(); 
+  selectedCategories.clear();
+  selectedGroups.clear();
   selectedDifficulties.clear();
-  selectedDeckSize = 50; 
+  selectedModules.clear();
+  selectedDeckSize = 50;
 
   stopAudio();
+
+  // Module-based decks (e.g. dbt) skip the cert picker entirely
+  if (DECKS[name].modules_ordered) {
+    showFilterPicker();
+    return;
+  }
 
   const cards = DECKS[name].cards;
   const certs = [...new Set(cards.map(c => c.certification).filter(Boolean))];
@@ -361,11 +368,26 @@ function categoryLabel(cat) {
 }
 
 function buildFilterChips() {
-  const cards = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  const deck = DECKS[currentDeckName];
+  let cards = currentCert ? deck.cards.filter(c => c.certification === currentCert) : deck.cards;
+
+  // ── Module chips (only for module-based decks) ────────────────────────────
+  const modSec = document.getElementById('moduleSection');
+  if (deck.modules_ordered) {
+    modSec.style.display = 'block';
+    document.getElementById('moduleChips').innerHTML = deck.modules_ordered.map(mod => `
+      <div class="chip${selectedModules.has(mod) ? ' selected' : ''}" onclick="toggleModule('${CSS.escape(mod)}')">${mod}</div>
+    `).join('');
+    if (selectedModules.size > 0) cards = cards.filter(c => selectedModules.has(c.module));
+  } else {
+    modSec.style.display = 'none';
+  }
+
+  // ── Category chips ────────────────────────────────────────────────────────
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))].sort();
   const activeCards = selectedCategories.size > 0 ? cards.filter(c => selectedCategories.has(c.category)) : cards;
-  
-  const groupCounts = {}; 
+
+  const groupCounts = {};
   activeCards.forEach(c => (Array.isArray(c.group) ? c.group : [c.group]).filter(Boolean).forEach(g => groupCounts[g] = (groupCounts[g] || 0) + 1));
   const groups = Object.keys(groupCounts).sort((a,b) => groupCounts[b] - groupCounts[a]);
   const diffs = DIFFICULTIES.filter(d => cards.some(c => c.difficulty === d));
@@ -373,30 +395,32 @@ function buildFilterChips() {
   document.getElementById('categoryChips').innerHTML = categories.map(cat => `
     <div class="chip${selectedCategories.has(cat) ? ' selected' : ''}" onclick="toggleCategory('${CSS.escape(cat)}')">${categoryLabel(cat)}</div>
   `).join('');
-  
+
   const grpSec = document.getElementById('groupSection');
   if (selectedCategories.size > 0 && groups.length > 1) {
     grpSec.style.display = 'block';
     document.getElementById('groupChips').innerHTML = groups.map(g => `
       <div class="chip${selectedGroups.has(g) ? ' selected' : ''}" onclick="toggleGroup('${CSS.escape(g)}')">${g} <span class="chip-count">${groupCounts[g]}</span></div>
     `).join('');
-  } else { 
-    grpSec.style.display = 'none'; 
+  } else {
+    grpSec.style.display = 'none';
   }
 
   document.getElementById('difficultyChips').innerHTML = diffs.map(d => `
     <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" onclick="toggleDifficulty('${CSS.escape(d)}')">${d}</div>
   `).join('');
-  
+
   updateFilterCount();
 }
 
+function toggleModule(mod) { selectedModules.has(mod) ? selectedModules.delete(mod) : selectedModules.add(mod); selectedCategories.clear(); selectedGroups.clear(); buildFilterChips(); }
 function toggleCategory(cat) { selectedCategories.has(cat) ? selectedCategories.delete(cat) : selectedCategories.add(cat); buildFilterChips(); }
 function toggleGroup(g) { selectedGroups.has(g) ? selectedGroups.delete(g) : selectedGroups.add(g); buildFilterChips(); }
 function toggleDifficulty(d) { selectedDifficulties.has(d) ? selectedDifficulties.delete(d) : selectedDifficulties.add(d); buildFilterChips(); }
 
 function updateFilterCount() {
-  const all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  let all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  if (selectedModules.size > 0) all = all.filter(c => selectedModules.has(c.module));
   const filtered = all.filter(c => {
     const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
     const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
@@ -425,7 +449,8 @@ function selectSize(s) {
 
 // ── Screen 4: Study view ───────────────────────────────────────────────────
 function startFiltered() {
-  const all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  let all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
+  if (selectedModules.size > 0) all = all.filter(c => selectedModules.has(c.module));
   const filtered = all.filter(c => {
     const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
     const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
