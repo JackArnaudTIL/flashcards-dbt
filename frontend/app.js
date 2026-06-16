@@ -11,7 +11,7 @@ import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { jinja2 } from "@codemirror/legacy-modes/mode/jinja2";
 import { recordRating, getDeckProgress, deckStats, loadUserProgress, clearCache, mergeLocalToFirestore } from './progress.js';
 import { auth } from './firebase.js';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
@@ -201,7 +201,8 @@ function renderAuthArea(user) {
 }
 
 function signInUser() {
-  signInWithRedirect(auth, new GoogleAuthProvider());
+  signInWithPopup(auth, new GoogleAuthProvider())
+    .catch(err => console.error('Sign-in failed:', err));
 }
 
 async function signOutUser() {
@@ -211,8 +212,6 @@ async function signOutUser() {
 }
 
 let _pendingMergeUid = null;
-
-getRedirectResult(auth).catch(err => console.error('Redirect sign-in failed:', err));
 
 onAuthStateChanged(auth, async user => {
   if (user) {
