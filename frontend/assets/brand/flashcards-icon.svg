@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="flashcards for all icon">
+<style>@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap');</style>
+<g transform="rotate(13 57 44)"><rect x="42" y="22" width="30" height="44" rx="6" fill="#ED93B1" stroke="#D4537E" stroke-width="1.3"/><text x="57" y="51" text-anchor="middle" fill="#A33B5F" style="font-family:'Libre Baskerville', Georgia, 'Times New Roman', serif;font-size:20px;font-weight:700">!</text></g>
+<rect x="26" y="28" width="30" height="44" rx="6" fill="#D4537E"/>
+<text x="41" y="62" text-anchor="middle" fill="#FFFFFF" style="font-family:'Libre Baskerville', Georgia, 'Times New Roman', serif;font-size:30px;font-weight:700">?</text>
+</svg>

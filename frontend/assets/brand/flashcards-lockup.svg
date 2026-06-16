@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 130" width="340" height="130" role="img" aria-label="flashcards for all">
+<style>@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&amp;display=swap');</style>
+<g transform="translate(0,0) scale(1.0)">
+<g transform="rotate(13 86 70)"><rect x="66" y="40" width="40" height="58" rx="8" fill="#ED93B1" stroke="#D4537E" stroke-width="1.6"/><text x="86" y="79" text-anchor="middle" fill="#A33B5F" style="font-family:'Libre Baskerville', Georgia, 'Times New Roman', serif;font-size:26px;font-weight:700">!</text></g>
+<rect x="46" y="48" width="40" height="58" rx="8" fill="#D4537E"/>
+<text x="66" y="92" text-anchor="middle" fill="#FFFFFF" style="font-family:'Libre Baskerville', Georgia, 'Times New Roman', serif;font-size:40px;font-weight:700">?</text>
+</g>
+<text x="120" y="84" fill="#26201F" style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;font-size:36px;font-weight:500;letter-spacing:-0.5px">flashcards</text>
+<text x="122" y="111" fill="#D4537E" style="font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;font-size:19px;font-weight:500">for all</text>
+</svg>
