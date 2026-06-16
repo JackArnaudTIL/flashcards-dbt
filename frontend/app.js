@@ -1006,6 +1006,7 @@ window.showFilterPicker = showFilterPicker;
 window.filterBack = filterBack;
 window.startFiltered = startFiltered;
 window.toggleCustomization = toggleCustomization;
+window.toggleModule = toggleModule;
 window.toggleCategory = toggleCategory;
 window.toggleGroup = toggleGroup;
 window.toggleDifficulty = toggleDifficulty;
