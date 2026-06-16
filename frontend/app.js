@@ -700,6 +700,10 @@ async function flip() {
         const scoreClass = { Good: 'match', Ok: 'ok', Hard: 'hard' };
         const scoreLabel = { Good: '✓ Good answer', Ok: '~ Partially correct', Hard: '✗ Needs work' };
 
+        const storedExplanation = (card.explanation || '').trim();
+        const safeStoredExplanation = storedExplanation
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+
         const applyReview = (score, safeFeedback) => {
           if (diffContainer) {
             diffContainer.classList.add('ai-mode');
@@ -707,6 +711,11 @@ async function flip() {
               <div class="ai-review-box">
                 <div class="ai-review-label">AI Review</div>
                 <div class="ai-review-text">${safeFeedback}</div>
+                ${safeStoredExplanation ? `
+                <div class="ai-review-divider"></div>
+                <div class="ai-review-label">How it works</div>
+                <div class="ai-review-text ai-review-explanation">${safeStoredExplanation}</div>
+                ` : ''}
               </div>
             `;
             diffContainer.style.display = 'block';

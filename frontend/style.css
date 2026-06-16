@@ -1276,6 +1276,16 @@ pre code {
   color: var(--ink-mid);
 }
 
+.ai-review-divider {
+  border: none;
+  border-top: 1px solid var(--ink-faint);
+  margin: 10px 0;
+}
+
+.ai-review-explanation {
+  color: var(--ink-soft);
+}
+
 /* ── Error ───────────────────────────────────────────────────── */
 .error { 
   text-align: center; 

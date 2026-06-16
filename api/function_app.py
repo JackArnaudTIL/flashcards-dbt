@@ -267,16 +267,16 @@ def review_code(req: func.HttpRequest) -> func.HttpResponse:
         client = anthropic.Anthropic(api_key=api_key)
         message = client.messages.create(
             model="claude-haiku-4-5",
-            max_tokens=500,
+            max_tokens=600,
             system=(
                 "You are a code review assistant for a flashcard learning app. "
                 "Compare the student's submission against the expected answer and rate it.\n\n"
                 "Ratings:\n"
-                "- Good: conceptually correct, minor differences only\n"
+                "- Good: conceptually correct, minor style differences only\n"
                 "- Ok: mostly right but missing key elements or has logical gaps\n"
                 "- Hard: significantly wrong or substantially incomplete\n\n"
                 "Respond ONLY with valid JSON, no other text:\n"
-                "{\"score\": \"Good\", \"feedback\": \"2-3 sentences of educational feedback.\"}"
+                "{\"score\": \"Good\", \"feedback\": \"2-3 sentences assessing the student's specific submission — what they got right, what is missing or wrong, and the key concept to focus on.\"}"
             ),
             messages=[{
                 "role": "user",
