@@ -297,24 +297,24 @@ pre code {
 
 .landing-wrap {
   width: 100%;
-  max-width: 560px;
+  max-width: 620px;
   display: flex;
   flex-direction: column;
-  gap: 2.25rem;
+  gap: 1.75rem;
 }
 
-/* Large stacked logo */
+/* Large horizontal lockup */
 .landing-visual {
   display: flex;
 }
 
 .landing-hero-img {
-  /* stacked SVG is 260×212; content is centred within it.
-     Scale it large, pull left so the icon visually aligns with
-     the left text margin below. */
-  width: min(340px, 90vw);
+  /* lockup SVG is 340×130; front card starts at x=46.
+     At min(520px,92vw), scale≈1.53, card left edge ≈70px —
+     pull back to align with text below. */
+  width: min(520px, 92vw);
   height: auto;
-  margin-left: -24px;
+  margin-left: -70px;
 }
 
 .landing-hero {
