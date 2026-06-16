@@ -25742,7 +25742,7 @@
           "module": "dbt Modeling"
         }
       ],
-    "icon": "assets/icons/dbt-logo.png"    
+    "icon": "assets/icons/dbt-bit-standalone.png"
   },
     "Snowflake": {
       "section": "Professional Development",
@@ -28443,7 +28443,7 @@
           "certification": "snowpro advanced architect"
         }
       ],
-    "icon": "assets/icons/snowflake-color.ico"
+    "icon": "assets/icons/snowflake-color.png"
     }
   }
 }
