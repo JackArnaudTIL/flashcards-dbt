@@ -41,7 +41,20 @@
 <div id="app">
 
   <div id="deckPicker">
+    <div id="authArea" class="auth-area"></div>
     <div id="deckGrid"></div>
+  </div>
+
+  <!-- Merge prompt shown when signed-in user has existing local history -->
+  <div id="mergeOverlay" class="merge-overlay" style="display:none">
+    <div class="merge-sheet">
+      <p class="merge-title">You have local progress</p>
+      <p class="merge-body">Merge your existing study history into your account so it's available everywhere?</p>
+      <div class="merge-actions">
+        <button class="merge-btn-secondary" onclick="dismissMerge()">Skip</button>
+        <button class="merge-btn-primary" onclick="confirmMerge()">Merge</button>
+      </div>
+    </div>
   </div>
 
   <div id="certPicker" style="display:none">
@@ -62,6 +75,11 @@
     <div class="fast-start-hero">
         <h2 class="hero-count" id="heroCountDisplay">50 cards</h2>
         <p class="hero-sub">Ready to start? Click below to begin your session.</p>
+        <div class="deck-progress-stats" id="deckProgressStats" style="display:none">
+          <span id="statAttempted"></span>
+          <span class="stat-divider">·</span>
+          <span id="statSuccess"></span>
+        </div>
         <button class="start-btn hero-start" id="startBtn" onclick="startFiltered()">Start Study</button>
     </div>
 
@@ -98,6 +116,11 @@
           <div class="filter-scroll-wrapper">
             <div class="filter-chips horizontal-scroll" id="difficultyChips"></div>
           </div>
+        </div>
+
+        <div class="filter-section" id="historySection">
+            <div class="filter-heading">Card History</div>
+            <div class="filter-chips horizontal-scroll" id="historyChips"></div>
         </div>
 
         <div class="filter-section" id="deckSizeSection">

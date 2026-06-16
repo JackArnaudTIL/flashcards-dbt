@@ -286,6 +286,107 @@ pre code {
   box-shadow: var(--shadow-md);
 }
 
+/* ── Auth area ───────────────────────────────────────────────── */
+.auth-area {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  padding: 0.75rem 0 0.25rem;
+  min-height: 2.5rem;
+}
+
+.auth-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.auth-name {
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
+.auth-btn {
+  font-size: 12px;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.auth-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+.auth-btn-signin {
+  border-color: var(--ink);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── Merge prompt ────────────────────────────────────────────── */
+.merge-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.merge-sheet {
+  background: var(--card);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 1.5rem 1.5rem 2rem;
+  width: 100%;
+  max-width: 480px;
+}
+
+.merge-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+}
+
+.merge-body {
+  font-size: 14px;
+  color: var(--ink-soft);
+  margin: 0 0 1.25rem;
+  line-height: 1.5;
+}
+
+.merge-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.merge-btn-secondary {
+  font-size: 14px;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--ink-faint);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.merge-btn-primary {
+  font-size: 14px;
+  font-weight: 500;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--ink);
+  color: var(--card);
+  cursor: pointer;
+}
+
 /* ── Deck picker ─────────────────────────────────────────────── */
 .deck-section-heading {
   font-size: 11px;
@@ -584,9 +685,25 @@ pre code {
   box-shadow: var(--shadow-md); 
 }
 
-.chip.selected { 
-  background: var(--ink); 
-  border-color: var(--ink); 
+.chip-disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.deck-progress-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 0.75rem;
+}
+
+.stat-divider { opacity: 0.4; }
+
+.chip.selected {
+  background: var(--ink);
+  border-color: var(--ink);
   color: #fff; 
   box-shadow: var(--shadow-md); 
 }

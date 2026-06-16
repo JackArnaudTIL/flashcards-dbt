@@ -9,6 +9,9 @@ import { yaml } from "@codemirror/lang-yaml";
 import { StreamLanguage } from "@codemirror/language";
 import { shell } from "@codemirror/legacy-modes/mode/shell";
 import { jinja2 } from "@codemirror/legacy-modes/mode/jinja2";
+import { recordRating, getDeckProgress, deckStats, loadUserProgress, clearCache, mergeLocalToFirestore } from './progress.js';
+import { auth } from './firebase.js';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
 const DIFFICULTIES = ['Easy', 'Medium', 'Hard'];
 const DECK_SIZES = [10, 20, 50, 100];
@@ -16,7 +19,8 @@ const DECK_SIZES = [10, 20, 50, 100];
 let DECKS = {}, deck = [], index = 0, flipped = false, ratings = [];
 let thumbs = [], flags = [], codeReviews = [], currentDeckName = '', currentCert = null, currentExplanation = '';
 let selectedCategories = new Set(), selectedGroups = new Set(), selectedDifficulties = new Set(), selectedModules = new Set();
-let selectedDeckSize = 50; 
+let selectedDeckSize = 50;
+let selectedHistory = 'all'; // 'all' | 'fresh' | 'reviewed'
 
 // ── Global IDE & Audio Controllers ───────────────────────────────────────
 let codeEditorView;
@@ -181,6 +185,68 @@ window.copyCode = function(btn) {
   setTimeout(() => { btn.innerHTML = originalHtml; }, 2000);
 };
 
+// ── Auth ──────────────────────────────────────────────────────────────────
+function renderAuthArea(user) {
+  const el = document.getElementById('authArea');
+  if (!el) return;
+  if (user) {
+    el.innerHTML = `
+      <img src="${user.photoURL}" class="auth-avatar" alt="${user.displayName}" title="${user.displayName}">
+      <span class="auth-name">${user.displayName.split(' ')[0]}</span>
+      <button class="auth-btn" onclick="signOutUser()">Sign out</button>
+    `;
+  } else {
+    el.innerHTML = `<button class="auth-btn auth-btn-signin" onclick="signInUser()">Sign in with Google</button>`;
+  }
+}
+
+function signInUser() {
+  signInWithPopup(auth, new GoogleAuthProvider()).catch(err => console.error('Sign in failed:', err));
+}
+
+async function signOutUser() {
+  await signOut(auth);
+  clearCache();
+  renderAuthArea(null);
+}
+
+let _pendingMergeUid = null;
+
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    const local = JSON.parse(localStorage.getItem('fc_progress') || '{}');
+    const hasLocal = Object.keys(local).length > 0;
+    await loadUserProgress(user.uid);
+    renderAuthArea(user);
+    if (hasLocal) {
+      _pendingMergeUid = user.uid;
+      document.getElementById('mergeOverlay').style.display = 'flex';
+    }
+    // Refresh filter stats if the filter screen is open
+    if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
+  } else {
+    clearCache();
+    renderAuthArea(null);
+  }
+});
+
+async function confirmMerge() {
+  if (_pendingMergeUid) await mergeLocalToFirestore(_pendingMergeUid);
+  _pendingMergeUid = null;
+  document.getElementById('mergeOverlay').style.display = 'none';
+  if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
+}
+
+function dismissMerge() {
+  _pendingMergeUid = null;
+  document.getElementById('mergeOverlay').style.display = 'none';
+}
+
+window.signInUser   = signInUser;
+window.signOutUser  = signOutUser;
+window.confirmMerge = confirmMerge;
+window.dismissMerge = dismissMerge;
+
 // ── Data Loading ──────────────────────────────────────────────────────────
 fetch('cards.json')
   .then(r => { 
@@ -320,6 +386,7 @@ function selectDeck(name) {
   selectedDifficulties.clear();
   selectedModules.clear();
   selectedDeckSize = 50;
+  selectedHistory = 'all';
 
   stopAudio();
 
@@ -408,7 +475,11 @@ function buildFilterChips() {
     modSec.style.display = 'none';
   }
 
-  // ── Category chips ────────────────────────────────────────────────────────
+  // ── Category chips (hidden until a module is selected, for module-based decks) ──
+  const catSec = document.getElementById('categorySection');
+  const showCats = !deck.modules_ordered || selectedModules.size > 0;
+  catSec.style.display = showCats ? 'block' : 'none';
+
   const categories = [...new Set(cards.map(c => c.category).filter(Boolean))].sort();
   const activeCards = selectedCategories.size > 0 ? cards.filter(c => selectedCategories.has(c.category)) : cards;
 
@@ -435,6 +506,32 @@ function buildFilterChips() {
     <div class="chip diff-${d}${selectedDifficulties.has(d) ? ' selected' : ''}" data-diff="${d}" onclick="toggleDifficulty(this.dataset.diff)">${d}</div>
   `).join('');
 
+  // ── History chips ─────────────────────────────────────────────────────────
+  const progress = getDeckProgress(currentDeckName);
+  const hasHistory = cards.some(c => progress[c.id]?.attempts > 0);
+  const HISTORY_OPTIONS = [
+    { val: 'all',      label: 'All cards' },
+    { val: 'fresh',    label: 'Not yet attempted' },
+    { val: 'reviewed', label: 'Previously seen' },
+  ];
+  document.getElementById('historyChips').innerHTML = HISTORY_OPTIONS.map(o => `
+    <div class="chip${selectedHistory === o.val ? ' selected' : ''}${!hasHistory && o.val !== 'all' ? ' chip-disabled' : ''}"
+         data-hist="${o.val}" onclick="toggleHistory(this.dataset.hist)">${o.label}</div>
+  `).join('');
+
+  // ── Hero stats ────────────────────────────────────────────────────────────
+  const stats = deckStats(currentDeckName, cards);
+  const statEl = document.getElementById('deckProgressStats');
+  if (stats.attempted > 0) {
+    const pct = Math.round((stats.attempted / stats.total) * 100);
+    document.getElementById('statAttempted').textContent = `${pct}% attempted`;
+    document.getElementById('statSuccess').textContent =
+      stats.successRate !== null ? `${stats.successRate}% success` : '';
+    statEl.style.display = 'flex';
+  } else {
+    statEl.style.display = 'none';
+  }
+
   updateFilterCount();
 }
 
@@ -442,16 +539,25 @@ function toggleModule(mod) { selectedModules.has(mod) ? selectedModules.delete(m
 function toggleCategory(cat) { selectedCategories.has(cat) ? selectedCategories.delete(cat) : selectedCategories.add(cat); buildFilterChips(); }
 function toggleGroup(g) { selectedGroups.has(g) ? selectedGroups.delete(g) : selectedGroups.add(g); buildFilterChips(); }
 function toggleDifficulty(d) { selectedDifficulties.has(d) ? selectedDifficulties.delete(d) : selectedDifficulties.add(d); buildFilterChips(); }
+function toggleHistory(val) { if (selectedHistory !== val) { selectedHistory = val; buildFilterChips(); } }
+
+function applyHistoryFilter(cards) {
+  if (selectedHistory === 'all') return cards;
+  const progress = getDeckProgress(currentDeckName);
+  if (selectedHistory === 'fresh')    return cards.filter(c => !progress[c.id]?.attempts);
+  if (selectedHistory === 'reviewed') return cards.filter(c =>  progress[c.id]?.attempts > 0);
+  return cards;
+}
 
 function updateFilterCount() {
   let all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
   if (selectedModules.size > 0) all = all.filter(c => selectedModules.has(c.module));
-  const filtered = all.filter(c => {
+  const filtered = applyHistoryFilter(all.filter(c => {
     const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
     const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
     const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
     return catOk && grpOk && diffOk;
-  });
+  }));
   
   const count = filtered.length;
   const sessionCount = selectedDeckSize !== null && selectedDeckSize < count ? selectedDeckSize : count;
@@ -479,13 +585,13 @@ function selectSize(s) {
 function startFiltered() {
   let all = currentCert ? DECKS[currentDeckName].cards.filter(c => c.certification === currentCert) : DECKS[currentDeckName].cards;
   if (selectedModules.size > 0) all = all.filter(c => selectedModules.has(c.module));
-  const filtered = all.filter(c => {
+  const filtered = applyHistoryFilter(all.filter(c => {
     const catOk = selectedCategories.size === 0 || selectedCategories.has(c.category);
     const grpOk = selectedGroups.size === 0 || (Array.isArray(c.group) ? c.group : [c.group]).some(g => selectedGroups.has(g));
     const diffOk = selectedDifficulties.size === 0 || selectedDifficulties.has(c.difficulty);
     return catOk && grpOk && diffOk;
-  });
-  
+  }));
+
   deck = filtered.sort(() => Math.random() - 0.5).slice(0, selectedDeckSize || filtered.length);
   ratings = Array(deck.length).fill(null);
   thumbs = Array(deck.length).fill(null);
@@ -858,11 +964,13 @@ async function flip() {
 
 function rate(r) {
   ratings[index] = r;
-  if (index < deck.length - 1) { 
-    index++; 
-    render(); 
-  } else { 
-    showSummary(); 
+  const card = deck[index];
+  if (card?.id) recordRating(currentDeckName, card.id, r);
+  if (index < deck.length - 1) {
+    index++;
+    render();
+  } else {
+    showSummary();
   }
 }
 
@@ -1017,6 +1125,7 @@ window.toggleModule = toggleModule;
 window.toggleCategory = toggleCategory;
 window.toggleGroup = toggleGroup;
 window.toggleDifficulty = toggleDifficulty;
+window.toggleHistory = toggleHistory;
 window.thumb = thumb;
 window.cancelFlag = cancelFlag;
 window.submitFlag = submitFlag;
