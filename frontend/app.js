@@ -678,12 +678,14 @@ function render() {
     resultEl.className = 'comparison-result';
   }
 
-  // clear glow and close overlay when moving to a new card
+  // clear glow, flag panel, and overlay when moving to a new card
   const studyUnitEl = document.getElementById('cardStudyUnit');
   if (studyUnitEl) studyUnitEl.classList.remove('result-reviewing', 'result-match', 'result-ok', 'result-hard');
   currentExplanation = '';
   const explOverlay = document.getElementById('explanationOverlay');
   if (explOverlay) explOverlay.style.display = 'none';
+  hide('flagPanel');
+  document.getElementById('flagNote').value = '';
 
   if (diffContainer) {
     diffContainer.style.display = 'none';

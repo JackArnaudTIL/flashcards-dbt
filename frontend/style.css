@@ -1081,11 +1081,33 @@ pre code {
 }
 
 @media (max-width: 480px) {
-  .card-face { 
-    padding: 1.25rem 1.25rem 1rem; 
+  .card-face {
+    padding: 1.25rem 1.25rem 1rem;
   }
-  .card-text { 
-    font-size: 1.1rem; 
+  .card-text {
+    font-size: 1.1rem;
+  }
+
+  /* Landing page — drop negative margin on small screens to prevent
+     the logo spilling off-screen; shrink to fit the viewport */
+  #signinScreen {
+    padding: 2rem 1.25rem 3rem;
+  }
+  .landing-wrap {
+    padding-top: 1.5rem;
+    gap: 1.5rem;
+  }
+  .landing-hero-img {
+    width: min(300px, 88vw);
+    margin-left: 0;
+  }
+  .landing-tagline {
+    font-size: 1.75rem;
+  }
+
+  /* Auth area — hide the name on narrow screens to avoid crowding */
+  .auth-name {
+    display: none;
   }
 }
 
