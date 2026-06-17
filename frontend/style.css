@@ -523,6 +523,8 @@ pre code {
   transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
   text-align: left;
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
 }
 
 .deck-tile:hover {
@@ -564,7 +566,8 @@ pre code {
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-top: 6px;
+  margin-top: auto;
+  padding-top: 10px;
 }
 
 .deck-tile-progress-bar {
