@@ -196,7 +196,7 @@ function renderAuthArea(user) {
       <button class="auth-btn" onclick="signOutUser()">Sign out</button>
     `;
   } else {
-    el.innerHTML = '';
+    el.innerHTML = `<button class="auth-btn auth-btn-signin" onclick="signInUser()">Sign in</button>`;
   }
 }
 
@@ -205,17 +205,28 @@ function signInUser() {
     .catch(err => console.error('Sign-in failed:', err));
 }
 
+let _guestMode = false;
+
+function continueAsGuest() {
+  _guestMode = true;
+  document.getElementById('signinScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  renderAuthArea(null);
+}
+
 async function signOutUser() {
+  _guestMode = false;
   await signOut(auth);
   clearCache();
-  renderAuthArea(null);
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('signinScreen').style.display = 'flex';
 }
 
 let _pendingMergeUid = null;
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    // Show app immediately using localStorage data, load Firestore in background
+    _guestMode = false;
     document.getElementById('signinScreen').style.display = 'none';
     document.getElementById('app').style.display = 'block';
     renderAuthArea(user);
@@ -231,7 +242,7 @@ onAuthStateChanged(auth, user => {
         if (document.getElementById('filterPicker').style.display !== 'none') buildFilterChips();
       })
       .catch(err => console.warn('Could not load Firestore progress:', err));
-  } else {
+  } else if (!_guestMode) {
     clearCache();
     document.getElementById('app').style.display = 'none';
     document.getElementById('signinScreen').style.display = 'flex';
@@ -251,10 +262,11 @@ function dismissMerge() {
   document.getElementById('mergeOverlay').style.display = 'none';
 }
 
-window.signInUser   = signInUser;
-window.signOutUser  = signOutUser;
-window.confirmMerge = confirmMerge;
-window.dismissMerge = dismissMerge;
+window.signInUser      = signInUser;
+window.signOutUser     = signOutUser;
+window.continueAsGuest = continueAsGuest;
+window.confirmMerge    = confirmMerge;
+window.dismissMerge    = dismissMerge;
 
 // ── Data Loading ──────────────────────────────────────────────────────────
 fetch('cards.json')
