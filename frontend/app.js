@@ -368,12 +368,22 @@ function buildDeckGrid() {
           ? `<div class="deck-tile-icon">${icon}</div>`
           : `<div class="deck-tile-icon"><img src="${icon}" alt=""></div>`
         : '';
+      const { total, attempted } = deckStats(name, cards);
+      const pct = total > 0 ? Math.round((attempted / total) * 100) : 0;
+      const progressHtml = `
+        <div class="deck-tile-progress">
+          <div class="deck-tile-progress-bar">
+            <div class="deck-tile-progress-fill" style="width:${pct}%"></div>
+          </div>
+          <span class="deck-tile-progress-label">${attempted > 0 ? `${pct}% complete` : `${total} cards`}</span>
+        </div>`;
+
       const tile  = document.createElement('div');
       tile.className = 'deck-tile';
       tile.innerHTML = `
         ${iconHtml}
         <div class="deck-tile-name">${name}</div>
-        <div class="deck-tile-count">${cards.length} cards</div>
+        ${progressHtml}
       `;
       tile.onclick = () => selectDeck(name);
       row.appendChild(tile);
