@@ -750,7 +750,7 @@ function render() {
   const att = ratings.filter(r => r !== null).length;
   document.getElementById('pFill').style.width = Math.round((att / deck.length) * 100) + '%';
   document.getElementById('pLabel').textContent = `${att} / ${deck.length} attempted`;
-  document.getElementById('pBreakdown').textContent = att > 0 ? `${ratings.filter(r=>r==='Good').length} Got it · ${ratings.filter(r=>r==='Ok').length} Ok · ${ratings.filter(r=>r==='Hard').length} Hard` : '';
+  document.getElementById('pBreakdown').textContent = att > 0 ? `✓ ${ratings.filter(r=>r==='Good').length}  –  ${ratings.filter(r=>r==='Ok').length}  ✕ ${ratings.filter(r=>r==='Hard').length}` : '';
   
   renderThumbs();
 }
@@ -767,7 +767,7 @@ function autoRate(score) {
   document.getElementById('pFill').style.width = Math.round((att / deck.length) * 100) + '%';
   document.getElementById('pLabel').textContent = `${att} / ${deck.length} attempted`;
   document.getElementById('pBreakdown').textContent = att > 0 ?
-    `${ratings.filter(r=>r==='Good').length} Got it · ${ratings.filter(r=>r==='Ok').length} Ok · ${ratings.filter(r=>r==='Hard').length} Hard` : '';
+    `✓ ${ratings.filter(r=>r==='Good').length}  –  ${ratings.filter(r=>r==='Ok').length}  ✕ ${ratings.filter(r=>r==='Hard').length}` : '';
   document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('ai-suggested'));
   const btn = document.querySelector(`.rating-btn.${score}`);
   if (btn) btn.classList.add('ai-suggested');

@@ -248,9 +248,15 @@
       <div class="response-block" id="responseBlock">
         <p class="hint" id="hintText">Click the card to reveal the answer</p>
         <div class="rating-row" id="ratingRow" style="display:none">
-          <button class="rating-btn Good" onclick="rate('Good')">Got it</button>
-          <button class="rating-btn Ok"   onclick="rate('Ok')">OK</button>
-          <button class="rating-btn Hard" onclick="rate('Hard')">Hard</button>
+          <button class="rating-btn Hard" onclick="rate('Hard')" title="Missed it">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+          <button class="rating-btn Ok" onclick="rate('Ok')" title="Nearly">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/></svg>
+          </button>
+          <button class="rating-btn Good" onclick="rate('Good')" title="Got it">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
         </div>
       </div>
       
@@ -266,9 +272,9 @@
         <h2>Deck complete</h2>
         <p>Here's how you did:</p>
         <div class="stat-grid">
-          <div class="stat"><div class="stat-n" id="sGood">0</div><div class="stat-l">Got it</div></div>
-          <div class="stat"><div class="stat-n" id="sOk">0</div><div class="stat-l">OK</div></div>
-          <div class="stat"><div class="stat-n" id="sHard">0</div><div class="stat-l">Hard</div></div>
+          <div class="stat"><div class="stat-n stat-good" id="sGood">0</div><div class="stat-l">Got it</div></div>
+          <div class="stat"><div class="stat-n stat-ok"   id="sOk">0</div><div class="stat-l">Nearly</div></div>
+          <div class="stat"><div class="stat-n stat-hard" id="sHard">0</div><div class="stat-l">Missed</div></div>
         </div>
         <div id="flagSummary" style="display:none">
           <p class="flag-summary-label">You flagged <span id="flagCount">0</span> card(s) for review.</p>

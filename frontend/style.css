@@ -1251,58 +1251,39 @@ pre code {
   letter-spacing: 0.01em;
 }
 
-.rating-row { 
-  display: flex; 
-  gap: 8px; 
-  justify-content: center; 
+.rating-row {
+  display: flex;
+  gap: 1.25rem;
+  justify-content: center;
 }
 
 .rating-btn {
-  flex: 1; 
-  padding: 9px 0;
-  border: 1px solid var(--ink-faint); 
-  border-radius: var(--radius-md);
-  background: var(--card); 
-  color: var(--ink-soft);
-  font-family: inherit; 
-  font-size: 13px; 
-  font-weight: 500;
-  cursor: pointer; 
-  transition: all 0.15s;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: var(--shadow-sm);
+  flex: none;
 }
 
-.rating-btn:hover { 
-  box-shadow: var(--shadow-md); 
-  transform: translateY(-1px); 
+.rating-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.rating-btn.Good { 
-  border-color: var(--green); 
-  color: var(--green); 
+.rating-btn:active {
+  transform: scale(0.94);
 }
 
-.rating-btn.Good:hover { 
-  background: var(--green-dim); 
-}
-
-.rating-btn.Ok { 
-  border-color: var(--amber); 
-  color: var(--amber); 
-}
-
-.rating-btn.Ok:hover { 
-  background: var(--amber-dim); 
-}
-
-.rating-btn.Hard { 
-  border-color: var(--red);   
-  color: var(--red); 
-}
-
-.rating-btn.Hard:hover { 
-  background: var(--red-dim); 
-}
+.rating-btn.Good { background: var(--green); }
+.rating-btn.Ok   { background: var(--amber); }
+.rating-btn.Hard { background: var(--red); }
 
 /* ── Nav controls ────────────────────────────────────────────── */
 .controls { 
@@ -1382,11 +1363,14 @@ pre code {
   box-shadow: var(--shadow-sm); 
 }
 
-.stat-n { 
-  font-size: 2rem; 
-  font-weight: 400; 
-  color: var(--ink); 
+.stat-n {
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--ink);
 }
+.stat-good { color: var(--green); }
+.stat-ok   { color: var(--amber); }
+.stat-hard { color: var(--red); }
 
 .stat-l { 
   font-size: 11px; 
@@ -1452,9 +1436,9 @@ pre code {
 }
 
 /* ── AI-suggested rating button ──────────────────────────────── */
-.rating-btn.Good.ai-suggested { background: var(--green-dim); font-weight: 700; }
-.rating-btn.Ok.ai-suggested   { background: var(--amber-dim); font-weight: 700; }
-.rating-btn.Hard.ai-suggested { background: var(--red-dim);   font-weight: 700; }
+.rating-btn.Good.ai-suggested { box-shadow: 0 0 0 3px var(--green-dim), var(--shadow-md); transform: translateY(-2px); }
+.rating-btn.Ok.ai-suggested   { box-shadow: 0 0 0 3px var(--amber-dim), var(--shadow-md); transform: translateY(-2px); }
+.rating-btn.Hard.ai-suggested { box-shadow: 0 0 0 3px var(--red-dim),   var(--shadow-md); transform: translateY(-2px); }
 
 /* ── Code Study Mode: unified card layout ───────────────────── */
 #cardStudyUnit.code-mode {
