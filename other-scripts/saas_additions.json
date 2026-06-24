@@ -1,0 +1,164 @@
+{
+  "schema_key": "saas",
+  "schema": {
+    "tables": [
+      {
+        "name": "stripe.subscriptions",
+        "columns": [
+          { "name": "id",             "type": "integer" },
+          { "name": "account_id",     "type": "integer" },
+          { "name": "plan_id",        "type": "varchar" },
+          { "name": "status",         "type": "varchar" },
+          { "name": "started_at",     "type": "timestamp" },
+          { "name": "cancelled_at",   "type": "timestamp" },
+          { "name": "monthly_amount", "type": "integer" },
+          { "name": "billing_cycle",  "type": "varchar" }
+        ]
+      },
+      {
+        "name": "stripe.invoices",
+        "columns": [
+          { "name": "id",              "type": "integer" },
+          { "name": "subscription_id", "type": "integer" },
+          { "name": "amount",          "type": "integer" },
+          { "name": "status",          "type": "varchar" },
+          { "name": "due_date",        "type": "date" },
+          { "name": "paid_at",         "type": "timestamp" },
+          { "name": "created_at",      "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "hubspot.companies",
+        "columns": [
+          { "name": "id",             "type": "integer" },
+          { "name": "name",           "type": "varchar" },
+          { "name": "domain",         "type": "varchar" },
+          { "name": "industry",       "type": "varchar" },
+          { "name": "createdat",      "type": "timestamp" },
+          { "name": "lifecyclestage", "type": "varchar" }
+        ]
+      },
+      {
+        "name": "hubspot.contacts",
+        "columns": [
+          { "name": "id",            "type": "integer" },
+          { "name": "companyid",     "type": "integer" },
+          { "name": "email",         "type": "varchar" },
+          { "name": "firstname",     "type": "varchar" },
+          { "name": "lastname",      "type": "varchar" },
+          { "name": "jobtitle",      "type": "varchar" },
+          { "name": "createdat",     "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "app.events",
+        "columns": [
+          { "name": "anonymous_id", "type": "varchar" },
+          { "name": "user_id",      "type": "integer" },
+          { "name": "event_name",   "type": "varchar" },
+          { "name": "occurred_at",  "type": "timestamp" },
+          { "name": "page",         "type": "varchar" },
+          { "name": "session_id",   "type": "varchar" }
+        ]
+      }
+    ]
+  },
+  "module_name": "Practice: SaaS Analytics",
+  "cards": [
+    {
+      "q": "Write a staging model for `stripe.subscriptions`. Rename `id` → `subscription_id`, cast `monthly_amount` from cents to dollars, and derive `is_active` (true when `status = 'active'`).",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('stripe', 'subscriptions') }}\n\n),\n\nrenamed as (\n\n    select\n        id                      as subscription_id,\n        account_id,\n        plan_id,\n        status,\n        started_at,\n        cancelled_at,\n        monthly_amount / 100.0  as monthly_amount_usd,\n        billing_cycle,\n        status = 'active'       as is_active\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "c1d2e3f4",
+      "module": "Practice: SaaS Analytics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "easy",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "Write a staging model for `hubspot.companies`. Rename `id` → `account_id`, `name` → `account_name`, `createdat` → `created_at`, and `lifecyclestage` → `lifecycle_stage`.",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('hubspot', 'companies') }}\n\n),\n\nrenamed as (\n\n    select\n        id              as account_id,\n        name            as account_name,\n        domain,\n        industry,\n        createdat       as created_at,\n        lifecyclestage  as lifecycle_stage\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "a5b6c7d8",
+      "module": "Practice: SaaS Analytics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "easy",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "Write a staging model for `hubspot.contacts`. Rename all camelCase columns to snake_case, map `companyid` → `account_id`, and derive `full_name` by concatenating `firstname` and `lastname`.",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('hubspot', 'contacts') }}\n\n),\n\nrenamed as (\n\n    select\n        id                              as user_id,\n        companyid                       as account_id,\n        email,\n        firstname                       as first_name,\n        lastname                        as last_name,\n        firstname || ' ' || lastname    as full_name,\n        jobtitle                        as job_title,\n        createdat                       as created_at\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "e9f0a1b2",
+      "module": "Practice: SaaS Analytics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "Write a staging model for `stripe.invoices`. Rename `id` → `invoice_id`, cast `amount` from cents to dollars, and add `is_overdue` (true when `status = 'open'` and `due_date < current_date`).",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('stripe', 'invoices') }}\n\n),\n\nrenamed as (\n\n    select\n        id                              as invoice_id,\n        subscription_id,\n        amount / 100.0                  as amount_usd,\n        status,\n        due_date,\n        paid_at,\n        created_at,\n        status = 'open'\n            and due_date < current_date as is_overdue\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "c3d4e5f6",
+      "module": "Practice: SaaS Analytics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "Write an incremental staging model for `app.events`. Exclude rows where `user_id` is null. On incremental runs, only process events where `occurred_at` is after the latest existing timestamp.",
+      "a": "```sql\n{{ config(materialized='incremental', unique_key='anonymous_id') }}\n\nwith source as (\n\n    select * from {{ source('app', 'events') }}\n\n    {% if is_incremental() %}\n    where occurred_at > (select max(occurred_at) from {{ this }})\n    {% endif %}\n\n),\n\nfiltered as (\n\n    select\n        anonymous_id,\n        user_id,\n        event_name,\n        occurred_at,\n        page,\n        session_id\n\n    from source\n\n    where user_id is not null\n\n)\n\nselect * from filtered\n```",
+      "id": "a7b8c9d0",
+      "module": "Practice: SaaS Analytics",
+      "category": "Incremental Models",
+      "group": "Materializations",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "What is MRR, and how do you normalise an annual subscription into it for a dbt mart model?",
+      "a": "MRR (Monthly Recurring Revenue) is the normalised monthly value of all active subscriptions. A monthly subscription contributes its full `monthly_amount`. An annual subscription contributes its total value divided by 12 — a $1,200/year plan is $100 MRR. Normalise in staging (add a `monthly_amount_usd` column), then simply sum it in the mart where `is_active = true`.",
+      "id": "e1f2a3b4",
+      "module": "Practice: SaaS Analytics",
+      "category": "SaaS Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write a `fct_mrr` mart model from `ref('stg_subscriptions')`. Group active subscriptions by `plan_id` and return `subscription_count` and `total_mrr_usd`.",
+      "a": "```sql\nwith subscriptions as (\n\n    select * from {{ ref('stg_subscriptions') }}\n\n),\n\naggregated as (\n\n    select\n        plan_id,\n        count(*)                as subscription_count,\n        sum(monthly_amount_usd) as total_mrr_usd\n\n    from subscriptions\n\n    where is_active\n\n    group by 1\n\n)\n\nselect * from aggregated\n```",
+      "id": "c5d6e7f8",
+      "module": "Practice: SaaS Analytics",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "saas"
+    },
+    {
+      "q": "How would you identify churned subscriptions in a dbt staging model, and why should you keep them rather than filter them out?",
+      "a": "Filter for `status = 'cancelled'` or `cancelled_at is not null`, and derive `churned_month = date_trunc('month', cancelled_at)`. Keep churned rows — filtering them out in staging makes it impossible to calculate churn rate in downstream marts. Staging should be source-faithful; mart models decide what to include.",
+      "id": "a9b0c1d2",
+      "module": "Practice: SaaS Analytics",
+      "category": "SaaS Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write a `dim_accounts` mart model. Left join `stg_accounts` to `stg_subscriptions` on `account_id`, keeping only the latest active subscription per account.",
+      "a": "```sql\nwith accounts as (\n\n    select * from {{ ref('stg_accounts') }}\n\n),\n\nsubscriptions as (\n\n    select * from {{ ref('stg_subscriptions') }}\n\n    where is_active\n\n),\n\nranked as (\n\n    select\n        *,\n        row_number() over (\n            partition by account_id\n            order by started_at desc\n        ) as rn\n\n    from subscriptions\n\n),\n\njoined as (\n\n    select\n        a.account_id,\n        a.account_name,\n        a.domain,\n        a.industry,\n        a.lifecycle_stage,\n        a.created_at,\n        s.plan_id,\n        s.billing_cycle,\n        s.monthly_amount_usd\n\n    from accounts a\n    left join ranked s\n        on a.account_id = s.account_id\n        and s.rn = 1\n\n)\n\nselect * from joined\n```",
+      "id": "e3f4a5b6",
+      "module": "Practice: SaaS Analytics",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "hard",
+      "requires_code": true,
+      "schema_ref": "saas"
+    }
+  ]
+}

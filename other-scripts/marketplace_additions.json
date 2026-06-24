@@ -1,0 +1,181 @@
+{
+  "schema_key": "marketplace",
+  "schema": {
+    "tables": [
+      {
+        "name": "app.clients",
+        "columns": [
+          { "name": "id",         "type": "integer" },
+          { "name": "email",      "type": "varchar" },
+          { "name": "first_name", "type": "varchar" },
+          { "name": "last_name",  "type": "varchar" },
+          { "name": "created_at", "type": "timestamp" },
+          { "name": "country",    "type": "varchar" }
+        ]
+      },
+      {
+        "name": "app.freelancers",
+        "columns": [
+          { "name": "id",         "type": "integer" },
+          { "name": "email",      "type": "varchar" },
+          { "name": "first_name", "type": "varchar" },
+          { "name": "last_name",  "type": "varchar" },
+          { "name": "created_at", "type": "timestamp" },
+          { "name": "country",    "type": "varchar" },
+          { "name": "daily_rate", "type": "numeric" }
+        ]
+      },
+      {
+        "name": "app.listings",
+        "columns": [
+          { "name": "id",            "type": "integer" },
+          { "name": "freelancer_id", "type": "integer" },
+          { "name": "title",         "type": "varchar" },
+          { "name": "category",      "type": "varchar" },
+          { "name": "daily_rate",    "type": "numeric" },
+          { "name": "status",        "type": "varchar" },
+          { "name": "created_at",    "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "app.contracts",
+        "columns": [
+          { "name": "id",                 "type": "integer" },
+          { "name": "listing_id",         "type": "integer" },
+          { "name": "client_id",          "type": "integer" },
+          { "name": "freelancer_id",      "type": "integer" },
+          { "name": "agreed_daily_rate",  "type": "numeric" },
+          { "name": "total_days",         "type": "integer" },
+          { "name": "status",             "type": "varchar" },
+          { "name": "started_at",         "type": "timestamp" },
+          { "name": "completed_at",       "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "app.reviews",
+        "columns": [
+          { "name": "id",          "type": "integer" },
+          { "name": "contract_id", "type": "integer" },
+          { "name": "reviewer_id", "type": "integer" },
+          { "name": "reviewee_id", "type": "integer" },
+          { "name": "rating",      "type": "integer" },
+          { "name": "created_at",  "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "stripe.charges",
+        "columns": [
+          { "name": "id",          "type": "integer" },
+          { "name": "contract_id", "type": "integer" },
+          { "name": "amount",      "type": "integer" },
+          { "name": "status",      "type": "varchar" },
+          { "name": "created_at",  "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "stripe.transfers",
+        "columns": [
+          { "name": "id",          "type": "integer" },
+          { "name": "contract_id", "type": "integer" },
+          { "name": "amount",      "type": "integer" },
+          { "name": "status",      "type": "varchar" },
+          { "name": "created_at",  "type": "timestamp" }
+        ]
+      }
+    ]
+  },
+  "module_name": "Practice: Marketplace",
+  "cards": [
+    {
+      "q": "Write a staging model for `app.contracts`. Rename `id` → `contract_id`. Derive `contract_value_usd` (agreed_daily_rate × total_days), `platform_fee_usd` (10% of value), and `freelancer_payout_usd` (90% of value).",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('app', 'contracts') }}\n\n),\n\nrenamed as (\n\n    select\n        id                                        as contract_id,\n        listing_id,\n        client_id,\n        freelancer_id,\n        agreed_daily_rate,\n        total_days,\n        agreed_daily_rate * total_days            as contract_value_usd,\n        agreed_daily_rate * total_days * 0.10     as platform_fee_usd,\n        agreed_daily_rate * total_days * 0.90     as freelancer_payout_usd,\n        status,\n        started_at,\n        completed_at\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "f1a2b3c4",
+      "module": "Practice: Marketplace",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "marketplace"
+    },
+    {
+      "q": "Write a staging model for `stripe.charges`. Rename `id` → `charge_id`, cast `amount` from cents to dollars, and only include rows where `status = 'succeeded'`.",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('stripe', 'charges') }}\n\n),\n\nrenamed as (\n\n    select\n        id              as charge_id,\n        contract_id,\n        amount / 100.0  as amount_usd,\n        status,\n        created_at\n\n    from source\n\n    where status = 'succeeded'\n\n)\n\nselect * from renamed\n```",
+      "id": "d5e6f7a8",
+      "module": "Practice: Marketplace",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "easy",
+      "requires_code": true,
+      "schema_ref": "marketplace"
+    },
+    {
+      "q": "Write a staging model for `app.reviews`. Rename `id` → `review_id` and add `is_positive` (true when `rating >= 4`).",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('app', 'reviews') }}\n\n),\n\nrenamed as (\n\n    select\n        id              as review_id,\n        contract_id,\n        reviewer_id,\n        reviewee_id,\n        rating,\n        rating >= 4     as is_positive,\n        created_at\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "b9c0d1e2",
+      "module": "Practice: Marketplace",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "easy",
+      "requires_code": true,
+      "schema_ref": "marketplace"
+    },
+    {
+      "q": "Your platform takes a 10% commission on every contract. Where in the dbt layer should this calculation live, and why not in the mart?",
+      "a": "In staging (`stg_contracts`), as a derived column: `agreed_daily_rate * total_days * 0.10 as platform_fee_usd`. It belongs in staging because: it's a deterministic transformation of source fields, multiple downstream marts will need it, and if the rate ever changes you edit it in one place. Putting fee logic in a mart means duplicating it across every mart that needs it.",
+      "id": "f3a4b5c6",
+      "module": "Practice: Marketplace",
+      "category": "Marketplace Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write a `fct_platform_revenue` model from `ref('stg_contracts')`. Group completed contracts by calendar month (`completed_at`) and return `contract_count` and `total_platform_fees_usd`.",
+      "a": "```sql\nwith contracts as (\n\n    select * from {{ ref('stg_contracts') }}\n\n),\n\nmonthly as (\n\n    select\n        date_trunc('month', completed_at)   as revenue_month,\n        count(*)                            as contract_count,\n        sum(platform_fee_usd)               as total_platform_fees_usd\n\n    from contracts\n\n    where status = 'completed'\n        and completed_at is not null\n\n    group by 1\n\n)\n\nselect * from monthly\n```",
+      "id": "d7e8f9a0",
+      "module": "Practice: Marketplace",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "marketplace"
+    },
+    {
+      "q": "A marketplace has both clients and freelancers. How do you structure dbt mart models to serve both sides without duplicating logic?",
+      "a": "Keep shared facts in one place — a `fct_contracts` model holds all contract-level data regardless of which side you're analysing. Build separate enriched dimension tables (`dim_clients`, `dim_freelancers`) that each join the shared fact to their own profile. Avoid putting client-side aggregations inside the freelancer mart. If multiple marts share intermediate aggregation logic, extract it into an intermediate model both draw from.",
+      "id": "b1c2d3e4",
+      "module": "Practice: Marketplace",
+      "category": "Marketplace Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write a `dim_freelancers` mart model. Join `stg_freelancers` to aggregated stats from `stg_contracts` and `stg_reviews`: include `total_contracts`, `completed_contracts`, `total_earned_usd`, and `avg_rating`.",
+      "a": "```sql\nwith freelancers as (\n\n    select * from {{ ref('stg_freelancers') }}\n\n),\n\ncontract_stats as (\n\n    select\n        freelancer_id,\n        count(*)                                                    as total_contracts,\n        count(case when status = 'completed' then 1 end)            as completed_contracts,\n        sum(case when status = 'completed'\n            then freelancer_payout_usd end)                         as total_earned_usd\n\n    from {{ ref('stg_contracts') }}\n\n    group by 1\n\n),\n\nreview_stats as (\n\n    select\n        reviewee_id     as freelancer_id,\n        avg(rating)     as avg_rating\n\n    from {{ ref('stg_reviews') }}\n\n    group by 1\n\n),\n\njoined as (\n\n    select\n        f.freelancer_id,\n        f.first_name,\n        f.last_name,\n        f.email,\n        f.country,\n        f.created_at,\n        coalesce(c.total_contracts, 0)      as total_contracts,\n        coalesce(c.completed_contracts, 0)  as completed_contracts,\n        coalesce(c.total_earned_usd, 0)     as total_earned_usd,\n        r.avg_rating\n\n    from freelancers f\n    left join contract_stats c using (freelancer_id)\n    left join review_stats r using (freelancer_id)\n\n)\n\nselect * from joined\n```",
+      "id": "f5a6b7c8",
+      "module": "Practice: Marketplace",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "hard",
+      "requires_code": true,
+      "schema_ref": "marketplace"
+    },
+    {
+      "q": "A `contracts` table has both `client_id` and `freelancer_id` foreign keys. How would you test both in a dbt YAML file?",
+      "a": "```yaml\nmodels:\n  - name: stg_contracts\n    columns:\n      - name: client_id\n        tests:\n          - relationships:\n              to: ref('stg_clients')\n              field: client_id\n      - name: freelancer_id\n        tests:\n          - relationships:\n              to: ref('stg_freelancers')\n              field: freelancer_id\n```\nThe `relationships` test checks that every value in the column exists in the referenced model — equivalent to a foreign key constraint. Running this catches orphaned contracts where the client or freelancer record has been deleted.",
+      "id": "d9e0f1a2",
+      "module": "Practice: Marketplace",
+      "category": "Marketplace Concepts",
+      "group": "Testing",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Should cancelled contracts be filtered out in `stg_contracts`? Why or why not?",
+      "a": "No — keep them. Staging should be source-faithful. Cancelled contracts are needed downstream to calculate cancellation rates, understand which listing categories fail, and analyse client behaviour before churn. Filtering in staging permanently removes data from all downstream models. Mart models and BI tools decide what to exclude based on `status`.",
+      "id": "b3c4d5e6",
+      "module": "Practice: Marketplace",
+      "category": "Marketplace Concepts",
+      "group": "Concepts",
+      "difficulty": "easy"
+    }
+  ]
+}

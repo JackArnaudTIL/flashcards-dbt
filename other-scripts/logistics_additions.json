@@ -1,0 +1,159 @@
+{
+  "schema_key": "logistics",
+  "schema": {
+    "tables": [
+      {
+        "name": "ops.shipments",
+        "columns": [
+          { "name": "id",           "type": "integer" },
+          { "name": "customer_id",  "type": "integer" },
+          { "name": "driver_id",    "type": "integer" },
+          { "name": "depot_id",     "type": "integer" },
+          { "name": "service_type", "type": "varchar" },
+          { "name": "status",       "type": "varchar" },
+          { "name": "weight_kg",    "type": "numeric" },
+          { "name": "requested_at", "type": "timestamp" },
+          { "name": "collected_at", "type": "timestamp" },
+          { "name": "delivered_at", "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "ops.shipment_events",
+        "columns": [
+          { "name": "id",          "type": "integer" },
+          { "name": "shipment_id", "type": "integer" },
+          { "name": "event_type",  "type": "varchar" },
+          { "name": "occurred_at", "type": "timestamp" },
+          { "name": "notes",       "type": "varchar" }
+        ]
+      },
+      {
+        "name": "ops.drivers",
+        "columns": [
+          { "name": "id",           "type": "integer" },
+          { "name": "first_name",   "type": "varchar" },
+          { "name": "last_name",    "type": "varchar" },
+          { "name": "depot_id",     "type": "integer" },
+          { "name": "vehicle_type", "type": "varchar" },
+          { "name": "joined_at",    "type": "timestamp" }
+        ]
+      },
+      {
+        "name": "ops.depots",
+        "columns": [
+          { "name": "id",     "type": "integer" },
+          { "name": "name",   "type": "varchar" },
+          { "name": "city",   "type": "varchar" },
+          { "name": "region", "type": "varchar" }
+        ]
+      },
+      {
+        "name": "gps.location_pings",
+        "columns": [
+          { "name": "shipment_id", "type": "integer" },
+          { "name": "driver_id",   "type": "integer" },
+          { "name": "lat",         "type": "numeric" },
+          { "name": "lng",         "type": "numeric" },
+          { "name": "recorded_at", "type": "timestamp" },
+          { "name": "speed_kmh",   "type": "numeric" }
+        ]
+      }
+    ]
+  },
+  "module_name": "Practice: Logistics",
+  "cards": [
+    {
+      "q": "Write a staging model for `ops.shipments`. Rename `id` → `shipment_id`. Use a staging CTE to derive `sla_days` from `service_type` (same_day=0, express=1, standard=3), then derive `is_on_time` in a renamed CTE.",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('ops', 'shipments') }}\n\n),\n\nwith_sla as (\n\n    select\n        *,\n        case service_type\n            when 'same_day'  then 0\n            when 'express'   then 1\n            when 'standard'  then 3\n        end as sla_days\n\n    from source\n\n),\n\nrenamed as (\n\n    select\n        id              as shipment_id,\n        customer_id,\n        driver_id,\n        depot_id,\n        service_type,\n        status,\n        weight_kg,\n        requested_at,\n        collected_at,\n        delivered_at,\n        sla_days,\n        delivered_at is not null\n            and delivered_at\n                <= requested_at + (sla_days * interval '1 day') as is_on_time\n\n    from with_sla\n\n)\n\nselect * from renamed\n```",
+      "id": "1a2b3c4d",
+      "module": "Practice: Logistics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    },
+    {
+      "q": "Write a staging model for `ops.shipment_events`. Rename `id` → `event_id`. No other transformations needed.",
+      "a": "```sql\nwith source as (\n\n    select * from {{ source('ops', 'shipment_events') }}\n\n),\n\nrenamed as (\n\n    select\n        id          as event_id,\n        shipment_id,\n        event_type,\n        occurred_at,\n        notes\n\n    from source\n\n)\n\nselect * from renamed\n```",
+      "id": "2e3f4a5b",
+      "module": "Practice: Logistics",
+      "category": "Staging Models",
+      "group": "Sources",
+      "difficulty": "easy",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    },
+    {
+      "q": "Write an intermediate model `int_shipments_current_status` from `ref('stg_shipment_events')`. Use `ROW_NUMBER()` to return only the most recent event per shipment.",
+      "a": "```sql\nwith events as (\n\n    select * from {{ ref('stg_shipment_events') }}\n\n),\n\nranked as (\n\n    select\n        *,\n        row_number() over (\n            partition by shipment_id\n            order by occurred_at desc\n        ) as rn\n\n    from events\n\n),\n\ncurrent_status as (\n\n    select\n        shipment_id,\n        event_type      as current_status,\n        occurred_at     as status_updated_at\n\n    from ranked\n\n    where rn = 1\n\n)\n\nselect * from current_status\n```",
+      "id": "3c4d5e6f",
+      "module": "Practice: Logistics",
+      "category": "Intermediate Models",
+      "group": "Models",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    },
+    {
+      "q": "A `shipment_events` table stores one row per status change — a shipment can have 5+ events. How do you model the current status in dbt without losing the full history?",
+      "a": "Keep all events in staging (`stg_shipment_events`). Build an intermediate model that uses `ROW_NUMBER() OVER (PARTITION BY shipment_id ORDER BY occurred_at DESC)` and filters to `rn = 1` to get the latest event per shipment. Mart models join this back to `stg_shipments` for the current status. The full event log stays in staging for anyone who needs trend or audit analysis.",
+      "id": "4a5b6c7d",
+      "module": "Practice: Logistics",
+      "category": "Logistics Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write an incremental staging model for `gps.location_pings`. Filter out stationary pings (`speed_kmh = 0`). On incremental runs, only process pings after the latest existing `recorded_at`.",
+      "a": "```sql\n{{ config(\n    materialized='incremental',\n    unique_key=['shipment_id', 'recorded_at']\n) }}\n\nwith source as (\n\n    select * from {{ source('gps', 'location_pings') }}\n\n    {% if is_incremental() %}\n    where recorded_at > (select max(recorded_at) from {{ this }})\n    {% endif %}\n\n),\n\nfiltered as (\n\n    select\n        shipment_id,\n        driver_id,\n        lat,\n        lng,\n        recorded_at,\n        speed_kmh\n\n    from source\n\n    where speed_kmh > 0\n\n)\n\nselect * from filtered\n```",
+      "id": "5e6f7a8b",
+      "module": "Practice: Logistics",
+      "category": "Incremental Models",
+      "group": "Materializations",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    },
+    {
+      "q": "The `service_type` column in `stg_shipments` should only ever be `same_day`, `express`, or `standard`. How do you enforce this in dbt?",
+      "a": "```yaml\nmodels:\n  - name: stg_shipments\n    columns:\n      - name: service_type\n        tests:\n          - accepted_values:\n              values: ['same_day', 'express', 'standard']\n```\nThe `accepted_values` test fails if any row contains a value outside the list — catching new service types added to the source system before they silently break downstream SLA logic.",
+      "id": "6c7d8e9f",
+      "module": "Practice: Logistics",
+      "category": "Logistics Concepts",
+      "group": "Testing",
+      "difficulty": "easy"
+    },
+    {
+      "q": "Where should SLA threshold logic live in a dbt project, and what is the risk of putting it in a mart?",
+      "a": "In staging — as a `sla_days` column derived from `service_type` using a CASE statement. If it lives in a mart, every mart that needs SLA calculations duplicates the CASE logic. When the business changes a threshold (e.g. express moves from 1 day to 2), you update it in one staging model and all downstream models inherit the change automatically.",
+      "id": "7a8b9c0d",
+      "module": "Practice: Logistics",
+      "category": "Logistics Concepts",
+      "group": "Concepts",
+      "difficulty": "medium"
+    },
+    {
+      "q": "Write a `fct_deliveries` mart model from `ref('stg_shipments')`. Group delivered shipments by `delivery_date` (day-truncated from `delivered_at`) and `service_type`. Return `delivery_count`, `on_time_count`, and `avg_weight_kg`.",
+      "a": "```sql\nwith shipments as (\n\n    select * from {{ ref('stg_shipments') }}\n\n),\n\naggregated as (\n\n    select\n        date_trunc('day', delivered_at)         as delivery_date,\n        service_type,\n        count(*)                                as delivery_count,\n        count(case when is_on_time then 1 end)  as on_time_count,\n        avg(weight_kg)                          as avg_weight_kg\n\n    from shipments\n\n    where status = 'delivered'\n        and delivered_at is not null\n\n    group by 1, 2\n\n)\n\nselect * from aggregated\n```",
+      "id": "8e9f0a1b",
+      "module": "Practice: Logistics",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "medium",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    },
+    {
+      "q": "Write a `fct_driver_performance` mart model from `ref('stg_shipments')`. Aggregate by `driver_id`: return `total_shipments`, `delivered_count`, and `on_time_rate` (on-time deliveries ÷ total delivered, guarded against divide-by-zero).",
+      "a": "```sql\nwith shipments as (\n\n    select * from {{ ref('stg_shipments') }}\n\n),\n\naggregated as (\n\n    select\n        driver_id,\n        count(*)                                            as total_shipments,\n        count(case when status = 'delivered' then 1 end)    as delivered_count,\n        count(case when is_on_time then 1 end)\n            / nullif(\n                count(case when status = 'delivered'\n                    then 1 end), 0\n              )::numeric                                    as on_time_rate\n\n    from shipments\n\n    group by 1\n\n)\n\nselect * from aggregated\n```",
+      "id": "9c0d1e2f",
+      "module": "Practice: Logistics",
+      "category": "Mart Models",
+      "group": "Models",
+      "difficulty": "hard",
+      "requires_code": true,
+      "schema_ref": "logistics"
+    }
+  ]
+}
