@@ -1,0 +1,590 @@
+{
+  "deck": "Snowflake",
+  "cards": [
+    {
+      "q": "What is ARRAY_AGG() in Snowflake?",
+      "a": "An aggregate function that collects column values into a VARIANT ARRAY. Often combined with OBJECT_CONSTRUCT to produce nested JSON output: SELECT ARRAY_AGG(OBJECT_CONSTRUCT('id', id, 'name', name)) FROM my_table;",
+      "group": "Semi-Structured Data",
+      "difficulty": "medium",
+      "category": "Semi-Structured Data",
+      "module": "Snowflake Core",
+      "id": "10fb6744"
+    },
+    {
+      "q": "What does the :: operator do in Snowflake?",
+      "a": "Casts a VARIANT value to a SQL type: src:price::FLOAT, src:created_at::TIMESTAMP_NTZ. Without casting, Snowflake keeps the value as VARIANT, which may cause unexpected comparison behaviour.",
+      "group": "Semi-Structured Data",
+      "difficulty": "easy",
+      "category": "Semi-Structured Data",
+      "module": "Snowflake Core",
+      "id": "81d38a52"
+    },
+    {
+      "q": "What file formats can Snowflake ingest natively into VARIANT columns?",
+      "a": "JSON, XML, Avro, ORC, and Parquet. COPY INTO automatically stores each top-level record as one VARIANT row when the file format is set to JSON/Avro/etc. CSV is not semi-structured and loads into individual typed columns.",
+      "group": "Semi-Structured Data",
+      "difficulty": "medium",
+      "category": "Semi-Structured Data",
+      "module": "Snowflake Core",
+      "id": "330af616"
+    },
+    {
+      "q": "What is Dynamic Data Masking in Snowflake?",
+      "a": "A column-level security feature that applies a masking policy to a column. Users with privileged roles see real data; others see masked data (e.g., NULL, a fixed string, or a partially masked value). The masking is applied at query time — data on disk is unchanged.",
+      "group": "Security",
+      "difficulty": "medium",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "8617e350"
+    },
+    {
+      "q": "What is a Row Access Policy in Snowflake?",
+      "a": "Attaches a policy function to a table or view that filters rows returned to a user based on their role or session context. The filter is transparent — users with restricted access see fewer rows but aren't aware of the filtering.",
+      "group": "Security",
+      "difficulty": "medium",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "2145acdc"
+    },
+    {
+      "q": "What is Snowflake's approach to encryption?",
+      "a": "All data at rest is encrypted with AES-256. All data in transit uses TLS. Snowflake manages encryption keys automatically (Snowflake-managed keys). Business Critical and VPS editions support customer-managed keys via Tri-Secret Secure (a key held jointly by Snowflake and the customer).",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "8e31bd39"
+    },
+    {
+      "q": "What is Tri-Secret Secure in Snowflake?",
+      "a": "A Business Critical/VPS feature that combines a Snowflake-managed key with a customer-managed key (held in AWS KMS/Azure Key Vault/GCP KMS). Both keys are required to decrypt data — Snowflake alone cannot access it without the customer's key.",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "7b5094ad"
+    },
+    {
+      "q": "What is column-level security in Snowflake?",
+      "a": "The ability to restrict access to specific columns using Dynamic Data Masking policies or by granting SELECT on individual columns (not the whole table). Privilege: GRANT SELECT (col1, col2) ON TABLE my_table TO ROLE analyst;",
+      "group": "Security",
+      "difficulty": "medium",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "176e2c59"
+    },
+    {
+      "q": "What is the Search Optimization Service in Snowflake?",
+      "a": "An optional, paid table-level service that builds a search access path for selective equality and range queries on high-cardinality columns. Particularly useful for queries like WHERE id = 'some-uuid' that would otherwise scan many micro-partitions.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "56bf3414"
+    },
+    {
+      "q": "What is a Query Profile in Snowflake?",
+      "a": "A graphical execution plan available in Snowsight showing each operator in the query, how long it took, rows processed, and bytes scanned. Key things to look for: spill to disk, large CartesianJoin, exploding joins, and which step is the bottleneck.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "d1ef03b3"
+    },
+    {
+      "q": "When should you increase Virtual Warehouse size vs. add more clusters?",
+      "a": "Increase size (scale up) when individual queries are slow — they need more CPU/memory per query. Add clusters (scale out) when many users are queued and individual query speed is fine — they need more concurrent capacity.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "41ff2409"
+    },
+    {
+      "q": "What is warehouse query queuing in Snowflake?",
+      "a": "When a single-cluster warehouse is at full concurrency, incoming queries queue. In Snowsight you can see queue time in the query history. Solutions: scale up the warehouse, enable multi-cluster, or route query types to separate warehouses.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "d6860429"
+    },
+    {
+      "q": "What is a Snowflake Resource Monitor and how does it help cost control?",
+      "a": "A Resource Monitor tracks credit usage by one or more virtual warehouses against a quota. When the quota reaches a threshold (e.g., 90%), it can notify, suspend, or immediately suspend the warehouse. Prevents unexpected runaway costs.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "9b4c367c"
+    },
+    {
+      "q": "What is database replication in Snowflake?",
+      "a": "A feature that replicates a database (or account objects) from a primary account to one or more secondary accounts in different regions or cloud providers. Used for read-scale, disaster recovery, and cross-region data sharing.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "Snowflake Core",
+      "id": "5ee87e57"
+    },
+    {
+      "q": "What is a Snowflake Failover Group?",
+      "a": "A group of account objects (databases, integrations, warehouses) that can be failed over together from a primary to a secondary account. On failover, the secondary becomes the new primary and handles reads and writes.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "Snowflake Core",
+      "id": "ce16e9a4"
+    },
+    {
+      "q": "What separates Snowflake's architecture from shared-disk and shared-nothing architectures?",
+      "a": "Snowflake uses a hybrid: storage is shared (centralised cloud object storage accessed by all compute) like shared-disk, but compute nodes (virtual warehouses) are independent MPP clusters that don't share memory or CPU, like shared-nothing. This gives both storage elasticity and compute isolation.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "119935c5"
+    },
+    {
+      "q": "Can multiple virtual warehouses access the same data simultaneously in Snowflake?",
+      "a": "Yes. Because storage and compute are decoupled, any number of virtual warehouses can read from the same tables concurrently without contention. Each warehouse has its own local disk cache, but underlying storage is shared.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "35f63f6c"
+    },
+    {
+      "q": "What happens to the local disk (data) cache when a virtual warehouse is suspended?",
+      "a": "It is lost. The cache is stored on the warehouse's local SSDs; suspension deallocates those resources. When the warehouse resumes, the cache starts empty and is rebuilt as queries are executed.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "bf82304c"
+    },
+    {
+      "q": "What is the maximum Time Travel retention for Enterprise edition?",
+      "a": "90 days for permanent tables. Standard edition is limited to 1 day. Temporary and transient tables are limited to 0 or 1 day regardless of edition.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "d300e017"
+    },
+    {
+      "q": "What is the Fail-Safe period and who can access data during it?",
+      "a": "7 days, non-configurable, beginning after the Time Travel window closes. Only Snowflake Support can recover data during Fail-Safe — it is not user-accessible. It exists as an emergency recovery measure, not a routine tool.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "52fae99e"
+    },
+    {
+      "q": "What is the purpose of the 60-second minimum warehouse billing?",
+      "a": "Warehouses are billed for at least 60 seconds each time they start (resume or initial start). After the first 60 seconds, billing is per-second. This means very short queries benefit from keeping warehouses running (or using Snowpark-optimised warehouses with different billing).",
+      "group": "Domain 1: Architecture",
+      "difficulty": "hard",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "326c68bf"
+    },
+    {
+      "q": "What are the scaling modes for a multi-cluster warehouse?",
+      "a": "Auto-scale mode — clusters spin up when queries queue and shut down when load drops (recommended for variable concurrency). Maximised mode — all clusters run at all times (for consistently high concurrency). You set min and max cluster counts.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "hard",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "26d7c949"
+    },
+    {
+      "q": "Which Snowflake edition supports multi-cluster virtual warehouses?",
+      "a": "Enterprise edition and above (Enterprise, Business Critical, VPS). Standard edition supports only single-cluster warehouses.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "eaaf5bfb"
+    },
+    {
+      "q": "What is a Snowflake account and how does it differ from a database?",
+      "a": "An account is the top-level entity — it represents a Snowflake subscription tied to a cloud provider and region. It contains all databases, warehouses, users, roles, and other objects. A database is an object within an account that organises schemas and their tables.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "easy",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "d8d77170"
+    },
+    {
+      "q": "How does Snowflake combine RBAC and DAC?",
+      "a": "Snowflake uses RBAC as the primary model (privileges granted to roles, roles granted to users). DAC is layered on top: every object has an owner role, and that role can grant privileges on the object to other roles. The combination is called DAC + RBAC.",
+      "group": "Domain 2: Security",
+      "difficulty": "medium",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "a2f5c107"
+    },
+    {
+      "q": "What is the difference between SECURITYADMIN and USERADMIN?",
+      "a": "USERADMIN creates and manages users and roles only. SECURITYADMIN inherits USERADMIN's privileges AND can GRANT/REVOKE any privilege on any object in the account — making it effectively a security superuser.",
+      "group": "Domain 2: Security",
+      "difficulty": "medium",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "56df3cdc"
+    },
+    {
+      "q": "What is Federated Authentication / SSO in Snowflake?",
+      "a": "Allows users to log in to Snowflake using an external Identity Provider (e.g., Okta, Azure AD) via SAML 2.0. Snowflake validates the SAML assertion rather than an internal password. MFA can be enforced by the IdP.",
+      "group": "Domain 2: Security",
+      "difficulty": "medium",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "03d77dcc"
+    },
+    {
+      "q": "What is key-pair authentication in Snowflake?",
+      "a": "An alternative to password-based authentication where the user authenticates with a private RSA key. Used with programmatic clients (Python, JDBC, ODBC). The public key is registered with the user in Snowflake; the private key stays client-side.",
+      "group": "Domain 2: Security",
+      "difficulty": "hard",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "1e5fcb46"
+    },
+    {
+      "q": "What encryption does Snowflake apply by default?",
+      "a": "AES-256 for data at rest, TLS 1.2+ for data in transit. Encryption is automatic and transparent — all data in Snowflake's storage layer is encrypted using a hierarchy of keys managed by Snowflake.",
+      "group": "Domain 2: Security",
+      "difficulty": "medium",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "7b17859e"
+    },
+    {
+      "q": "What are Object Tags in Snowflake and how do they relate to governance?",
+      "a": "String key-value pairs that can be attached to Snowflake objects (tables, columns, warehouses). Used for data classification (e.g., sensitivity: 'PII'), cost tracking, and as selectors for masking policies or row access policies.",
+      "group": "Domain 2: Security",
+      "difficulty": "hard",
+      "category": "Domain 2: Security",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "df75f284"
+    },
+    {
+      "q": "In what order does Snowflake check caches before going to cloud storage?",
+      "a": "1. Result cache (Cloud Services Layer) — if the exact same query was run recently and data hasn't changed, return the cached result immediately. 2. Local disk cache (warehouse SSD) — if the required micro-partitions are already in the warehouse's cache. 3. Cloud storage — fetch the micro-partitions from S3/GCS/Azure.",
+      "group": "Domain 3: Performance",
+      "difficulty": "hard",
+      "category": "Domain 3: Performance",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "d91d20b0"
+    },
+    {
+      "q": "What metrics in a Query Profile indicate that a warehouse is undersized?",
+      "a": "Spill to local storage and spill to remote storage — these appear as distinct operations in the profile. Remote spill is the worst indicator. Also watch for long Sort or Aggregate steps with high bytes spilled.",
+      "group": "Domain 3: Performance",
+      "difficulty": "hard",
+      "category": "Domain 3: Performance",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "28b0b7c7"
+    },
+    {
+      "q": "What is the Search Optimization Service and what types of queries benefit most?",
+      "a": "A paid table service that builds a secondary search access path for point lookups on high-cardinality columns (e.g., WHERE id = 'uuid'). Queries with highly selective equality/range predicates on non-clustered columns benefit most. Analytic queries with range scans on clustered keys generally don't need it.",
+      "group": "Domain 3: Performance",
+      "difficulty": "hard",
+      "category": "Domain 3: Performance",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "e3be1ebf"
+    },
+    {
+      "q": "How does warehouse size affect performance for a complex GROUP BY query?",
+      "a": "A larger warehouse has more CPU cores and more memory per node. For a memory-intensive GROUP BY on a large dataset, a larger size prevents spilling and completes the aggregation faster. However, for small queries the query may already be fast at XS — upgrading doesn't help.",
+      "group": "Domain 3: Performance",
+      "difficulty": "medium",
+      "category": "Domain 3: Performance",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "a5dcb3d7"
+    },
+    {
+      "q": "What file formats can COPY INTO load natively?",
+      "a": "CSV, JSON, Avro, ORC, Parquet, and XML. Snowflake also supports gzip, Bzip2, Brotli, Zstandard, Deflate, and Raw Deflate compression on most formats.",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "medium",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "eea135c1"
+    },
+    {
+      "q": "What does VALIDATION_MODE in COPY INTO do?",
+      "a": "Validates the files without loading them. RETURN_ERRORS returns all rows that would fail. RETURN_N_ROWS returns the first N rows that would be loaded. Useful for checking file format issues before committing a load.",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "medium",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "8d42169b"
+    },
+    {
+      "q": "What does ON_ERROR = 'SKIP_FILE' do in COPY INTO?",
+      "a": "If any row in a file causes an error, the entire file is skipped (not loaded). Other files in the COPY operation continue. Compare with CONTINUE (skip only the bad row) and ABORT_STATEMENT (stop the whole COPY).",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "hard",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "3697b657"
+    },
+    {
+      "q": "What is the PURGE option in COPY INTO?",
+      "a": "When PURGE = TRUE, Snowflake automatically removes the source files from the stage after a successful load. Reduces storage cost and simplifies pipeline cleanup.",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "medium",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "3ce87aaf"
+    },
+    {
+      "q": "What is a file format object in Snowflake?",
+      "a": "A named, reusable object (CREATE FILE FORMAT) that stores file format settings (type, delimiter, null string, skip_header, etc.). Referenced in COPY INTO and stage definitions by name — avoids repeating settings in every COPY statement.",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "easy",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "82af29ac"
+    },
+    {
+      "q": "What triggers Snowpipe to load a new file?",
+      "a": "Either: (1) an event notification from cloud storage (SQS for S3, Azure Event Grid, GCS Pub/Sub) configured to fire when a file lands — AUTO_INGEST=TRUE; or (2) a REST API call to Snowpipe's insertFiles endpoint that explicitly notifies Snowpipe of new files.",
+      "group": "Domain 4: Data Loading",
+      "difficulty": "hard",
+      "category": "Domain 4: Data Loading",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "df278fd9"
+    },
+    {
+      "q": "What SQL languages/constructs can Snowflake UDFs be written in?",
+      "a": "JavaScript, Python, Java, Scala, and SQL. Table UDFs (UDTFs) return a table instead of a scalar. UDFs are called in SQL like built-in functions.",
+      "group": "Domain 5: Transformations",
+      "difficulty": "medium",
+      "category": "Domain 5: Transformations",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "5861175e"
+    },
+    {
+      "q": "What is a Snowflake Stored Procedure and how does it differ from a UDF?",
+      "a": "A stored procedure encapsulates procedural logic (loops, conditionals, DDL, DML). Unlike UDFs, stored procedures are called with CALL (not in SELECT), can return a single value or nothing, and can run DDL statements. Written in JavaScript, Python, Java, Scala, or Snowflake Scripting (SQL).",
+      "group": "Domain 5: Transformations",
+      "difficulty": "medium",
+      "category": "Domain 5: Transformations",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "357378f0"
+    },
+    {
+      "q": "What does the QUALIFY clause do in Snowflake SQL?",
+      "a": "Filters rows after window functions are evaluated — analogous to HAVING for aggregates. Eliminates the need for a wrapping subquery: SELECT ..., ROW_NUMBER() OVER (...) AS rn FROM t QUALIFY rn = 1;",
+      "group": "Domain 5: Transformations",
+      "difficulty": "medium",
+      "category": "Domain 5: Transformations",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "4e15558b"
+    },
+    {
+      "q": "How do you query a specific index in a JSON array stored in a VARIANT column?",
+      "a": "Use bracket notation: column:array[0] for the first element, column:array[1] for the second, etc. You can chain: src:items[0]:product_id::INT to get the product_id of the first item and cast it to INT.",
+      "group": "Domain 5: Transformations",
+      "difficulty": "medium",
+      "category": "Domain 5: Transformations",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "ffdc5c13"
+    },
+    {
+      "q": "What objects can be included in a Snowflake Share?",
+      "a": "Tables, external tables, secure views, secure materialised views, and secure UDFs. Standard (non-secure) views are not shareable. The consumer mounts the share as a read-only database in their account.",
+      "group": "Domain 6: Data Sharing",
+      "difficulty": "medium",
+      "category": "Domain 6: Data Sharing",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "fd3c37a3"
+    },
+    {
+      "q": "What is the difference between a Data Exchange and the Snowflake Marketplace?",
+      "a": "The Snowflake Marketplace is a public, global listing where any Snowflake account can publish or discover data products. A Data Exchange is a private, invitation-only sharing hub — organisations create their own exchange for a defined group of partners or internal business units.",
+      "group": "Domain 6: Data Sharing",
+      "difficulty": "hard",
+      "category": "Domain 6: Data Sharing",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "ec37f5d9"
+    },
+    {
+      "q": "Does data sharing in Snowflake involve copying data between accounts?",
+      "a": "No. Secure Data Sharing is a live pointer to the provider's data stored in their account. The consumer's virtual warehouse queries the provider's micro-partitions directly — there is no ETL or duplication. Data is always current.",
+      "group": "Domain 6: Data Sharing",
+      "difficulty": "medium",
+      "category": "Domain 6: Data Sharing",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "3b16a076"
+    },
+    {
+      "q": "What is database replication in Snowflake used for?",
+      "a": "Replicating a Snowflake database to a secondary account in a different region or cloud provider. Used for: disaster recovery / failover, read-scale distribution, and moving data closer to users in other geographies.",
+      "group": "Domain 6: Data Sharing",
+      "difficulty": "hard",
+      "category": "Domain 6: Data Sharing",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "0be8493a"
+    },
+    {
+      "q": "What is the difference between Snowpipe and COPY INTO for continuous ingestion?",
+      "a": "COPY INTO runs in a user-managed warehouse on demand or on schedule — suited for large, batch loads. Snowpipe uses Snowflake-managed (serverless) compute and triggers automatically when files arrive — suited for near-real-time micro-batch ingestion with low operational overhead.",
+      "group": "Data Ingestion",
+      "difficulty": "medium",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "1f976e76"
+    },
+    {
+      "q": "How does Snowpipe handle duplicate files?",
+      "a": "Snowpipe tracks file metadata (path + ETag) and skips files that were already loaded within the past 64 days. To force reload a file, you must either rename it, change its content (changing ETag), or use the COPY INTO command with FORCE=TRUE.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "e058de13"
+    },
+    {
+      "q": "What is the Kafka Connector for Snowflake and how does it ingest data?",
+      "a": "A Kafka Connect plugin that continuously reads messages from Kafka topics and writes them to Snowflake tables (via Snowpipe or INSERT). Each Kafka record becomes a VARIANT row in a Snowflake table. Supports exactly-once delivery using offset tracking.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "baa9c169"
+    },
+    {
+      "q": "What is an append-only stream and when should you use it?",
+      "a": "A stream type that only captures INSERT operations — it ignores UPDATEs and DELETEs. More storage-efficient than a standard stream because the change tracking overhead is lower. Use it on insert-only source tables such as event logs, audit tables, or Snowpipe landing tables.",
+      "group": "Streams & Tasks",
+      "difficulty": "medium",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "c5568dbd"
+    },
+    {
+      "q": "How do you build a task DAG in Snowflake?",
+      "a": "Create a root task with a CRON schedule and child tasks with AFTER <parent_task>. Child tasks run when their parent succeeds. Use ALTER TASK ... RESUME to activate each task (root last). The DAG is visualised in Snowsight under the task definition.",
+      "group": "Streams & Tasks",
+      "difficulty": "medium",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "6697f570"
+    },
+    {
+      "q": "What is the maximum number of child tasks per root task (task DAG) in Snowflake?",
+      "a": "1,000 tasks in a single DAG (as of current limits). Root task can have multiple direct children, each of which can have their own children.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "3cfce3b9"
+    },
+    {
+      "q": "What is a Snowflake Dynamic Table and how does it differ from a stream+task pipeline?",
+      "a": "A Dynamic Table is a declarative, automatically refreshed materialisation: you write the transformation SQL; Snowflake tracks dependencies, determines changed data, and refreshes it. A stream+task pipeline is imperative: you write the CDC logic yourself. Dynamic Tables simplify pipeline code but offer less control over exactly when/how changes are applied.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "e8bd81cc"
+    },
+    {
+      "q": "What is TARGET_LAG in a Dynamic Table?",
+      "a": "Specifies the acceptable freshness lag: how far behind the Dynamic Table can be relative to its source data. Snowflake refreshes the table at a rate needed to stay within this lag. Setting 'DOWNSTREAM' means the lag is inherited from downstream Dynamic Tables.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "983e6667"
+    },
+    {
+      "q": "What is the difference between a Standard stream and an Insert-only stream on an external table?",
+      "a": "Standard streams on regular tables capture INSERT/UPDATE/DELETE. External table streams are insert-only by nature (external files are immutable) — they track which new files have been added to the external stage, enabling incremental processing of data-lake files.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "23ba8a90"
+    },
+    {
+      "q": "How do you implement idempotent incremental loads in Snowflake using streams?",
+      "a": "Use MERGE (not INSERT) when consuming the stream: match on a primary key, update matched rows, insert new rows. Because MERGE is atomic and streams track consumed changes, re-running the task will not double-insert — the stream will be empty unless new changes have arrived.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "df962cc9"
+    },
+    {
+      "q": "What is COPY INTO <location> (unloading) and what formats does it support?",
+      "a": "Exports query results or table data to a Snowflake internal stage or external cloud storage. Supports CSV, JSON, Parquet. Options include HEADER (add column names), PARTITION BY (create sub-folders), MAX_FILE_SIZE, and compression.",
+      "group": "Data Loading",
+      "difficulty": "medium",
+      "category": "Data Loading",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "c1b3ae12"
+    },
+    {
+      "q": "What is the Semi-structured schema detection feature in Snowflake?",
+      "a": "INFER_SCHEMA() and the related column definitions in COPY INTO auto-detect column names and types from staged Parquet, Avro, or ORC files. You can use CREATE TABLE ... USING TEMPLATE (SELECT ARRAY_AGG(OBJECT_CONSTRUCT(*)) FROM TABLE(INFER_SCHEMA(...))) to auto-create a matching table.",
+      "group": "Semi-Structured",
+      "difficulty": "hard",
+      "category": "Semi-Structured",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "34e99630"
+    }
+  ]
+}

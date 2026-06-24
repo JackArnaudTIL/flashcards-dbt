@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You want to use a 'Macro' to define a 'Column Alias'. Logic?",
+      "a": "`select col as {{ my_macro(\"col\") }}`\n\n**Watch out:** `select col as my_macro(\"col\")`; macros must be wrapped in curly braces to be executed.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c27f90cd"
+    },
+    {
+      "q": "You want to check if a model is an 'Incremental' build from a macro. How?",
+      "a": "`{{ is_incremental() }}`\n\n**Watch out:** `{% if model.config.materialized == \"incremental\" %}`; this checks the config, but doesn't check if the table actually exists and can be updated.",
+      "group": "Execution",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "9b40b83e"
+    },
+    {
+      "q": "You want to get the 'Full Path' of a model file. Property?",
+      "a": "`model.original_file_path`\n\n**Watch out:** `model.path`; path is the relative path from the models folder, whereas original_file_path is the full project path.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "354ac9dc"
+    },
+    {
+      "q": "You want to 'Sort' a list in Jinja. Filter?",
+      "a": "`{{ my_list | sort }}`\n\n**Watch out:** `{{ my_list.sort() }}`; remember, Jinja uses pipes for almost all list/string operations.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f3448da3"
+    },
+    {
+      "q": "You want to see the 'Compiled SQL' for a Singular Test. Where?",
+      "a": "`target/compiled/[project]/tests/`\n\n**Watch out:** `target/run/tests/`; tests don't have run artifacts in the same way models do.",
+      "group": "Debugging",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "18373e61"
+    },
+    {
+      "q": "You want to use a 'Macro' to create a 'User' in the warehouse. Command?",
+      "a": "Use `dbt run-operation my_create_user_macro`\n\n**Watch out:** Putting the macro call in a model; models should only perform data transformations, not DDL administration.",
+      "group": "Execution",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b17dce9c"
+    },
+    {
+      "q": "You want to get the 'Description' of a model from a macro. Property?",
+      "a": "`model.description`\n\n**Watch out:** `model.config.description`; descriptions are nodes properties, not config properties.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "9ad29984"
+    },
+    {
+      "q": "You want to check if dbt is running in 'Debug' mode. Logic?",
+      "a": "`{% if flags.DEBUG %}`\n\n**Watch out:** `{% if debug %}`; remember to use the `flags` object for CLI-level states.",
+      "group": "Execution",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "fb6cd2ed"
+    },
+    {
+      "q": "You want to get the 'Profile' name being used. Property?",
+      "a": "`target.profile_name`\n\n**Watch out:** `target.name`; name is the *target* (e.g. dev), profile_name is the *group* (e.g. snowflake_prod).",
+      "group": "Targeting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e8200331"
+    },
+    {
+      "q": "You want to 'Capitalize' only the first letter of a string. Filter?",
+      "a": "`{{ my_string | capitalize }}`\n\n**Watch out:** `{{ my_string | upper }}`; upper will capitalize every single letter.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "36f12bce"
+    },
+    {
+      "q": "You want to see the 'Arguments' passed to a macro during failure. How?",
+      "a": "Use `{{ log(...) }}` at the start of the macro to print all input arguments\n\n**Watch out:** Checking the compiled SQL; arguments aren't visible in the output unless they are explicitly selected.",
+      "group": "Debugging",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d77c4dce"
+    },
+    {
+      "q": "You want to get the 'Project Name' of the root project. Variable?",
+      "a": "`{{ project_name }}`\n\n**Watch out:** `{{ package_name }}`; project_name always refers to the current executing project.",
+      "group": "Variables",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "48912c28"
+    },
+    {
+      "q": "You want to use a 'Macro' to determine the 'Column Order' of a table. Logic?",
+      "a": "A list of column names and a loop to generate the `SELECT` list\n\n**Watch out:** `SELECT *`; this relies on the source order, which dbt cannot guarantee.",
+      "group": "Control Flow",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "14ba1e59"
+    },
+    {
+      "q": "You want to get the 'Schema' of a model's 'Alias'. Property?",
+      "a": "`model.schema`\n\n**Watch out:** `model.alias.schema`; alias is just a string, it doesn't have its own schema property.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "20956e8f"
+    },
+    {
+      "q": "You want to check if a 'Variable' is a List or a String. Filter?",
+      "a": "`{% if my_var is iterable and my_var is not string %}`\n\n**Watch out:** `{% if my_var is list %}`; Jinja doesn`t have a native `is list` test (dbt does in some versions, but `iterable' is safer).",
+      "group": "Syntax",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "fbad49c3"
+    },
+    {
+      "q": "You want to use 'Jinja' to calculate a mathematical value for a column. Syntax?",
+      "a": "`select {{ 1 + 1 }} as two`\n\n**Watch out:** `select 1 + 1 as two`; the second version is calculated by the warehouse, the first is calculated by dbt during compilation.",
+      "group": "Execution",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "114457d1"
+    },
+    {
+      "q": "You want to find all 'Seeds' in the project. Object?",
+      "a": "Loop through `graph.nodes` and filter for `resource_type: seed`\n\n**Watch out:** `graph.seeds`; seeds are stored under the `nodes` key in the manifest.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cd2039c7"
+    },
+    {
+      "q": "You want to see 'Jinja' errors in the dbt terminal. What is the usual cause?",
+      "a": "A syntax mistake like a missing `endif` or a misspelled macro name\n\n**Watch out:** A warehouse-level `Syntax Error`; if Jinja fails, the warehouse never even receives the query.",
+      "group": "Debugging",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1c60b946"
+    },
+    {
+      "q": "Your CI job builds 500 models every PR, taking 30 minutes. How do you optimize this?",
+      "a": "Use `state:modified+` and defer to the production manifest\n\n**Watch out:** Using `dbt run --select tag:ci`; manual tagging misses downstream dependencies affected by logic changes.",
+      "group": "CI/CD",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8fee8638"
+    },
+    {
+      "q": "You need to use an API Key in a model without committing it to Git. How?",
+      "a": "Define a dbt Cloud Environment Variable (DBT_ENV_...) and use `{{ env_var(...) }}`\n\n**Watch out:** Putting the key in `dbt_project.yml` vars; this exposes the secret to everyone with repo access.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "405c1a92"
+    },
+    {
+      "q": "You want a 'Marketing' job to trigger only after 'Core' finishes. Configuration?",
+      "a": "Use `Job Chaining` in dbt Cloud Job settings\n\n**Watch out:** Scheduling both at the same time; if the first job is delayed, the second runs on stale data.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4f47cffe"
+    },
+    {
+      "q": "You see 'Model not found' in CI for a parent model you didn't touch. Why?",
+      "a": "Enable `Defer to Production` in CI job settings\n\n**Watch out:** Adding the parent model to the PR manually; this wastes compute and pollutes the branch code.",
+      "group": "CI/CD",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ca451b08"
+    },
+    {
+      "q": "You want a 'Full Refresh' on Sundays, but standard 'Incremental' daily. How?",
+      "a": "Create two separate dbt Cloud jobs with different schedules and CLI commands\n\n**Watch out:** Writing Jinja `if` logic to check the day; managing execution at the job level is cleaner and more visible.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "76a7999f"
+    },
+    {
+      "q": "You need to rotate the DB password used by dbt Cloud. Where is this updated?",
+      "a": "In dbt Cloud `Credentials` under the Environment settings\n\n**Watch out:** Updating `profiles.yml` in Git; dbt Cloud ignores local profiles in favor of UI-managed credentials.",
+      "group": "Security",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "db0285e6"
+    },
+    {
+      "q": "You want to block a PR merge if a dbt test fails. How?",
+      "a": "Set dbt Cloud CI as a `Required Check` in your Git provider settings\n\n**Watch out:** Relying on developers to manually check the dbt UI; without a block, bad data will eventually reach prod.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f9fb0846"
+    },
+    {
+      "q": "A dbt Cloud job fails with 'Git Clone Failed'. First check?",
+      "a": "Verify the PAT or Deploy Key permissions in your Git provider\n\n**Watch out:** Re-running the job immediately; Git auth errors require credential updates, not just retries.",
+      "group": "Troubleshooting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ff4e835e"
+    },
+    {
+      "q": "You want to run only models that 'Failed' in the previous run. Command?",
+      "a": "`dbt build --select state:failed --state path/to/artifacts`\n\n**Watch out:** `dbt run`; run won't include the tests that might have been the reason for the failure.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3c9ce3fd"
+    },
+    {
+      "q": "You want 'Dev' to build into 'dev_schema' and 'Prod' into 'prod_schema'. How?",
+      "a": "Create separate `Environments` in dbt Cloud and set the target schema for each\n\n**Watch out:** Hardcoding schema names in SQL; this prevents the code from being portable across targets.",
+      "group": "Environments",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4a2268dd"
+    },
+    {
+      "q": "You want to trigger a dbt job from Airflow. How?",
+      "a": "Use the dbt Cloud Administrative API\n\n**Watch out:** Using `dbt run` in a BashOperator; dbt Cloud jobs must be triggered via API to run on Cloud workers.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cc96fd51"
+    },
+    {
+      "q": "BI tool shows stale data but dbt job says 'Success'. Troubleshooting?",
+      "a": "Check `Source Freshness` logs; the run might have finished but used data that was already old\n\n**Watch out:** Assuming `Success` means `Live`; success only means the SQL executed without errors.",
+      "group": "Freshness",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cd561d07"
+    },
+    {
+      "q": "You want to build and skip 'Unit Tests' to save CI time. Command?",
+      "a": "`dbt build --exclude resource_type:unit_test`\n\n**Watch out:** `dbt build --skip-unit-tests`; this flag does not exist in the dbt CLI.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c556d381"
+    },
+    {
+      "q": "Ensure 'Marts' only build if 'Staging' tests pass. Command?",
+      "a": "`dbt build`\n\n**Watch out:** `dbt run`; run does not execute tests, allowing Marts to build even if upstream data is corrupted.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b680a1f7"
+    },
+    {
+      "q": "Hitting concurrency limits in Snowflake. How to limit dbt Cloud?",
+      "a": "Reduce the `Threads` setting in the Environment connection\n\n**Watch out:** Scheduling fewer jobs; a single job with high threads can still hit the limit.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5592743a"
+    },
+    {
+      "q": "See 'Compiled SQL' for a production failure. Where?",
+      "a": "In the Cloud `Run History` details, under the `Logs` or `Artifacts` tab\n\n**Watch out:** Checking local `target/` files; local artifacts do not reflect production run states.",
+      "group": "Troubleshooting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2fc2b368"
+    },
+    {
+      "q": "Run a job using a 'Custom Branch' for testing. Configuration?",
+      "a": "Change the `Git Branch` in the Job settings UI\n\n**Watch out:** Merging to `main` just to test in dbt Cloud; this risks breaking production code prematurely.",
+      "group": "Git Workflow",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "25527d31"
+    },
+    {
+      "q": "Receive Slack alerts only on 'Failure'. How?",
+      "a": "Configure `Notifications` in Job settings for `On Failure`\n\n**Watch out:** Setting `On Run` alerts; this causes alert fatigue when successful jobs flood the channel.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1190ed4d"
+    },
+    {
+      "q": "Moving Core to Cloud. What happens to local 'profiles.yml'?",
+      "a": "Stop using it for Cloud; Cloud manages connections via the UI/Environments\n\n**Watch out:** Committing `profiles.yml` to Git; this is a security risk and ignored by dbt Cloud anyway.",
+      "group": "Environments",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1bf6db32"
+    },
+    {
+      "q": "Run models tagged 'finance' that were modified. Command?",
+      "a": "`dbt run --select state:modified,tag:finance`\n\n**Watch out:** Using a space instead of a comma; space is `OR`, comma is `AND` (Intersection).",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "871e7fbb"
+    },
+    {
+      "q": "Perform a 'Blue/Green' deployment swap. Process?",
+      "a": "Use a final `run-operation` in the job to rename the staging schema to prod\n\n**Watch out:** Manually renaming tables in the warehouse; this is prone to error and timing issues.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "beca6220"
+    },
+    {
+      "q": "You want to run 500 tests in parallel. Configuration?",
+      "a": "Increase `Threads` in the connection settings\n\n**Watch out:** Searching for a `--parallel` flag; dbt is multi-threaded by default based on thread count.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "34e305ef"
+    },
+    {
+      "q": "Build model only if yesterday's build was a success. How?",
+      "a": "Use `state:failed` selection against the previous manifest to identify the need for rebuilds\n\n**Watch out:** Searching for a `persist_status` config in YAML.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "a03e6969"
+    },
+    {
+      "q": "Run dbt Cloud on an 'Isolated' network. Feature?",
+      "a": "dbt Cloud `Private Link`\n\n**Watch out:** Manually whitelisting IPs; hard to maintain and less secure for enterprise data.",
+      "group": "Security",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c57382b3"
+    },
+    {
+      "q": "See which user triggered a run. Where?",
+      "a": "In the `Run Details` sidebar in dbt Cloud\n\n**Watch out:** Checking warehouse logs; they usually only show the Service Account name.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "946b7211"
+    },
+    {
+      "q": "Fail the entire job immediately if one model fails. Flag?",
+      "a": "`--fail-fast`\n\n**Watch out:** Thinking this is default; default behavior is to finish all independent DAG branches.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "39d61ca8"
+    },
+    {
+      "q": "Use different dbt 'versions' for different jobs. Where?",
+      "a": "In the `Environment` settings dropdown in dbt Cloud\n\n**Watch out:** Setting `require-dbt-version` in YAML; this restricts the run but doesn`t change the environment`s version.",
+      "group": "Environments",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "84125cc0"
+    },
+    {
+      "q": "Run all models in the 'Intermediate' folder. Command?",
+      "a": "`dbt run --select path:models/intermediate`\n\n**Watch out:** `dbt run --select intermediate`; folder paths require the `path:` prefix or glob syntax.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ef711ac3"
+    },
+    {
+      "q": "You want to build only models that have been 'modified' but NOT their children. Command?",
+      "a": "`dbt run --select state:modified`\n\n**Watch out:** `dbt run --select state:modified+`; the `+` suffix adds all downstream children.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "6d63d23e"
+    },
+    {
+      "q": "Capture 'Freshness' metrics for BI tools. Step?",
+      "a": "Add a `dbt source freshness` step to the Cloud job before the build\n\n**Watch out:** Assuming `dbt build` checks freshness automatically; it is a separate command.",
+      "group": "Freshness",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5aee12c7"
+    },
+    {
+      "q": "PR merge takes 1 hour due to docs generation. Optimization?",
+      "a": "Disable `Generate Docs` for CI jobs; documentation is only critical for production runs\n\n**Watch out:** Reducing the number of models; docs generation is a metadata task that scales with project size.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2a2aad8e"
+    },
+    {
+      "q": "Run only models with 'Enforced Contracts'. Selection?",
+      "a": "`dbt ls --select config.contract.enforced:true`\n\n**Watch out:** Thinking selectors only work for tags or paths.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "dbb141bc"
+    },
+    {
+      "q": "Run a job every 15 minutes. How?",
+      "a": "Set the `Interval` or `Cron` trigger in the Job settings\n\n**Watch out:** Scheduling logic in `dbt_project.yml`; project files only contain transformation logic.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2e2583cc"
+    },
+    {
+      "q": "You need a personal schema (dbt_jsmith) for local dev. Where?",
+      "a": "In `profiles.yml` under the `dev` target\n\n**Watch out:** In `dbt_project.yml`; project files should not store developer-specific schema names.",
+      "group": "Environments",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "551e188d"
+    },
+    {
+      "q": "Run models that were 'Skipped' in the last run. Selection?",
+      "a": "Use `state:failed` selection; skipped models are children of failed models\n\n**Watch out:** Searching for `state:skipped`; `failed` is the correct selector for the broken DAG path.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "508d4fa5"
+    },
+    {
+      "q": "Pass an environment variable at runtime via CLI. Command?",
+      "a": "`dbt run --vars `{\"my_var\": \"value\"}''\n\n**Watch out:** Setting the variable in `profiles.yml`; profiles are for connection info, not model variables.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "daf16f6a"
+    },
+    {
+      "q": "Build all models children of a specific Source. Command?",
+      "a": "`dbt build --select source:raw_data.orders+`\n\n**Watch out:** `dbt build --select +source:...`; the prefix selects parents, and sources have no parents.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d4391ded"
+    },
+    {
+      "q": "Skip Staging models if they already exist in the warehouse. Possible?",
+      "a": "No, `dbt run` always builds unless using `Incremental` logic\n\n**Watch out:** Searching for a `--skip-if-exists` flag.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "da84150c"
+    },
+    {
+      "q": "Run all models modified AND tagged 'finance'. Command?",
+      "a": "`dbt run --select state:modified,tag:finance`\n\n**Watch out:** Space instead of comma; space is `Union`, comma is `Intersection`.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ce4293b6"
+    },
+    {
+      "q": "See which models are 'Public' in dbt Explorer. How?",
+      "a": "Filter the Explorer list by `Access` level\n\n**Watch out:** Looking for a `public` tag; access is a separate config property.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "32d2e9ba"
+    },
+    {
+      "q": "PR merge blocks because of 'Docs Generate' failure. Why?",
+      "a": "Check for invalid doc blocks or Markdown syntax in the `.md` files\n\n**Watch out:** Troubleshooting the SQL; doc failures are usually metadata/YAML related.",
+      "group": "Troubleshooting",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "24b72246"
+    },
+    {
+      "q": "You want to run all models that have a 'description' in YAML. Selection?",
+      "a": "`dbt run --select config.description:*`\n\n**Watch out:** Thinking selectors only work for physical attributes like tags.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d89afe3f"
+    }
+  ]
+}

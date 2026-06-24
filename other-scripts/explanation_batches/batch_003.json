@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You want to use a 'Variable' in the 'dbt_project.yml' file. Syntax?",
+      "a": "`{{ var(\"my_var\") }}`\n\n**Watch out:** Using quotes inside the double quotes (e.g. \"{{ var(\"my_var\") }}\"); this causes a YAML parsing error.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b60956a0"
+    },
+    {
+      "q": "You want to see which models are 'Public' in dbt Explorer. How?",
+      "a": "Filter the Explorer view by `Access` level\n\n**Watch out:** Looking for a `public` tag; access is a separate configuration property, not a tag.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5678eb08"
+    },
+    {
+      "q": "You want to run all models that are NOT tagged 'pii'. Command?",
+      "a": "`dbt run --exclude tag:pii`\n\n**Watch out:** `dbt run --select ^tag:pii`; dbt does not use the caret for negation in selectors.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "38ecfe12"
+    },
+    {
+      "q": "You want to use a 'Macro' to generate the 'Alias' for every model. How?",
+      "a": "Override the `generate_alias_name` macro in your project\n\n**Watch out:** Editing the model config `alias` for every file; this is not scalable and hard to maintain.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "dab00e34"
+    },
+    {
+      "q": "You want to see 'Data Freshness' in the lineage graph. Requirement?",
+      "a": "You must have run `dbt source freshness` and be viewing the results in dbt Explorer\n\n**Watch out:** Assuming it's in the standard lineage; freshness is a separate metadata layer.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4982d1c3"
+    },
+    {
+      "q": "You want to run all models that are parents of 'fct_orders' AND children of 'stg_users'. Command?",
+      "a": "`dbt run --select +fct_orders,stg_users+`\n\n**Watch out:** `dbt run --select +fct_orders stg_users+`; space is UNION, comma is INTERSECTION.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "0bdeff01"
+    },
+    {
+      "q": "Your 'Seed' contains a date column that dbt is loading as a string. Fix?",
+      "a": "Set the column type to `date` or `timestamp` in the `dbt_project.yml` seed config\n\n**Watch out:** Changing the format in the CSV; warehouses are picky about date auto-detection from CSV strings.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d7a6f1b8"
+    },
+    {
+      "q": "You want to see the 'Status' of every model in the last run in the CLI. Command?",
+      "a": "`dbt ls --resource-type model --output json` (or just check the run log)\n\n**Watch out:** `dbt list status`; no such command exists.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "649b9e21"
+    },
+    {
+      "q": "You want to ensure that all 'Staging' models are never built as Tables. Where?",
+      "a": "In `dbt_project.yml` set materialized: view for the staging path\n\n**Watch out:** In the global config; this would prevent Marts from being Tables too.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b860c61c"
+    },
+    {
+      "q": "Your model is failing because of a 'Long Query' timeout in Snowflake. Architectural fix?",
+      "a": "Break the model into smaller `Intermediate` models and materialize them as Tables\n\n**Watch out:** Increasing the thread count; this will actually make the timeout more likely by competing for resources.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "7d9ce083"
+    },
+    {
+      "q": "You want to run a build and only run tests for models that 'failed' last time. Command?",
+      "a": "`dbt build --select state:failed`\n\n**Watch out:** `dbt test --select state:failed`; this only runs tests, it doesn't rebuild the failed models.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e8ec7b3b"
+    },
+    {
+      "q": "You want to use a 'Variable' that is defined in another project. How?",
+      "a": "Variables are project-scoped; you must define it in your project or pass it via CLI\n\n**Watch out:** Assuming `ref()` pulls variables from the upstream project.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "da88474b"
+    },
+    {
+      "q": "You want to see the 'Source code' of a macro in dbt docs. How?",
+      "a": "dbt Core docs do not show macro source; you must view it in the Git repo or IDE\n\n**Watch out:** Searching dbt Explorer for `Macro source`.",
+      "group": "Documentation",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c5cf0715"
+    },
+    {
+      "q": "You want to build a model that uses a 'Recursive CTE'. Requirement?",
+      "a": "You must use a `Table` materialization (on most warehouses) as Views often struggle with recursion limits\n\n**Watch out:** Using View materialization.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fad97d80"
+    },
+    {
+      "q": "You want to run all models that have NOT been modified. Command?",
+      "a": "`dbt run --exclude state:modified`\n\n**Watch out:** `dbt run --select !state:modified`; dbt uses the exclude flag for negative selection.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1f414c77"
+    },
+    {
+      "q": "You want to track 'Data Quality' scores in dbt Explorer. How?",
+      "a": "This is a feature of dbt Cloud's Explorer that aggregates test pass/fail rates\n\n**Watch out:** Looking for a `quality` tag in YAML.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bd9404f5"
+    },
+    {
+      "q": "Your 'Seed' load is failing because of a duplicated header in the CSV. Fix?",
+      "a": "Clean the CSV file to ensure all header names are unique\n\n**Watch out:** Trying to fix this in `dbt_project.yml`; seed configuration cannot resolve physical CSV structure issues.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "62fcba36"
+    },
+    {
+      "q": "You want to ensure that 'Finance' models are built into a specific warehouse. How?",
+      "a": "Set the `database` config for the finance folder in `dbt_project.yml`\n\n**Watch out:** Changing the profile; this affects the whole run, not just one folder.",
+      "group": "Configuration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "01e701f8"
+    },
+    {
+      "q": "Failing because of 'Long Query' timeout in Snowflake. Architectural fix?",
+      "a": "Break into smaller `Intermediate` models and materialize as Tables\n\n**Watch out:** Increasing thread count; competes for resources.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e252cc0e"
+    },
+    {
+      "q": "Build and only run tests for models that 'failed' last time. Command?",
+      "a": "`dbt build --select state:failed`\n\n**Watch out:** `dbt test --select state:failed`; doesn't rebuild failed models.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "17c40af9"
+    },
+    {
+      "q": "Use 'Variable' defined in another project. How?",
+      "a": "Variables are project-scoped; define in your project or pass via CLI\n\n**Watch out:** Assuming `ref()` pulls variables.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "74b20582"
+    },
+    {
+      "q": "See 'Source code' of a macro in dbt docs. How?",
+      "a": "Core docs do not show; view in Git repo or IDE\n\n**Watch out:** Searching dbt Explorer for `Macro source`.",
+      "group": "Documentation",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "74d67b40"
+    },
+    {
+      "q": "Build model that uses a 'Recursive CTE'. Requirement?",
+      "a": "Must use `Table` materialization (usually) as Views struggle with recursion limits\n\n**Watch out:** Using View materialization.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f060efde"
+    },
+    {
+      "q": "Track 'Data Quality' scores in dbt Explorer. How?",
+      "a": "Cloud's Explorer feature aggregates test pass/fail rates\n\n**Watch out:** Looking for a `quality` tag.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "faf046e7"
+    },
+    {
+      "q": "Seed load failing because of duplicated header in CSV. Fix?",
+      "a": "Clean CSV ensuring unique header names\n\n**Watch out:** Fixing in dbt_project.yml.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e78a371b"
+    },
+    {
+      "q": "Ensure 'Finance' models build into specific warehouse. How?",
+      "a": "Set `database` config for the finance folder in `dbt_project.yml`\n\n**Watch out:** Changing profile; affects whole run.",
+      "group": "Configuration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "cb8d19da"
+    },
+    {
+      "q": "Build and skip tests for models that didn't rebuild. Possible?",
+      "a": "No, `dbt build` runs all tests for selected models\n\n**Watch out:** Searching for --skip-tests flag.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f1bb5ec8"
+    },
+    {
+      "q": "Track 'GDPR' sensitive models. How?",
+      "a": "Use `meta` tag in YAML\n\n**Watch out:** Using `tags`; meta better for structured metadata.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2d38df1c"
+    },
+    {
+      "q": "Use 'Macro' defined in one specific project. How?",
+      "a": "Project-scoped; use `{{ my_project.my_macro() }}`\n\n**Watch out:** Using `{{ my_macro() }}` if name conflict.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "35144a3b"
+    },
+    {
+      "q": "Build model with 'Window Function' on 10TB table. Efficient?",
+      "a": "Incremental or Table; window functions on 10TB in View is extremely slow\n\n**Watch out:** View materialization.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "056b1abc"
+    },
+    {
+      "q": "See lineage of a Source. Command?",
+      "a": "`dbt ls --select source:raw_data.*+`\n\n**Watch out:** `dbt ls --select +source:raw_data.*`; no parents.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "256c4255"
+    },
+    {
+      "q": "Ensure 'Marts' built as Tables by default. Where?",
+      "a": "`dbt_project.yml` under `marts` folder path config\n\n**Watch out:** Global config.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "52c73b5c"
+    },
+    {
+      "q": "Run 'Seed' but only if changed. Command?",
+      "a": "No `seed:modified`; run `dbt seed`\n\n**Watch out:** `dbt seed --select state:modified`.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "19ee4d78"
+    },
+    {
+      "q": "Use 'Variable' in 'dbt_project.yml'. Syntax?",
+      "a": "`{{ var(\"my_var\") }}`\n\n**Watch out:** Nested quotes e.g. \"{{ var(\"my_var\") }}\"; YAML parsing error.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "197f6f4c"
+    },
+    {
+      "q": "See which models 'Public' in dbt Explorer. How?",
+      "a": "Filter Explorer by `Access` level\n\n**Watch out:** Looking for `public` tag.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "79ed590f"
+    },
+    {
+      "q": "Use 'Macro' to generate 'Alias' for every model. How?",
+      "a": "Override `generate_alias_name` macro in project\n\n**Watch out:** Editing model config alias for every file.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "19b2c7a3"
+    },
+    {
+      "q": "Run models parents of 'fct_orders' AND children of 'stg_users'. Command?",
+      "a": "`dbt run --select +fct_orders,stg_users+`\n\n**Watch out:** Space is UNION, comma is INTERSECTION.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d4f0ed4c"
+    },
+    {
+      "q": "Seed 'date' column loaded as string. Fix?",
+      "a": "Set column type to `date` or `timestamp` in `dbt_project.yml`\n\n**Watch out:** Changing format in CSV.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3e705b23"
+    },
+    {
+      "q": "See 'Status' of every model in last run in CLI. Command?",
+      "a": "`dbt ls --resource-type model --output json`\n\n**Watch out:** `dbt list status`.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a37fefb2"
+    },
+    {
+      "q": "Ensure 'Staging' never built as Tables. Where?",
+      "a": "`dbt_project.yml` set materialized: view for staging path\n\n**Watch out:** Global config.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5b74e187"
+    },
+    {
+      "q": "Failing because of 'Long Query' in Snowflake. Fix?",
+      "a": "Break into smaller `Intermediate` models and materialize as Tables\n\n**Watch out:** Increasing thread count.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3f1fbbef"
+    },
+    {
+      "q": "Build and only run tests for 'failed' models last time. Command?",
+      "a": "`dbt build --select state:failed`\n\n**Watch out:** `dbt test --select state:failed`.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "01ae26f8"
+    },
+    {
+      "q": "Use 'Variable' in another project. How?",
+      "a": "Project-scoped; define in yours or pass via CLI\n\n**Watch out:** Assuming `ref()` pulls vars.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3b2c0768"
+    },
+    {
+      "q": "You are a Producer in a dbt Mesh setup. You need to ensure 'customer_id' is always an Integer to avoid breaking downstream projects. How do you enforce this?",
+      "a": "Define a model `contract` in YAML with `data_type: integer` and `enforced: true`\n\n**Watch out:** Using a `not_null` test; tests only alert you after bad data is already written to the warehouse.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "2946329f"
+    },
+    {
+      "q": "You need to remove a column from a public model used by other teams. You want to give them 30 days to migrate. What is the best practice?",
+      "a": "Create a new `version` of the model and set a `deprecation_date` on the old version\n\n**Watch out:** Renaming the column and aliasing the old name to NULL; this breaks downstream logic expecting actual data types.",
+      "group": "Versioning",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "a743925d"
+    },
+    {
+      "q": "You want to show a Tableau dashboard's dependency on a dbt model in the lineage graph. How?",
+      "a": "Define an `Exposure` in a YAML file and list the model in `depends_on`\n\n**Watch out:** Adding a comment in the SQL file; dbt metadata and lineage can only be generated from YAML definitions.",
+      "group": "Exposures",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b3464312"
+    },
+    {
+      "q": "You want to prevent any developer from accidentally dropping the 'Production' schema during a local run. How?",
+      "a": "Ensure the `dev` target in `profiles.yml` points to a unique personal schema (e.g., dbt_jsmith)\n\n**Watch out:** Sharing `prod` credentials for local development; this is the leading cause of accidental production data loss.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b1858c54"
+    },
+    {
+      "q": "You want to provide a searchable 'Description' for a macro in dbt Explorer. Where is this defined?",
+      "a": "In a `docs` block within a `.md` file\n\n**Watch out:** Using a Jinja comment in the .sql file; these are for code readability and do not render in the documentation UI.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "119e60d0"
+    },
+    {
+      "q": "Your 'Finance' project needs to use the 'Orders' project's data in a Mesh setup. What file do you edit in the Finance project to enable this?",
+      "a": "`dependencies.yml` to list the upstream project and its production manifest\n\n**Watch out:** Adding it to `packages.yml`; Mesh uses dependencies to reference live data, not raw code imports.",
+      "group": "Mesh",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "0d7d157e"
+    },
+    {
+      "q": "You want to find 'Orphan' models that aren't used by any downstream models or dashboards. What tool is best?",
+      "a": "Check dbt Explorer and filter for nodes with no children or Exposures\n\n**Watch out:** Assuming that if a model builds successfully, it is being used in the business.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "94b4ea91"
+    },
+    {
+      "q": "A team is complaining that your Mesh 'Producer' model is slow. You realize they are querying a View you exposed. Fix?",
+      "a": "Materialize the public model as a `Table` or `Incremental`\n\n**Watch out:** Keeping it as a View; views in Mesh force the Consumer to pay the compute cost of the Producer's logic.",
+      "group": "Mesh",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "47d55e50"
+    },
+    {
+      "q": "You want to prevent any project from referencing your 'Intermediate' staging tables in a Mesh setup. Config?",
+      "a": "Set `access: private` in the model's YAML properties\n\n**Watch out:** Setting `access: internal`; internal allows references within the project, but private is the most restrictive for preventing Mesh leaks.",
+      "group": "Mesh",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "f38b092c"
+    },
+    {
+      "q": "You are versioning a model. Which version does dbt point to if a user writes '{{ ref('my_model') }}' without a version argument?",
+      "a": "It points to the `latest_version` explicitly defined in the YAML\n\n**Watch out:** Assuming it defaults to the highest numerical version automatically.",
+      "group": "Versioning",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "7c0f5060"
+    },
+    {
+      "q": "You have enforced a contract, but the build is failing even though the SQL is correct. What did you likely miss in YAML?",
+      "a": "Ensure *every* column in the SQL output is defined in the YAML file\n\n**Watch out:** Forgetting that enforced contracts require 100% column coverage in the property file.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5f40127d"
+    },
+    {
+      "q": "Your CEO asks, 'Who owns the Revenue number in this dashboard?' Where in dbt is this recorded?",
+      "a": "The `owner` field in the Exposure or the model`s `group' configuration\n\n**Watch out:** Checking Git Blame; the person who last touched the code isn't necessarily the business owner.",
+      "group": "Exposures",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "4cc46a12"
+    },
+    {
+      "q": "You want to include a 3-paragraph explanation of a business metric in dbt docs. How to keep YAML clean?",
+      "a": "Use a `doc block` in a `.md` file\n\n**Watch out:** Cramming long text into `schema.yml` strings; this makes the YAML unreadable for other engineers.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "3ae213b5"
+    },
+    {
+      "q": "You need to find all models containing 'email_address' for a GDPR audit. How in dbt Cloud?",
+      "a": "Use the Search bar in dbt Explorer to filter by column name\n\n**Watch out:** Manual `grep` in the IDE; this misses columns created via dynamic SQL or macros.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5beb9195"
+    },
+    {
+      "q": "You want to automate a Slack alert when a new 'public' model is added. What artifact do you parse?",
+      "a": "`manifest.json` after the production build\n\n**Watch out:** Checking the `models/` folder via Git; the manifest contains the final `access` state after compilation.",
+      "group": "Discovery",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "65ad8235"
+    },
+    {
+      "q": "You want to standardized 'Gross Margin' logic for all BI tools. Feature?",
+      "a": "Define it as a `Metric` in the dbt Semantic Layer\n\n**Watch out:** Just creating a model `fct_margin`; without a semantic definition, users may still re-calculate it incorrectly in BI.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "604b5039"
+    },
+    {
+      "q": "You are using dbt Mesh. A Consumer build fails because your Producer model changed. Why didn't the Contract catch this?",
+      "a": "Check if `enforced: true` was set; a contract without enforcement is just documentation\n\n**Watch out:** Assuming a list of columns in YAML acts as a restrictive gate by itself.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "d447b295"
+    }
+  ]
+}

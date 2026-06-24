@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "In development, you want to avoid rebuilding unchanged upstream models when iterating on a downstream model. dbt pattern?",
+      "a": "Use dbt run --select my_downstream_model --defer --state path/to/prod/artifacts — resolves unselected upstream models against production tables without rebuilding them\n\n**Watch out:** ephemeral models cannot be deferred — they are always compiled inline; use view or table for upstream models you want to defer.",
+      "group": "Developer Productivity",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "51f11cb6"
+    },
+    {
+      "q": "When should you choose 'ephemeral' materialization over 'view'?",
+      "a": "Use ephemeral when the model is a simple CTE used only once and you want no database object created. Use view when multiple downstream models reference it or you need to query it directly\n\n**Watch out:** ephemeral models increase compile time when referenced many times because they are inlined at every reference point — views are cheaper when referenced repeatedly.",
+      "group": "Materialization Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "eac2f6b7"
+    },
+    {
+      "q": "Your dbt project has very long compile times due to thousands of ref() calls and complex Jinja macros. Optimizations?",
+      "a": "Cache expensive macro results with {% set x = heavy_macro() %} and reuse x. Split into sub-projects (Mesh) to reduce per-project compile scope. Check if any macros call run_query() outside {% if execute %}\n\n**Watch out:** Increasing threads speeds up execution, not compilation — compilation is largely single-threaded in dbt.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "1e13c849"
+    },
+    {
+      "q": "You want to use dbt's node_selection syntax to run only models that were modified AND have the tag 'finance'. Command?",
+      "a": "dbt run --select `state:modified,tag:finance` — the comma acts as an intersection (AND). Use `+` for union\n\n**Watch out:** `state:modified AND tag:finance` is not valid dbt syntax — use comma for intersection and space-separated sets or `+` for union.",
+      "group": "Node Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "1a6dd73c"
+    },
+    {
+      "q": "You want to run all models downstream of a source named 'raw_data' across all tables. Command?",
+      "a": "dbt run --select `source:raw_data+` — selects all models downstream of any table in the raw_data source. The `+` suffix includes all children\n\n**Watch out:** dbt run --select source:raw_data (without `+`) selects only the source nodes themselves, not downstream models.",
+      "group": "Node Selection",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "eed7c1b9"
+    },
+    {
+      "q": "What are the three model access levels in dbt and what does each permit?",
+      "a": "private — only models in the same group within the project. protected (default) — any model within the same project. public — any model in any project (cross-project Mesh references)\n\n**Watch out:** access: public does not set warehouse permissions — it is a dbt metadata flag only, not a database GRANT.",
+      "group": "Access Levels",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "e5de79e0"
+    },
+    {
+      "q": "You want staging models to be unreferenceable by mart models within the same project. How?",
+      "a": "Assign staging models to a group (`group: staging`) and set `access: private`. Only models within the `staging` group can reference them; mart models in a different group cannot\n\n**Watch out:** access: protected (default) allows any model in the same project to reference them — use private for group-level isolation.",
+      "group": "Access Levels",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "baa466bf"
+    },
+    {
+      "q": "What is a dbt group and how is it different from a database schema or role?",
+      "a": "A dbt group is a named collection of models defined via `group:` in schema.yml or dbt_project.yml. It is metadata-only — it controls which models can reference which (with access: private) but has no effect on warehouse schemas or database permissions\n\n**Watch out:** Creating a dbt group does not create a warehouse schema, role, or any database object.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "3d4a1053"
+    },
+    {
+      "q": "You want to automatically grant SELECT to a 'reporting' role on every model after it is built, across an entire project folder. Config?",
+      "a": "In dbt_project.yml, under the relevant folder path: +post-hook: \"GRANT SELECT ON {{ this }} TO ROLE reporting\". This applies the grant to every model built under that path\n\n**Watch out:** Granting permissions manually or in each model's config() block works but is not maintainable at scale.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "9ad81b62"
+    },
+    {
+      "q": "You need to tag PII columns in dbt so a data catalog can identify them. How?",
+      "a": "Add tags: [pii] or meta: {pii: true} at the column level in schema.yml. These are included in manifest.json and surfaced in dbt Explorer — consumable by catalog tools via the metadata API\n\n**Watch out:** Column-level tags in dbt are metadata only — they do not apply masking policies, RLS, or warehouse-level access restrictions.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "335df590"
+    },
+    {
+      "q": "A governance team wants to know which BI dashboards depend on fct_orders before they make a breaking change. dbt feature?",
+      "a": "Exposures — define dashboards and reports as exposure nodes in schema.yml with depends_on: [ref(`fct_orders`)]. dbt Explorer and the manifest show downstream exposure impact\n\n**Watch out:** dbt cannot automatically discover BI dependencies — you must manually declare them as exposures.",
+      "group": "Exposures",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "0701b35a"
+    },
+    {
+      "q": "You want to enforce that all columns in a public model have a description in schema.yml. Approach?",
+      "a": "Write a custom macro (e.g., in on-run-end) that queries the graph or manifest to find columns without descriptions and raise a warning/error. Or use the dbt_project_evaluator package which includes a rule for undocumented columns\n\n**Watch out:** dbt does not natively fail builds for missing column descriptions — use dbt_project_evaluator or a custom check.",
+      "group": "Documentation",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "0350bfc2"
+    },
+    {
+      "q": "What is the dbt_project_evaluator package used for?",
+      "a": "An open-source dbt package that tests your dbt project against a set of best-practice rules — checks for undocumented models, missing tests, direct source references instead of staging models, and other structural anti-patterns\n\n**Watch out:** dbt_project_evaluator tests your project structure, not your data — it runs as a dbt model set and surfaces results as test failures.",
+      "group": "Best Practices",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "8f78d8b8"
+    },
+    {
+      "q": "You need a repeatable way to enforce naming conventions across all models in a large project (e.g., staging models must be prefixed 'stg_'). Approach?",
+      "a": "Add dbt_project_evaluator to packages.yml and enable the naming convention rules, or write a custom singular test that queries the manifest's node names and fails if they violate the pattern\n\n**Watch out:** dbt does not natively enforce naming conventions — use dbt_project_evaluator or a custom validation.",
+      "group": "Best Practices",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "df4d97b7"
+    },
+    {
+      "q": "What is the recommended pattern for a staging layer in a well-structured dbt project, and why?",
+      "a": "Staging models should: source directly from raw source tables (source()), do light transformation only (casting, renaming, deduplication), be 1:1 with source tables, and use access: private so only the intermediate/mart layer can build on them\n\n**Watch out:** Skipping staging and referencing raw sources directly in mart models creates tight coupling and makes source changes painful to propagate.",
+      "group": "Architecture",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "a1bd37a4"
+    },
+    {
+      "q": "What is the config hierarchy in dbt from lowest to highest precedence?",
+      "a": "dbt_project.yml (lowest) → schema.yml → model config() block (highest). A config() block in the model file overrides schema.yml, which overrides dbt_project.yml\n\n**Watch out:** Assuming dbt_project.yml always wins — it is the baseline, not the override.",
+      "group": "Config Hierarchy",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 1: dbt Mesh & Multi-Project Architecture",
+      "module": "dbt Architect",
+      "id": "0805c0c1"
+    },
+    {
+      "q": "You want to structure a large project so Finance staging models inherit +schema: finance_staging globally, without setting it on each model. Where?",
+      "a": "In dbt_project.yml under the Finance folder path: models: > my_project: > finance: > staging: > +schema: finance_staging. All models in that path inherit it; individual models can override via config() if needed\n\n**Watch out:** Setting schema individually in each model's config() block is correct but unmaintainable at scale.",
+      "group": "Config Hierarchy",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 1: dbt Mesh & Multi-Project Architecture",
+      "module": "dbt Architect",
+      "id": "295a0301"
+    },
+    {
+      "q": "What is the correct way to build a reusable dbt package that other teams can install via packages.yml?",
+      "a": "Create a standalone git repository with a dbt project structure (dbt_project.yml, macros/, models/). Publish to GitHub. Consumers install it via packages.yml with a git URL and optional version/revision pin\n\n**Watch out:** You cannot publish a package by sharing files directly — it must be a standalone dbt project in a git repo (or dbt Hub for open-source packages).",
+      "group": "Package Development",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 1: dbt Mesh & Multi-Project Architecture",
+      "module": "dbt Architect",
+      "id": "3f31536d"
+    },
+    {
+      "q": "What should go in a shared dbt package vs staying in a domain project?",
+      "a": "Package — generic macros, generic tests, utility models (e.g., date spine), adapter abstractions. Domain project — business-logic models, domain-specific transformations, team-owned data\n\n**Watch out:** Putting business logic in a shared package creates a coordination burden — every team must align on changes.",
+      "group": "Package Development",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 1: dbt Mesh & Multi-Project Architecture",
+      "module": "dbt Architect",
+      "id": "7492d6ae"
+    },
+    {
+      "q": "You are building a dbt package that uses dbt_utils internally. How should you declare this dependency?",
+      "a": "List dbt_utils in the package's own packages.yml. Consumers who install your package will need to run dbt deps — dbt resolves package dependencies recursively\n\n**Watch out:** Do not assume consumers have dbt_utils installed — declare all package-level dependencies explicitly in your package's packages.yml.",
+      "group": "Package Development",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 1: dbt Mesh & Multi-Project Architecture",
+      "module": "dbt Architect",
+      "id": "63aa7b54"
+    },
+    {
+      "q": "What does the 'unique_key' config option accept on an incremental model, and can it be a composite key?",
+      "a": "unique_key accepts a string (single column) or a list of strings (composite key, e.g., [`order_id`, `order_date`]). Composite keys are used when no single column uniquely identifies a row\n\n**Watch out:** Composite unique_key requires adapter support — not all strategies support lists; check adapter docs for merge vs delete+insert behaviour.",
+      "group": "Strategy Configuration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "27c355bf"
+    },
+    {
+      "q": "When should you use a full_refresh: false model config, and what does it do?",
+      "a": "full_refresh: false prevents the model from being rebuilt even when dbt run --full-refresh is passed. Use for append-only event tables where historical data must never be dropped\n\n**Watch out:** full_refresh: false is a safety guard, not a replacement for correct incremental logic — the model still runs incrementally on each scheduled run.",
+      "group": "Strategy Configuration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "7ae277c7"
+    },
+    {
+      "q": "What is the difference between a breaking and a non-breaking schema change on a contracted public model?",
+      "a": "Non-breaking — adding a nullable column, adding a new model version. Breaking — removing or renaming a column, changing a column's data type. Breaking changes require a new model version (v2) so consumers can migrate without downtime\n\n**Watch out:** Adding a NOT NULL column is also breaking if existing consumers do not provide values for it.",
+      "group": "Contracts",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "664fbf45"
+    },
+    {
+      "q": "A public model has contract.enforced: true but the warehouse adapter does not support a declared constraint type. What happens?",
+      "a": "dbt still compiles and emits the constraint in the DDL — but the warehouse silently accepts or ignores unsupported constraints (e.g., BigQuery accepts but does not enforce primary_key). The dbt compile-time schema check still passes\n\n**Watch out:** dbt does not raise an error for unsupported constraint types — check adapter documentation to know which constraints are actually enforced.",
+      "group": "Contracts",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "407484c4"
+    },
+    {
+      "q": "How do you decommission a deprecated model version once all consumers have migrated?",
+      "a": "Remove the version entry from the schema.yml versions: block and delete the version's SQL file (if using defined_in). Run dbt build to confirm no remaining refs. Coordinate with downstream project owners before removal\n\n**Watch out:** Simply deleting the SQL file without removing the versions: entry causes a compile error — dbt expects the file referenced by the version definition.",
+      "group": "Model Versioning",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "54512112"
+    },
+    {
+      "q": "You want to enforce that all public models in a project have contracts. Is there a native dbt mechanism?",
+      "a": "No native enforcement — use the dbt_project_evaluator package which has a rule checking that public models have enforced contracts. Or write a custom singular test querying the manifest's node metadata\n\n**Watch out:** dbt does not automatically fail builds for public models without contracts — this must be tested separately.",
+      "group": "Contracts",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "5490c3b2"
+    },
+    {
+      "q": "What is the recommended multi-environment setup for an enterprise dbt Cloud project?",
+      "a": "Three environments minimum — Development (personal dev schemas, uses developer credentials), Staging/CI (runs slim CI against PRs, separate credentials), Production (scheduled full builds, service account credentials, generates artifacts for state comparison)\n\n**Watch out:** Using a single environment for both CI and production creates resource contention and risks prod being blocked by CI runs.",
+      "group": "Environment Strategy",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "3894f988"
+    },
+    {
+      "q": "How do dev schemas work in dbt Cloud, and why are they important for team isolation?",
+      "a": "Each developer has a personal target schema (e.g., dbt_jackarnaud) configured in their dev environment credentials. Models build into this schema, not the shared dev or prod schema, preventing conflicts between developers working simultaneously\n\n**Watch out:** Without personal dev schemas, two developers running dbt simultaneously overwrite each other's work in the shared schema.",
+      "group": "Environment Strategy",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "c4052d36"
+    },
+    {
+      "q": "You want to use generate_schema_name so that in dev environments models use the developer's personal schema, but in prod they use the custom schema exactly. How?",
+      "a": "Override generate_schema_name to check target.name: if target.name == `prod`, return custom_schema_name (or default_schema if none). Otherwise, return default_schema (the personal dev schema). This ensures prod uses the right schema while dev stays isolated\n\n**Watch out:** The default generate_schema_name concatenates default_schema + custom_schema — this produces `dbt_jackarnaud_staging` in dev, which is usually unwanted.",
+      "group": "Environment Strategy",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "b90ee36a"
+    },
+    {
+      "q": "What does 'dbt build' do differently from 'dbt run' + 'dbt test'?",
+      "a": "dbt build runs models, seeds, snapshots, and tests in DAG order — it interleaves tests with the nodes they depend on (a model's tests run before downstream models use it). dbt run + dbt test runs all models first, then all tests — tests cannot gate downstream builds\n\n**Watch out:** dbt run + dbt test does not gate downstream models on their upstream tests passing — use dbt build for true quality-gated pipelines.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "c54983cb"
+    },
+    {
+      "q": "What is the difference between a 'categorical' and a 'time' dimension type in MetricFlow?",
+      "a": "categorical — a standard dimension used for grouping/filtering (e.g., status, region). time — a date/timestamp column used for time-series queries; requires type_params.time_granularity and enables time-based slicing in BI tools\n\n**Watch out:** Using type: categorical for a date column prevents MetricFlow from performing time-series granularity operations on it.",
+      "group": "Dimensions",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "96a288c5"
+    },
+    {
+      "q": "How do you expose a MetricFlow metric that divides all-time revenue by total customers? Metric type and params?",
+      "a": "type: ratio with type_params: {numerator: total_revenue, denominator: total_customers}. Both numerator and denominator must be defined measures in the semantic model(s)\n\n**Watch out:** You cannot use raw SQL expressions as numerator/denominator in a ratio metric — only named measures are accepted.",
+      "group": "Metric Types",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "8579f085"
+    },
+    {
+      "q": "When should a dbt Semantic Layer metric be used vs. a pre-aggregated dbt model?",
+      "a": "Semantic Layer — when the metric needs to be sliced by different dimensions at query time (e.g., revenue by region, by month, by product). Pre-aggregated model — when the aggregation grain is fixed and performance demands a materialised table\n\n**Watch out:** Pre-aggregating at a fixed grain locks the metric — the semantic layer gives flexibility at the cost of query-time compute.",
+      "group": "Architecture Decisions",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "9112970f"
+    },
+    {
+      "q": "What is the dbt_expectations package and when would you use it over built-in tests?",
+      "a": "dbt_expectations ports the Great Expectations framework into dbt generic tests — adds ~50 tests including row count comparisons, regex matching, column type checks, and statistical checks. Use when built-in not_null/unique/accepted_values are insufficient\n\n**Watch out:** dbt_expectations tests are still generic tests — they run as SQL queries, not Python Great Expectations suites.",
+      "group": "Test Packages",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "72293bd7"
+    },
+    {
+      "q": "You want to run only tests that are tagged 'critical' and have severity 'error' in CI. Select syntax?",
+      "a": "dbt test --select `tag:critical,config.severity:error` — selects tests matching both conditions. Use this in CI to run only the most important tests quickly\n\n**Watch out:** config.severity is a node property selector — it uses `config.` prefix, not `severity:` directly.",
+      "group": "Test Execution",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "632f6856"
+    },
+    {
+      "q": "What is the purpose of dbt's 'audit_helper' package?",
+      "a": "audit_helper provides macros for comparing the output of two queries or models side by side — useful when migrating a model to a new logic and validating the new version matches the old one before switching\n\n**Watch out:** audit_helper is a validation tool for migrations, not a testing framework — it is used interactively or in CI migration checks, not as persistent tests.",
+      "group": "Test Packages",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "7bab2770"
+    },
+    {
+      "q": "You want a macro to raise an error with a helpful message if called without a required argument. Pattern?",
+      "a": "Use {{ exceptions.raise_compiler_error(`message`) }} — raises a dbt compile-time error with the given message. Useful for macros that have required arguments without defaults\n\n**Watch out:** Using {{ log(`error`, info=True) }} only prints a message and does not stop compilation — use exceptions.raise_compiler_error to halt the build.",
+      "group": "Error Handling",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "a766b198"
+    },
+    {
+      "q": "What is the builtins object in dbt Jinja and when would you need it?",
+      "a": "builtins provides access to dbt's original built-in macros even when you have overridden them. For example, if you override ref(), you can call builtins.ref() inside your override to delegate to the original behaviour\n\n**Watch out:** Without builtins, overriding a macro like ref() without calling the original causes infinite recursion or breaks default behaviour entirely.",
+      "group": "Jinja Patterns",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "ba5d4bfa"
+    },
+    {
+      "q": "You want to generate a date spine (a complete sequence of dates) for a specific range. dbt pattern?",
+      "a": "Use dbt_utils.date_spine() macro — generates a series of dates between start_date and end_date at a given datepart granularity. Reference with ref() or use as a CTE in a model\n\n**Watch out:** Writing a recursive CTE for a date spine is adapter-specific and not portable — dbt_utils.date_spine() handles cross-adapter compatibility.",
+      "group": "Utility Patterns",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "086b466d"
+    },
+    {
+      "q": "What are dbt Cloud's SSO options and which plans support them?",
+      "a": "dbt Cloud supports SAML 2.0 SSO (e.g., Okta, Azure AD, Google Workspace) and can map SSO groups to dbt Cloud Groups for automatic permission assignment. SSO is an Enterprise plan feature\n\n**Watch out:** SSO is not available on the Developer or Team plans — users on those plans must use username/password or email-based auth.",
+      "group": "Security",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "214ac566"
+    },
+    {
+      "q": "What is the dbt Cloud Discovery API, and what can you build with it?",
+      "a": "A GraphQL API that exposes dbt project metadata (models, tests, sources, lineage, run results) for a given environment. Use it to build data catalogs, observability dashboards, or custom impact analysis tools\n\n**Watch out:** The Discovery API is read-only metadata — it does not trigger runs or modify the dbt project.",
+      "group": "APIs",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "2847925d"
+    },
+    {
+      "q": "You want to programmatically check whether a specific dbt job's last run succeeded before triggering a downstream process. How?",
+      "a": "Poll the dbt Cloud API GET /accounts/{accountId}/runs/?job_definition_id={jobId}&order_by=-id&limit=1 to get the latest run, then check the `status` field (10 = success, 20 = error, 30 = cancelled)\n\n**Watch out:** dbt Cloud does not push completion events by default — you must poll the API or configure a webhook (Outbound Webhooks, Enterprise) to get notified on completion.",
+      "group": "APIs",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "4ed232de"
+    },
+    {
+      "q": "What are dbt Cloud Outbound Webhooks used for?",
+      "a": "Outbound Webhooks fire an HTTP POST to a configured URL when specific dbt Cloud events occur (job started, completed, errored). Use them to trigger downstream systems, post Slack alerts, or update monitoring dashboards without polling the API\n\n**Watch out:** Outbound Webhooks are for notifying external systems — they do not replace the dbt Cloud API for querying run metadata.",
+      "group": "APIs",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "b17b72a1"
+    },
+    {
+      "q": "How can you use Snowflake zero-copy cloning in a dbt development workflow?",
+      "a": "Use a pre-hook or dbt_project.yml on-run-start to clone the production database into a dev environment: CREATE DATABASE dev_db CLONE prod_db. Developers get an instant full copy of production data at zero storage cost for the clone\n\n**Watch out:** Zero-copy cloning is a Snowflake feature — dbt does not natively manage clones; you implement it via hooks or an external automation step.",
+      "group": "Warehouse Features",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "6a803df5"
+    },
+    {
+      "q": "What is a materialized view in the context of dbt, and which adapters support it as a materialization?",
+      "a": "A materialized view is a database object that stores the result of a query and refreshes automatically when the underlying data changes (adapter-dependent). Supported as a dbt materialization on Snowflake, BigQuery, Redshift, and Postgres. Configure with materialized=`materialized_view`\n\n**Watch out:** Materialized views are NOT the same as dbt `table` materialization — they refresh automatically without a dbt run, but their refresh behaviour depends on the warehouse.",
+      "group": "Materializations",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "e83d64b6"
+    },
+    {
+      "q": "When should you choose a materialized_view over an incremental model in dbt?",
+      "a": "materialized_view — when the warehouse can automatically refresh it cheaply and the query is read-heavy with write-light patterns (e.g., Snowflake dynamic tables). incremental — when you need full control over update logic, lookback windows, or complex merge conditions\n\n**Watch out:** materialized_view refresh behaviour varies by warehouse — on some, it refreshes the entire view on every base table change, which can be expensive for large datasets.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "45f79ea4"
+    },
+    {
+      "q": "What is a Snowflake Dynamic Table and how does dbt support it?",
+      "a": "A Snowflake-native object that continuously refreshes based on a lag target (e.g., `target_lag: 1 minute`) rather than on a dbt schedule. dbt supports it via materialized=`dynamic_table` with snowflake-adapter-specific config (target_lag, warehouse)\n\n**Watch out:** Dynamic Tables replace the need for scheduled dbt runs on some models — but they are Snowflake-specific and have no equivalent on BigQuery or Redshift.",
+      "group": "Warehouse Features",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "70d3ccec"
+    },
+    {
+      "q": "You want to enforce SQL code style (e.g., no SELECT *) across your dbt project in CI. Tool?",
+      "a": "SQLFluff — a configurable SQL linter that integrates with dbt (via the dbt templater) and can run as a pre-commit hook or CI step. Configure rules in .sqlfluff\n\n**Watch out:** dbt itself does not lint SQL style — SQLFluff is the standard tool for this; alternatively, sqlfmt enforces formatting but not logic rules.",
+      "group": "Code Quality",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "f636fcd1"
+    },
+    {
+      "q": "What is the manifest.json file and what can you do with it?",
+      "a": "manifest.json is a JSON artifact generated by every dbt run/compile — it contains the full compiled node graph (models, tests, sources, macros) with metadata. Use it for custom impact analysis, data catalogs, CI state comparison (--state), and the Discovery API\n\n**Watch out:** manifest.json reflects the project at compile time — it does not include run results; those are in run_results.json.",
+      "group": "Artifacts",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "d6e2802f"
+    },
+    {
+      "q": "What is run_results.json and how does it differ from manifest.json?",
+      "a": "run_results.json records the execution results of the most recent dbt run — timing, row counts, status (pass/error/skip), and test results per node. manifest.json is a static snapshot of the compiled project graph. Both are needed for --state comparisons\n\n**Watch out:** manifest.json alone cannot tell you which nodes errored in a run — you need run_results.json for that.",
+      "group": "Artifacts",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "fc47eb23"
+    },
+    {
+      "q": "What is sources.yml used for beyond defining source tables?",
+      "a": "sources.yml also defines: freshness checks (loaded_at_field + freshness thresholds), column-level metadata and tests, source-level descriptions, and tags for selection. It is the single source of truth for all raw source metadata in a dbt project\n\n**Watch out:** Many teams only use sources.yml for table definitions — missing freshness, tests, and column docs reduces the value of dbt's source layer significantly.",
+      "group": "Documentation",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 10: Data Governance & Access Control",
+      "module": "dbt Architect",
+      "id": "64933320"
+    },
+    {
+      "q": "What is the recommended pattern for integrating dbt with Apache Airflow?",
+      "a": "Use the Cosmos library (astronomer-cosmos) — it parses the dbt manifest.json and creates an Airflow TaskGroup or DAG with one task per dbt node, preserving dependency order. Alternatively, use the dbt Cloud Airflow provider to trigger dbt Cloud jobs via BashOperator or KubernetesPodOperator for self-hosted dbt\n\n**Watch out:** Wrapping the entire `dbt build` command in a single BashOperator works but loses granularity — Airflow cannot retry individual failed models or show per-model status.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 11: dbt & Orchestration",
+      "module": "dbt Architect",
+      "id": "584a0580"
+    },
+    {
+      "q": "What are the trade-offs between running dbt inside Airflow (dbt Core + KubernetesPodOperator) vs. triggering dbt Cloud jobs from Airflow?",
+      "a": "dbt Core in Airflow — full control, per-node retries via Cosmos, no dbt Cloud cost, but you manage the compute environment. dbt Cloud jobs — managed compute, IDE, CI, artifact storage, but less granular Airflow integration (job is a black box to Airflow)\n\n**Watch out:** There is no universally `correct` pattern — the choice depends on team size, existing infra, and whether dbt Cloud's managed features justify the cost.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 11: dbt & Orchestration",
+      "module": "dbt Architect",
+      "id": "7d2fb71d"
+    },
+    {
+      "q": "You want Airflow to only trigger dbt models that are downstream of a specific source table after it has been loaded. Pattern?",
+      "a": "Use a sensor in Airflow to detect when the source table is loaded (e.g., S3KeySensor, SnowflakeSensor), then trigger dbt with --select `source:my_source.my_table+` to run only downstream models\n\n**Watch out:** Running dbt build (all models) on every source load is wasteful — use source-based selection to scope the run to affected models only.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 11: dbt & Orchestration",
+      "module": "dbt Architect",
+      "id": "6c28bde4"
+    },
+    {
+      "q": "What is the purpose of dbt's 'source freshness' check and how is it triggered?",
+      "a": "`dbt source freshness` queries the loaded_at_field of each source table and compares it against warn_after and error_after thresholds. It produces a sources.json artifact and returns a non-zero exit code if any source is stale — useful for gating dbt runs on fresh data\n\n**Watch out:** dbt source freshness is a separate command from dbt build — it does not run automatically; add it as a step before dbt build in your orchestrator.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 11: dbt & Orchestration",
+      "module": "dbt Architect",
+      "id": "cacaa553"
+    },
+    {
+      "q": "You want to select all models in the 'marts/' folder that are also tagged 'finance'. Syntax?",
+      "a": "dbt run --select `path:models/marts/,tag:finance` — the comma is an intersection (AND). Both conditions must be true for a node to be selected\n\n**Watch out:** Using a space between selectors creates a UNION (OR), not an intersection — `path:models/marts/ tag:finance` selects models in marts/ OR tagged finance.",
+      "group": "Node Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "62723ed3"
+    },
+    {
+      "q": "What does the '+' prefix and suffix mean in dbt node selection syntax?",
+      "a": "Prefix `+model` selects the model AND all its ancestors (parents, grandparents...). Suffix `model+` selects the model AND all its descendants. `+model+` selects the full lineage. `2+model` selects the model plus 2 levels of ancestors\n\n**Watch out:** `model+` does not select the model's ancestors — only its descendants.",
+      "group": "Node Selection",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "4ce97f0d"
+    },
+    {
+      "q": "You want to select only models whose 'materialized' config is set to 'table'. Syntax?",
+      "a": "dbt run --select `config.materialized:table` — the config. prefix accesses node config properties in node selection\n\n**Watch out:** You cannot use `materialized:table` without the `config.` prefix — that is not a valid selector method.",
+      "group": "Node Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "5a32c9d5"
+    },
+    {
+      "q": "You want to run all models that were in an ERROR state in the last run. Selection syntax?",
+      "a": "dbt run --select `result:error` --state path/to/last/run_results — the result: method selects nodes by their status in the provided run_results.json. Valid values: error, pass, warn, skip, fail\n\n**Watch out:** result: selectors require --state pointing to a run_results.json — without it, dbt has no prior results to filter on.",
+      "group": "Node Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "afbefb64"
+    },
+    {
+      "q": "You want to exclude all snapshots from a 'dbt build' run while selecting everything else. Syntax?",
+      "a": "dbt build --exclude `resource_type:snapshot` — the resource_type: selector filters by node type (model, test, seed, snapshot, analysis, source, exposure, metric)\n\n**Watch out:** `type:snapshot` is not valid syntax — use `resource_type:snapshot` with the full prefix.",
+      "group": "Node Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "2f7d5b5d"
+    }
+  ]
+}

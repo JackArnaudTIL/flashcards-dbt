@@ -1,0 +1,75 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "What does 'dbt ls' (list) do, and why is it useful in CI pipelines?",
+      "a": "dbt ls prints the names of selected nodes without running them — useful for validating node selection logic, generating impact reports, and feeding node lists into orchestrators for parallel job splitting\n\n**Watch out:** dbt ls does not run models — it is a read-only introspection command. Use it to preview what a --select expression would target before running.",
+      "group": "Node Selection",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "8336b2b6"
+    },
+    {
+      "q": "You want to run the model 'fct_orders' and all its first-generation parents only (not grandparents). Syntax?",
+      "a": "dbt run --select `1+fct_orders` — the numeric prefix limits ancestor depth to 1 level. `2+fct_orders` would include grandparents too\n\n**Watch out:** `+fct_orders` without a number includes all ancestors at every depth level, not just direct parents.",
+      "group": "Node Selection",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 12: Advanced Node Selection",
+      "module": "dbt Architect",
+      "id": "47934da9"
+    },
+    {
+      "q": "What is the difference between the 'timestamp' and 'check' snapshot strategies?",
+      "a": "timestamp — uses an updated_at column; a new snapshot record is created when updated_at is greater than the previous value. Efficient, but requires a reliable updated_at field. check — compares all columns (or a specified subset) for changes; slower but works for sources without updated_at\n\n**Watch out:** check strategy compares column values on every run — it is significantly more expensive than timestamp for large tables.",
+      "group": "Snapshot Strategy",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 13: Snapshot Architecture",
+      "module": "dbt Architect",
+      "id": "be8749b0"
+    },
+    {
+      "q": "What columns does dbt add to every snapshot table, and what do they track?",
+      "a": "dbt_scd_id (unique identifier per snapshot record), dbt_updated_at (when the snapshot was last evaluated), dbt_valid_from (when this version of the row became active), dbt_valid_to (when this version was superseded; NULL for the current row)\n\n**Watch out:** dbt_valid_to is NULL for the current/active row, not for the most recent snapshot — filtering WHERE dbt_valid_to IS NULL gives the current state.",
+      "group": "Snapshot Mechanics",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 13: Snapshot Architecture",
+      "module": "dbt Architect",
+      "id": "d0190a27"
+    },
+    {
+      "q": "A source table does not have an updated_at column and is very large. Can you still snapshot it?",
+      "a": "Yes — use strategy=`check` with check_cols specifying the columns most likely to change (e.g., check_cols=[`status`, `amount`]). This avoids comparing all columns, reducing the performance impact\n\n**Watch out:** check_cols=`all` on a very large table compares every column on every row — this is expensive; specify only the columns that matter.",
+      "group": "Snapshot Strategy",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 13: Snapshot Architecture",
+      "module": "dbt Architect",
+      "id": "8a2d8756"
+    },
+    {
+      "q": "In a dbt Mesh, a Finance project needs to snapshot an upstream 'orders' source owned by the Platform project. Where should the snapshot live?",
+      "a": "The snapshot should live in the project that owns the source or has the closest relationship to it — typically the Platform project or a dedicated `snapshots` project. Snapshots write to a target schema and cannot easily be shared as cross-project models\n\n**Watch out:** Do not put snapshots of upstream data in downstream consumer projects — this creates multiple conflicting snapshot tables of the same source.",
+      "group": "Mesh Architecture",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 13: Snapshot Architecture",
+      "module": "dbt Architect",
+      "id": "7a3ac180"
+    },
+    {
+      "q": "How do you test a dbt snapshot for correctness?",
+      "a": "Apply standard data tests (not_null, unique on dbt_scd_id) in schema.yml on the snapshot node. For logic testing, write a singular test asserting that dbt_valid_from < dbt_valid_to for all closed records, and that only one row per unique_key has dbt_valid_to IS NULL\n\n**Watch out:** You cannot write dbt unit tests on snapshots (unit tests are for models only) — use singular tests or data tests instead.",
+      "group": "Snapshot Testing",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 13: Snapshot Architecture",
+      "module": "dbt Architect",
+      "id": "3618acd7"
+    }
+  ]
+}

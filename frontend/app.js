@@ -703,6 +703,22 @@ function render() {
     codeContainer.style.display = card.requires_code ? 'block' : 'none';
   }
 
+  // ── Schema Panel ──
+  const schemaPanel = document.getElementById('schemaPanel');
+  const schemaPanelBody = document.getElementById('schemaPanelBody');
+  if (schemaPanel) {
+    const schemas = deckConfig.schemas;
+    if (card.schema_ref && schemas && schemas[card.schema_ref]) {
+      schemaPanelBody.innerHTML = renderSchemaHtml(schemas[card.schema_ref]);
+      schemaPanelBody.style.display = 'flex';
+      const chevron = document.getElementById('schemaPanelChevron');
+      if (chevron) chevron.classList.remove('collapsed');
+      schemaPanel.style.display = 'block';
+    } else {
+      schemaPanel.style.display = 'none';
+    }
+  }
+
   document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('ai-suggested'));
 
   const studyUnit = document.getElementById('cardStudyUnit');
@@ -1147,6 +1163,32 @@ function hideExplanationOverlay(e) {
 }
 
 // Since we're using a module, bind necessary UI hooks to the window so HTML onclicks work:
+function renderSchemaHtml(schema) {
+  return (schema.tables || []).map(table => `
+    <div class="schema-table">
+      <div class="schema-table-name">${table.name}</div>
+      <div class="schema-columns">
+        ${(table.columns || []).map(col => `
+          <div class="schema-column">
+            <span class="schema-col-name">${col.name}</span>
+            <span class="schema-col-type">${col.type}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleSchema() {
+  const body = document.getElementById('schemaPanelBody');
+  const chevron = document.getElementById('schemaPanelChevron');
+  if (!body) return;
+  const isHidden = body.style.display === 'none';
+  body.style.display = isHidden ? 'flex' : 'none';
+  if (chevron) chevron.classList.toggle('collapsed', !isHidden);
+}
+window.toggleSchema = toggleSchema;
+
 window.submitCode = submitCode;
 window.flip = flip;
 window.showPicker = showPicker;

@@ -1,0 +1,571 @@
+{
+  "deck": "Snowflake",
+  "cards": [
+    {
+      "q": "What is schema evolution in Snowflake COPY INTO?",
+      "a": "When ENABLE_SCHEMA_EVOLUTION = TRUE on a table, COPY INTO will automatically add new columns found in the source files (for semi-structured data) rather than failing. This allows the table schema to evolve as the source adds new fields without manual ALTER TABLE.",
+      "group": "Data Loading",
+      "difficulty": "hard",
+      "category": "Data Loading",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "095302f5"
+    },
+    {
+      "q": "What is a Snowflake Directory Table?",
+      "a": "Automatically maintained metadata about the files in a stage: file path, size, ETag, last modified time. Accessed via TABLE(@stage). Used in pipeline code to discover and process files efficiently — for example, to find all files added after a given timestamp.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "951c9514"
+    },
+    {
+      "q": "How can you monitor Snowpipe ingestion lag and errors?",
+      "a": "Use SYSTEM$PIPE_STATUS() to check pipe state, pending file count, and last loaded time. Query LOAD_HISTORY (information schema) or COPY_HISTORY (account_usage) for per-file load status and error details.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "05afe96d"
+    },
+    {
+      "q": "What is the role of a Storage Integration in Snowflake?",
+      "a": "A Snowflake object that stores credentials (IAM role ARN for AWS, service account for GCP, service principal for Azure) for accessing external cloud storage. Stages reference the integration instead of hardcoding access keys — centralising credential management and enabling key rotation without updating every stage.",
+      "group": "Data Ingestion",
+      "difficulty": "medium",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "fec697d2"
+    },
+    {
+      "q": "What is Snowpark and how does it relate to data engineering in Snowflake?",
+      "a": "Snowpark is a developer framework that lets you write data transformation logic in Python, Java, or Scala using a DataFrame API that executes natively inside Snowflake. Data engineers use it to write complex pipeline code that pushes compute to Snowflake, replacing Spark for many use cases.",
+      "group": "Snowpark",
+      "difficulty": "hard",
+      "category": "Snowpark",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "c47562f1"
+    },
+    {
+      "q": "What is a Snowpark Optimised Warehouse?",
+      "a": "A special warehouse type with 16x more memory per node than a standard warehouse, designed for memory-intensive ML workloads and large Snowpark (Python/Java) operations. Billed at a higher credit rate. Not recommended for standard SQL analytics.",
+      "group": "Snowpark",
+      "difficulty": "hard",
+      "category": "Snowpark",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "05823abf"
+    },
+    {
+      "q": "What considerations drive the choice of Snowflake cloud provider and region?",
+      "a": "Data residency and compliance requirements (GDPR, data sovereignty), latency to existing systems and users, colocation with other cloud services (e.g., Kafka on AWS → Snowflake on AWS), pricing differences, and supported features (some features are region-specific).",
+      "group": "Account Design",
+      "difficulty": "medium",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "557c0720"
+    },
+    {
+      "q": "When would you use multiple Snowflake accounts vs. multiple databases within one account?",
+      "a": "Multiple accounts for: hard isolation (different organisations, strict compliance boundaries, separate billing), cross-cloud deployments, or production/non-production separation with no risk of cross-environment access. Multiple databases within one account for: cost consolidation, shared governance, simpler cross-database queries (no replication needed).",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "ad74a11b"
+    },
+    {
+      "q": "What is a Snowflake Organisation and what does it enable?",
+      "a": "An overarching entity that links multiple Snowflake accounts under a single organisation name. Enables: account-level replication, cross-account cost visibility in ORGANISATION_USAGE, and Snowflake Marketplace publisher identity that spans accounts.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "8fe5602f"
+    },
+    {
+      "q": "How should you design the role hierarchy for a large enterprise Snowflake deployment?",
+      "a": "Custom functional roles (ANALYST, DATA_ENGINEER, REPORTER) grant object-level privileges. Custom access roles (DB_PROD_READ, DB_PROD_WRITE) own and grant access to specific databases. Functional roles inherit access roles. SYSADMIN sits above custom roles. Never grant ACCOUNTADMIN to functional users.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "d9ce5167"
+    },
+    {
+      "q": "What is the Snowflake Data Governance suite and what features does it include?",
+      "a": "A set of Enterprise+ features: Dynamic Data Masking (column-level obfuscation), Row Access Policies (row-level filtering), Object Tags (classification labels), Tag-Based Masking (apply masking via tags), Data Classification (auto-suggest tags for PII), Access History (query-level column-read audit log), and Policy Management (centralised policy objects).",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "672bf08d"
+    },
+    {
+      "q": "What is Access History in Snowflake and why is it important for architects?",
+      "a": "A feature (Enterprise+) that records which columns each query read or modified, who ran the query, and when. Stored in SNOWFLAKE.ACCOUNT_USAGE.ACCESS_HISTORY. Used for data lineage audits, PII access monitoring, and compliance reporting.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "39ebab68"
+    },
+    {
+      "q": "What is Private Connectivity in Snowflake (AWS PrivateLink / Azure Private Link / GCP Private Service Connect)?",
+      "a": "Routes Snowflake traffic over the cloud provider's private backbone instead of the public internet. Traffic never leaves the provider's network — reducing exposure and satisfying compliance requirements that prohibit public internet data transfer. Requires Business Critical or higher edition.",
+      "group": "Security Architecture",
+      "difficulty": "hard",
+      "category": "Security Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "8b9d5dd3"
+    },
+    {
+      "q": "What is a Snowflake Data Clean Room?",
+      "a": "A pattern (using Secure Data Sharing and Secure Views) that lets two parties run joint analyses on combined data without either party seeing the other's raw data. Neither side can extract the other's rows — they can only see aggregated or pre-defined query results.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "3df0de56"
+    },
+    {
+      "q": "How do you architect cross-region disaster recovery in Snowflake?",
+      "a": "Use Replication Groups (or Business Critical Failover Groups) to asynchronously replicate specified databases and account objects to a secondary account in a different region. Define an RPO (acceptable data loss) matching your replication schedule, and test failover regularly. Point DNS/connections at the primary account; redirect to secondary on failover.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "057df2f0"
+    },
+    {
+      "q": "What is the difference between database replication and a Failover Group?",
+      "a": "Database replication replicates data only. A Failover Group replicates both data AND account objects (users, roles, resource monitors, warehouses, integrations) needed to run a full Snowflake environment on the secondary account. Failover Groups support full account-level DR.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "07629a7b"
+    },
+    {
+      "q": "What are the RPO and RTO considerations when designing Snowflake HA?",
+      "a": "RPO (Recovery Point Objective) — time between the last replication sync and a failure. Governed by the replication schedule (minimum ~1 minute for some features). RTO (Recovery Time Objective) — time to promote the secondary and redirect connections. Promotion is near-instant in Snowflake; the bottleneck is usually DNS/connection-string updates.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "b92904a0"
+    },
+    {
+      "q": "How would you design a cost allocation model across business units sharing one Snowflake account?",
+      "a": "Create one virtual warehouse per business unit (or one per workload type). Apply Resource Monitors per warehouse with per-BU quotas. Tag warehouses with the business unit using Object Tags. Report on usage via ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY filtered by warehouse name or tag. Optionally use separate accounts with cross-account cost reporting via ORGANISATION_USAGE.",
+      "group": "Cost Architecture",
+      "difficulty": "hard",
+      "category": "Cost Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "d067d6b9"
+    },
+    {
+      "q": "What is a Snowflake Marketplace listing and what can be listed?",
+      "a": "A published data product on the Snowflake Marketplace. Listings can contain: databases shared via Secure Data Sharing (live data), or Native Apps (applications built on the Snowflake Native App Framework). Listings can be free, paid (via Snowflake billing), or request-only.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "d3f45216"
+    },
+    {
+      "q": "What is the Snowflake Native App Framework?",
+      "a": "Allows ISVs and data providers to build applications that run inside a consumer's Snowflake account — not just data shares. Native Apps can include Streamlit UIs, stored procedures, Python UDFs, and reference data. The provider's code runs in the consumer's account but the provider controls what it can access.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "35c7616a"
+    },
+    {
+      "q": "How does Snowflake handle data lineage at the platform level?",
+      "a": "Snowflake provides: (1) Access History (column-level read/write tracking). (2) Object Dependencies (SNOWFLAKE.ACCOUNT_USAGE.OBJECT_DEPENDENCIES shows how views/tasks/pipes reference tables). (3) Dynamic Tables have built-in lineage visualisation in Snowsight. For end-to-end data lineage across tools, integrate with a third-party catalog (e.g., Atlan, Alation, OpenMetadata).",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "9b4fc382"
+    },
+    {
+      "q": "What performance patterns should a Snowflake architect consider for a mixed workload (OLAP + ad-hoc + ETL)?",
+      "a": "Separate virtual warehouses by workload type: large ETL warehouse (L/XL, auto-suspend 5 min), medium analytics warehouse (M, multi-cluster for concurrency), small ad-hoc/BI warehouse (S/XS, auto-suspend 1 min). Use resource monitors per warehouse. Consider a Snowpark-optimised warehouse for ML workloads. Route by application/role using connection strings.",
+      "group": "Performance Architecture",
+      "difficulty": "hard",
+      "category": "Performance Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "b38a134f"
+    },
+    {
+      "q": "What is Snowsight?",
+      "a": "Snowflake's modern web-based UI (the successor to the Classic Console). It provides SQL worksheets, a query history viewer, database object explorer, dashboards, and admin screens for users, warehouses, and billing — all in the browser.",
+      "group": "Core Concepts",
+      "difficulty": "easy",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "31c1e894"
+    },
+    {
+      "q": "What is SnowSQL?",
+      "a": "The official command-line client for Snowflake. It connects to Snowflake over TLS, lets you run SQL interactively or in batch mode, and is the only client that supports the PUT and GET commands for transferring files to/from internal stages.",
+      "group": "Core Concepts",
+      "difficulty": "easy",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "8b205612"
+    },
+    {
+      "q": "What are Snowflake worksheets?",
+      "a": "Named, saved SQL editing contexts in Snowsight. Each worksheet has its own role, warehouse, database, and schema context. Multiple worksheets can run independently in parallel. Worksheets can be organised into folders and shared with other users.",
+      "group": "Core Concepts",
+      "difficulty": "easy",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "99ac1964"
+    },
+    {
+      "q": "How does Snowflake handle SQL identifier case sensitivity?",
+      "a": "Unquoted identifiers are stored and compared in UPPERCASE. Double-quoted identifiers preserve exact case and are case-sensitive. Best practice: use unquoted (uppercase) identifiers unless you specifically need mixed-case names.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "d3fbc3e6"
+    },
+    {
+      "q": "What is AUTOCOMMIT in Snowflake?",
+      "a": "Snowflake runs with AUTOCOMMIT = TRUE by default — every DML statement is automatically committed unless you explicitly start a transaction with BEGIN. You can disable AUTOCOMMIT at the session level to group statements into manual transactions.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "ebde7b21"
+    },
+    {
+      "q": "What is the Information Schema in Snowflake?",
+      "a": "An ANSI-standard set of views inside every Snowflake database (INFORMATION_SCHEMA schema) that shows metadata about the objects in that database — tables, columns, views, stages, file formats, etc. Data reflects the current state of that database only.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "5ef03cad"
+    },
+    {
+      "q": "What is ACCOUNT_USAGE in Snowflake and how does it differ from INFORMATION_SCHEMA?",
+      "a": "ACCOUNT_USAGE is a shared database (SNOWFLAKE.ACCOUNT_USAGE) with views covering the entire account — all databases, all warehouses, query history, login history, storage usage, etc. It has a latency of 45 minutes to 3 hours. INFORMATION_SCHEMA is per-database and near real-time but limited to that database's objects.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "bb5fc75e"
+    },
+    {
+      "q": "What does the SHOW command do in Snowflake?",
+      "a": "Lists objects of a given type visible to the current role: SHOW TABLES, SHOW WAREHOUSES, SHOW USERS, SHOW GRANTS TO ROLE my_role, etc. More convenient than querying INFORMATION_SCHEMA for a quick inventory; output can be queried with SELECT * FROM TABLE(RESULT_SCAN(LAST_QUERY_ID())).",
+      "group": "Core Concepts",
+      "difficulty": "easy",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "46ae0800"
+    },
+    {
+      "q": "What are constraints in Snowflake and are they enforced?",
+      "a": "Snowflake supports PRIMARY KEY, UNIQUE, FOREIGN KEY, and NOT NULL constraints in DDL for documentation and tooling compatibility. Only NOT NULL is enforced at runtime. PRIMARY KEY, UNIQUE, and FOREIGN KEY are informational only — Snowflake does not reject violating rows.",
+      "group": "Tables & Objects",
+      "difficulty": "medium",
+      "category": "Tables & Objects",
+      "module": "Snowflake 101",
+      "id": "0a99548f"
+    },
+    {
+      "q": "What is the difference between a Secure View and a regular view in Snowflake?",
+      "a": "A Secure View hides its underlying definition from users who don't own it — the definition is not visible in SHOW VIEWS or INFORMATION_SCHEMA. Required when sharing views via Secure Data Sharing (regular views expose their SQL to data consumers).",
+      "group": "Tables & Objects",
+      "difficulty": "medium",
+      "category": "Tables & Objects",
+      "module": "Snowflake 101",
+      "id": "9b61bfad"
+    },
+    {
+      "q": "What is a Snowflake Pipe object?",
+      "a": "A named object that encapsulates a COPY INTO statement and a source stage. Snowpipe uses the pipe definition to load files as they arrive. The pipe stores the load history used to deduplicate file loads.",
+      "group": "Data Loading",
+      "difficulty": "medium",
+      "category": "Data Loading",
+      "module": "Snowflake 101",
+      "id": "94466057"
+    },
+    {
+      "q": "What is the user stage vs. named internal stage?",
+      "a": "Every user automatically has a personal user stage (@~) — no creation needed, not shareable, tied to the user. A named internal stage (CREATE STAGE) is a standalone object that can be granted to roles and shared across users and processes. Preferred for production pipelines.",
+      "group": "Data Loading",
+      "difficulty": "medium",
+      "category": "Data Loading",
+      "module": "Snowflake 101",
+      "id": "6e1ea9f9"
+    },
+    {
+      "q": "What Snowflake data types are used for date and time?",
+      "a": "DATE (date only), TIME (time only), TIMESTAMP_NTZ (no timezone — stores as-is), TIMESTAMP_LTZ (local timezone — stores UTC, displays in session timezone), TIMESTAMP_TZ (stores offset with the value). TIMESTAMP is an alias for whichever variant the TIMESTAMP_TYPE_MAPPING session parameter specifies (default: NTZ).",
+      "group": "Tables & Objects",
+      "difficulty": "medium",
+      "category": "Tables & Objects",
+      "module": "Snowflake 101",
+      "id": "9b9b6629"
+    },
+    {
+      "q": "What is the VARIANT size limit in Snowflake?",
+      "a": "Each VARIANT value can be up to 16 MB when uncompressed. Individual objects or arrays that exceed this limit cannot be stored in a single VARIANT column — they must be split or truncated before loading.",
+      "group": "Semi-Structured Data",
+      "difficulty": "medium",
+      "category": "Semi-Structured Data",
+      "module": "Snowflake 101",
+      "id": "5c7f5f50"
+    },
+    {
+      "q": "What is a Snowflake Alert?",
+      "a": "A named object that evaluates a condition on a schedule and sends a notification (via a notification integration — email, SNS, PagerDuty, etc.) when the condition is true. Used for data quality monitoring, pipeline failure detection, and threshold alerts.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "48e91809"
+    },
+    {
+      "q": "What is the Snowflake Partner Ecosystem?",
+      "a": "A network of certified technology partners — BI tools (Tableau, Looker, Power BI), ETL/ELT tools (dbt, Fivetran, Matillion, Airbyte), data catalogues (Alation, Atlan), and security tools — that have native, certified connectors to Snowflake. Listed on the Snowflake Partner Connect page.",
+      "group": "Core Concepts",
+      "difficulty": "easy",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "a01eaea4"
+    },
+    {
+      "q": "What is a Notification Integration in Snowflake?",
+      "a": "A Snowflake object that connects Snowflake to an external messaging service (AWS SNS, Azure Event Grid, GCP Pub/Sub, email). Used by Alerts, Snowpipe error notifications, and Tasks to send messages outside Snowflake.",
+      "group": "Core Concepts",
+      "difficulty": "medium",
+      "category": "Core Concepts",
+      "module": "Snowflake 101",
+      "id": "dd0803ae"
+    },
+    {
+      "q": "What is an Event Table in Snowflake?",
+      "a": "A special table that stores log and trace events emitted from Snowflake handler code (Python UDFs, stored procedures, Snowpark). Replaces the need for external logging — you query the event table with SQL to see errors, log messages, and OpenTelemetry spans from your code.",
+      "group": "Architecture",
+      "difficulty": "hard",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "c9666bcb"
+    },
+    {
+      "q": "What are External Functions in Snowflake?",
+      "a": "User-defined functions that call an external HTTPS endpoint (an API Gateway backed by AWS Lambda, Azure Functions, or GCP Cloud Functions). The SQL query passes rows to the external service and receives results back. Useful for enrichment, ML inference, or third-party API calls.",
+      "group": "Architecture",
+      "difficulty": "hard",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "fb682df0"
+    },
+    {
+      "q": "What is the Query Acceleration Service (QAS) in Snowflake?",
+      "a": "A serverless feature that offloads parts of an eligible query (large scans, outlier partitions) to additional serverless compute rather than requiring you to upsize the warehouse. Useful for queries with variable data skew. Enabled per-warehouse with ENABLE_QUERY_ACCELERATION = TRUE.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "8223ad66"
+    },
+    {
+      "q": "What is a Snowflake Budget?",
+      "a": "A newer (2023+) account-level spending control object that sets a monthly credit spending limit for a group of Snowflake objects or the whole account. More granular than Resource Monitors — Budgets can monitor serverless feature costs (clustering, Tasks, Snowpipe) that Resource Monitors cannot.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "category": "Performance",
+      "module": "Snowflake Core",
+      "id": "7b4fe204"
+    },
+    {
+      "q": "What are Future Grants in Snowflake?",
+      "a": "A privilege grant applied to all future objects of a type in a schema or database: GRANT SELECT ON FUTURE TABLES IN SCHEMA mydb.myschema TO ROLE analyst. New tables created after the grant automatically receive the privilege — no need to re-grant on each new object.",
+      "group": "Security",
+      "difficulty": "medium",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "f454edc8"
+    },
+    {
+      "q": "What is GRANT OWNERSHIP in Snowflake and when would you use it?",
+      "a": "Transfers ownership of an object from one role to another: GRANT OWNERSHIP ON TABLE orders TO ROLE data_engineer. Needed when migrating objects between teams, or when the creating role should not retain long-term ownership. Only the current owner or ACCOUNTADMIN can transfer ownership.",
+      "group": "Security",
+      "difficulty": "medium",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "33b0841b"
+    },
+    {
+      "q": "What is External Tokenization in Snowflake?",
+      "a": "A column-level security pattern where sensitive values are replaced with tokens by an external vault (e.g., Protegrity, Voltage) before landing in Snowflake. A masking policy calls an External Function to de-tokenize values at query time for authorised users. Data at rest is never in plaintext.",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "a65dc8ab"
+    },
+    {
+      "q": "What is Data Classification in Snowflake?",
+      "a": "A system that automatically scans column values and metadata and suggests privacy tags (e.g., NAME, EMAIL, PHONE, SSN) that can then be applied via Object Tags. Helps teams identify PII/sensitive data without manually reviewing every column.",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "2786bb0f"
+    },
+    {
+      "q": "What is a Snowflake Network Rule?",
+      "a": "A newer (2023+) object that defines a set of IP ranges or VPC IDs as an allowed or blocked group. Network Rules are referenced by Network Policies, replacing the flat allowed/blocked IP list with reusable, composable rule objects.",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "463b0146"
+    },
+    {
+      "q": "What are Iceberg Tables in Snowflake?",
+      "a": "Tables that store data in the Apache Iceberg open-table format on customer-managed cloud storage, while using Snowflake as the query engine. Enables a data lakehouse pattern: open format data readable by other engines (Spark, Flink), governed and queried through Snowflake.",
+      "group": "Architecture",
+      "difficulty": "hard",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "6a5dc049"
+    },
+    {
+      "q": "What is Snowflake Cortex?",
+      "a": "A suite of serverless AI/ML features built into Snowflake: Cortex LLM Functions (COMPLETE, SUMMARIZE, TRANSLATE, SENTIMENT, CLASSIFY_TEXT using hosted LLMs), Cortex ML Functions (FORECAST, ANOMALY_DETECTION using AutoML), and Cortex Search (vector search). Runs entirely within Snowflake — no data leaves the platform.",
+      "group": "Architecture",
+      "difficulty": "hard",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "fe82ce8e"
+    },
+    {
+      "q": "What is the RESULT_SCAN function in Snowflake?",
+      "a": "Returns the output of a previous query as a table using its query ID: SELECT * FROM TABLE(RESULT_SCAN(LAST_QUERY_ID())). Useful for processing SHOW command output or inspecting results of VALIDATE statements in subsequent SQL.",
+      "group": "Architecture",
+      "difficulty": "medium",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "9947a80c"
+    },
+    {
+      "q": "What is the difference between TIMESTAMP_NTZ, TIMESTAMP_LTZ, and TIMESTAMP_TZ?",
+      "a": "TIMESTAMP_NTZ — stores date/time with no timezone; displayed exactly as stored. TIMESTAMP_LTZ — stores as UTC; displayed in the session's local timezone (TIMEZONE parameter). TIMESTAMP_TZ — stores the value plus an explicit UTC offset; preserves the original timezone information.",
+      "group": "Architecture",
+      "difficulty": "medium",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "e85db49a"
+    },
+    {
+      "q": "What is a Stored Procedure owner's rights vs. caller's rights in Snowflake?",
+      "a": "Owner's rights (default): the procedure runs with the privileges of the role that owns it, not the caller. The caller only needs EXECUTE PRIVILEGE — they can't see or access objects they don't have direct grants to. Caller's rights: the procedure runs with the caller's role — useful when you want the procedure to respect the caller's access level.",
+      "group": "Security",
+      "difficulty": "hard",
+      "category": "Security",
+      "module": "Snowflake Core",
+      "id": "8c936074"
+    },
+    {
+      "q": "What is the difference between a Task with a CRON schedule and a serverless Task?",
+      "a": "A warehouse-based Task runs on a specified virtual warehouse (you pay for warehouse time even if the task is fast). A serverless Task (WAREHOUSE = omitted, USER_TASK_MANAGED_INITIAL_WAREHOUSE_SIZE specified) uses Snowflake-managed compute — you pay per compute-second used, and Snowflake auto-sizes based on prior run history.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "Snowflake Core",
+      "id": "a3fc84d3"
+    },
+    {
+      "q": "What is a Snowflake SEQUENCE and what guarantees does it make?",
+      "a": "A sequence generates unique integer values with NEXTVAL. Values are guaranteed unique and monotonically increasing, but NOT gap-free — gaps can occur due to rollbacks, multi-session access, or batch allocation. Do not rely on sequences for dense, contiguous numbering.",
+      "group": "Architecture",
+      "difficulty": "medium",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "a2b9a090"
+    },
+    {
+      "q": "What is the difference between a Materialized View and a Dynamic Table in Snowflake?",
+      "a": "Materialized Views are automatically refreshed by Snowflake when base data changes, but have significant limitations: no JOINs on non-shared-micropartitions, no subqueries, Enterprise+ only. Dynamic Tables support full SQL (JOINs, CTEs, aggregations), have configurable lag, and can form dependency chains. Dynamic Tables are the recommended modern approach.",
+      "group": "Architecture",
+      "difficulty": "hard",
+      "category": "Architecture",
+      "module": "Snowflake Core",
+      "id": "b182565c"
+    },
+    {
+      "q": "What is the difference between an internal named stage and a user/table stage?",
+      "a": "User stage (@~) and table stage (@%tablename) are auto-created, not grantable, and tied to a user or table. Named stages (CREATE STAGE) are independent objects, can be granted to roles, support custom file format defaults, and are the recommended approach for production pipelines.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "915853ca"
+    },
+    {
+      "q": "What is columnar storage and why does Snowflake use it?",
+      "a": "Columnar storage organises data by column rather than by row. This means analytic queries that read only a few columns scan far less data. It also enables much higher compression ratios within a column (similar values together). Snowflake's micro-partitions are stored in a compressed columnar format (based on PAX/hybrid).",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "bde02e78"
+    },
+    {
+      "q": "What happens to old micro-partitions when data is updated or deleted in Snowflake?",
+      "a": "Micro-partitions are immutable. An UPDATE or DELETE creates new micro-partitions with the changed/surviving rows and marks the old micro-partitions as deleted. The old partitions are retained for the Time Travel retention period, then moved to Fail-Safe, and eventually purged.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "hard",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "cb99d0c5"
+    },
+    {
+      "q": "What is the Continuous Data Protection (CDP) lifecycle in Snowflake?",
+      "a": "The layered protection Snowflake provides automatically: 1. Operational storage (current data). 2. Time Travel (user-accessible historical queries/restores, up to 90 days). 3. Fail-Safe (7-day Snowflake-managed emergency recovery after Time Travel). No additional configuration required.",
+      "group": "Domain 1: Architecture",
+      "difficulty": "medium",
+      "category": "Domain 1: Architecture",
+      "module": "SnowPro Core",
+      "certification": "snowpro core",
+      "id": "fa8919c4"
+    }
+  ]
+}

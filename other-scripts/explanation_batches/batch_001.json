@@ -1,0 +1,572 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "What is the recommended SQL style for dbt models?",
+      "a": "Use CTEs (WITH clauses) instead of nested subqueries. Name CTEs after what they represent (source, renamed, filtered, final). This makes models easier to read, test, and debug.",
+      "group": "Best Practices",
+      "difficulty": "easy",
+      "category": "Best Practices",
+      "module": "dbt Fundamentals",
+      "id": "76e9b347"
+    },
+    {
+      "q": "Why should you avoid using `SELECT *` in dbt models?",
+      "a": "SELECT * makes the model's output schema unpredictable — new columns added upstream will silently appear downstream. Explicit column selection documents the model's schema and prevents unexpected changes.",
+      "group": "Best Practices",
+      "difficulty": "easy",
+      "category": "Best Practices",
+      "module": "dbt Fundamentals",
+      "id": "524ecec4"
+    },
+    {
+      "q": "What is the purpose of the staging layer in a dbt project?",
+      "a": "To provide a clean, consistent view of each raw source table — renaming columns to a standard convention, casting data types, filtering deleted rows, and deduplicating. All downstream models build on staging, never on raw sources directly.",
+      "group": "Best Practices",
+      "difficulty": "easy",
+      "category": "Best Practices",
+      "module": "dbt Fundamentals",
+      "id": "f53a251f"
+    },
+    {
+      "q": "When should you materialise a staging model as a table vs. a view?",
+      "a": "Start with view (default) — staging models are simple and views avoid storage cost. Switch to table if the staging model is expensive (large source, complex deduplication) or queried very frequently by many downstream models.",
+      "group": "Best Practices",
+      "difficulty": "medium",
+      "category": "Best Practices",
+      "module": "dbt Fundamentals",
+      "id": "b93303cc"
+    },
+    {
+      "q": "What is the purpose of adding descriptions to models and columns in dbt?",
+      "a": "Descriptions become part of the project's self-documenting lineage in dbt docs / Explorer. They help teammates (and your future self) understand what a model represents without reading the SQL.",
+      "group": "Best Practices",
+      "difficulty": "easy",
+      "category": "Best Practices",
+      "module": "dbt Fundamentals",
+      "id": "a8c679e1"
+    },
+    {
+      "q": "What are the three Jinja delimiter types used in dbt SQL files?",
+      "a": "{{ expression }} — outputs a value (e.g. {{ ref('model') }}). {% block %} — executes logic with no output (e.g. {% if %}, {% for %}, {% set %}). {# comment #} — comment that is stripped before the SQL is sent to the warehouse.",
+      "group": "Jinja Basics",
+      "difficulty": "easy",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "139cfd8a"
+    },
+    {
+      "q": "What does `{% set my_var = 'value' %}` do in a dbt model?",
+      "a": "Defines a Jinja variable local to that file. Unlike dbt variables (var()), it exists only at compile time and is not accessible from the command line or dbt_project.yml.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "d4367e8a"
+    },
+    {
+      "q": "What does `{{ this }}` refer to inside a dbt model?",
+      "a": "A special dbt variable that resolves to the fully-qualified database relation for the current model (e.g. my_db.my_schema.my_model). Mainly used inside incremental models to self-reference the existing table.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "0a7be8e9"
+    },
+    {
+      "q": "What does `{{ run_started_at }}` return in dbt?",
+      "a": "The UTC timestamp of when the current dbt run began. Useful for stamping audit columns (e.g. dbt_loaded_at) consistently across all models in a run, even if individual models finish at different times.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "51525965"
+    },
+    {
+      "q": "What is `env_var()` in dbt and when would you use it?",
+      "a": "A dbt Jinja function that reads an OS environment variable: {{ env_var('MY_VAR') }}. Accepts an optional default: {{ env_var('MY_VAR', 'default') }}. Used to inject secrets or environment-specific values (e.g. schemas, credentials) without hardcoding them.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "99320602"
+    },
+    {
+      "q": "What is the difference between `var()` and `env_var()` in dbt?",
+      "a": "var() reads a dbt project variable defined in dbt_project.yml or passed with --vars on the CLI — it is dbt-aware and version-controllable. env_var() reads an OS environment variable set outside dbt — used for secrets or infrastructure values that must not be committed to source control.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "d48d1de2"
+    },
+    {
+      "q": "How do you pass a variable to a dbt run from the command line?",
+      "a": "dbt run --vars '{my_var: my_value}'. Multiple variables: --vars '{var1: val1, var2: val2}'. CLI variables override defaults set in dbt_project.yml.",
+      "group": "Jinja Basics",
+      "difficulty": "medium",
+      "category": "Jinja Basics",
+      "module": "dbt in Practice",
+      "id": "c79827b9"
+    },
+    {
+      "q": "In what three places can you configure a dbt model, and what is the order of precedence?",
+      "a": "1. dbt_project.yml (lowest precedence — project-wide defaults by folder). 2. A config() block at the top of the model file. 3. A config block in a schema.yml (config: key). Model-level config always wins over project-level defaults.",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "ed47307a"
+    },
+    {
+      "q": "What columns does dbt automatically manage in an incremental model?",
+      "a": "None — dbt does not add any automatic columns. You are responsible for any audit columns you want (e.g. dbt_loaded_at, dbt_updated_at). The is_incremental() macro and {{ this }} are provided as tools, but column management is entirely in your SQL.",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "84b5b032"
+    },
+    {
+      "q": "What is `unique_key` in an incremental model config and what does it control?",
+      "a": "A column (or list of columns) used to identify a row uniquely. When dbt runs incrementally and unique_key is set, it deletes or merges existing rows with matching keys before inserting new ones — preventing duplicates. Without unique_key, dbt only appends rows.",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "172bfa3e"
+    },
+    {
+      "q": "What is the `on_schema_change` config for incremental models?",
+      "a": "Controls behaviour when upstream columns are added or removed. Options: 'ignore' (default — new columns are silently dropped), 'fail' (error on any schema change), 'append_new_columns' (add new columns, keep old ones), 'sync_all_columns' (keep in sync, dropping removed columns).",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "6ee20e13"
+    },
+    {
+      "q": "What is the `schema` config on a model and how does it interact with the target schema?",
+      "a": "Sets a custom schema suffix for the model: config(schema='reporting') makes dbt build the model in <target_schema>_reporting (by default). You can override the generate_schema_name macro to change this concatenation behaviour.",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "eb0bf6d2"
+    },
+    {
+      "q": "What is the `alias` config on a dbt model?",
+      "a": "Sets the name of the database object dbt creates, independently of the model's filename. config(alias='final_orders') builds a table/view called final_orders regardless of the .sql filename.",
+      "group": "Config & Materializations",
+      "difficulty": "medium",
+      "category": "Config & Materializations",
+      "module": "dbt in Practice",
+      "id": "90d7039d"
+    },
+    {
+      "q": "What is `loaded_at_field` in a dbt source definition?",
+      "a": "The name of the timestamp column in the source table that records when each row was loaded. dbt uses this column in `dbt source freshness` to determine whether the source data is fresh enough.",
+      "group": "Sources",
+      "difficulty": "medium",
+      "category": "Sources",
+      "module": "dbt in Practice",
+      "id": "210667a5"
+    },
+    {
+      "q": "What does `dbt source freshness` exit with if a source is stale?",
+      "a": "Exit code 1 (error) if any source exceeds its error_after threshold. Sources that exceed only warn_after produce a warning but exit 0. Sources with no freshness config are not checked.",
+      "group": "Sources",
+      "difficulty": "medium",
+      "category": "Sources",
+      "module": "dbt in Practice",
+      "id": "45bd80ba"
+    },
+    {
+      "q": "Can you apply data tests to a source in dbt?",
+      "a": "Yes. Define tests under the source table's columns in sources.yml the same way you would for a model — not_null, unique, accepted_values, relationships all work on source columns.",
+      "group": "Sources",
+      "difficulty": "medium",
+      "category": "Sources",
+      "module": "dbt in Practice",
+      "id": "5c613a23"
+    },
+    {
+      "q": "What is a `source override` in dbt (dbt_project.yml)?",
+      "a": "You can set config for all tables in a source at the source level (e.g. +tags, +meta) in sources.yml. This avoids repeating the config on every table. Individual tables can still override source-level config.",
+      "group": "Sources",
+      "difficulty": "medium",
+      "category": "Sources",
+      "module": "dbt in Practice",
+      "id": "b6a1709a"
+    },
+    {
+      "q": "How do you make a generic test only warn instead of fail?",
+      "a": "Set severity: warn in the test config in schema.yml: data_tests: [{not_null: {config: {severity: warn}}}]. The test runs but dbt continues and exits 0 if only warnings occurred.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "category": "Testing",
+      "module": "dbt in Practice",
+      "id": "1a14157d"
+    },
+    {
+      "q": "What is `store_failures: true` for dbt tests?",
+      "a": "When set in the test config (or globally in dbt_project.yml), dbt saves the rows that fail each test into a table in the warehouse. Useful for debugging — you can query the failure table to see exactly which records failed.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "category": "Testing",
+      "module": "dbt in Practice",
+      "id": "3b4b02e2"
+    },
+    {
+      "q": "How do you add a custom generic test in dbt?",
+      "a": "Create a macro in macros/ named test_<test_name>(model, column_name, ...) that returns a SELECT of failing rows. Then reference it in schema.yml by its name (without the test_ prefix).",
+      "group": "Testing",
+      "difficulty": "medium",
+      "category": "Testing",
+      "module": "dbt in Practice",
+      "id": "63d4c8fb"
+    },
+    {
+      "q": "What is `dbt_expectations` and what does it add?",
+      "a": "A popular dbt package (from Calogica) that adds 50+ data quality tests modelled after the Great Expectations library — e.g. expect_column_values_to_be_between, expect_table_row_count_to_be_between. Install via packages.yml.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "category": "Testing",
+      "module": "dbt in Practice",
+      "id": "9797bad2"
+    },
+    {
+      "q": "How do you apply a tag to every model in a subdirectory using `dbt_project.yml`?",
+      "a": "Use folder-level config in dbt_project.yml: under models: > project_name: > staging:, add +tags: ['staging']. The + prefix means the config applies to all nodes at and below that path.",
+      "group": "Tags & Selection",
+      "difficulty": "medium",
+      "category": "Tags & Selection",
+      "module": "dbt in Practice",
+      "id": "0ab962fc"
+    },
+    {
+      "q": "What does the `--exclude` flag do in dbt?",
+      "a": "Removes nodes from the set selected by --select. dbt run --select staging+ --exclude stg_payments runs everything downstream of staging/ except stg_payments and its descendants.",
+      "group": "Tags & Selection",
+      "difficulty": "medium",
+      "category": "Tags & Selection",
+      "module": "dbt in Practice",
+      "id": "cf46cabc"
+    },
+    {
+      "q": "What selector syntax targets all models in a specific directory?",
+      "a": "Use a path selector: dbt run --select models/staging/ or dbt run --select staging.*. The path selector matches any model whose file path contains that string.",
+      "group": "Tags & Selection",
+      "difficulty": "medium",
+      "category": "Tags & Selection",
+      "module": "dbt in Practice",
+      "id": "968ed1c6"
+    },
+    {
+      "q": "What does the `state:modified` selector do?",
+      "a": "Selects only models whose compiled SQL or upstream dependency has changed compared to a previous run's manifest.json. Used in Slim CI: dbt build --select state:modified+ --state path/to/previous/target",
+      "group": "Tags & Selection",
+      "difficulty": "medium",
+      "category": "Tags & Selection",
+      "module": "dbt in Practice",
+      "id": "8ed1f087"
+    },
+    {
+      "q": "What is `dbt_utils.generate_surrogate_key()` and when would you use it?",
+      "a": "A macro that hashes a list of column values to produce a deterministic surrogate key: {{ dbt_utils.generate_surrogate_key(['order_id', 'line_item_id']) }}. Use it when a natural unique key spans multiple columns or when upstream IDs may not be stable.",
+      "group": "Packages",
+      "difficulty": "medium",
+      "category": "Packages",
+      "module": "dbt in Practice",
+      "id": "877fb3bc"
+    },
+    {
+      "q": "What is `dbt_utils.star()` and when is it useful?",
+      "a": "A macro that generates SELECT col1, col2, ... for all columns in a relation, with optional exclusions: {{ dbt_utils.star(from=ref('stg_orders'), except=['pii_column']) }}. Useful in staging models where you want all columns minus a few.",
+      "group": "Packages",
+      "difficulty": "medium",
+      "category": "Packages",
+      "module": "dbt in Practice",
+      "id": "4a3b0413"
+    },
+    {
+      "q": "What is `dbt_utils.date_spine()` used for?",
+      "a": "Generates a table of sequential dates between two endpoints — useful for building calendar/date dimension tables or filling gaps in time-series data without relying on existing data to have every date.",
+      "group": "Packages",
+      "difficulty": "medium",
+      "category": "Packages",
+      "module": "dbt in Practice",
+      "id": "169324a8"
+    },
+    {
+      "q": "A 500GB table receives 1 million new rows hourly. Updates occur for the last 3 days. Which strategy do you use?",
+      "a": "Incremental with `merge` strategy and a look-back window\n\n**Watch out:** `append` strategy; this creates duplicates for updated rows.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "9ae7942a"
+    },
+    {
+      "q": "You are refactoring a 400-line nested subquery into dbt. How to structure for best practices?",
+      "a": "Break into an `Intermediate` model and use `ref()`\n\n**Watch out:** Keeping the subquery; makes logic impossible to test or reuse.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "41ce1f5a"
+    },
+    {
+      "q": "You change a column name in Staging. Command to identify downstream breaks?",
+      "a": "`dbt build --select stg_model_name+`\n\n**Watch out:** Running `dbt run`; this skips tests, letting breaks reach BI.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e38083ba"
+    },
+    {
+      "q": "Model used by 5 Marts is slow as a View. Architectural fix?",
+      "a": "Change materialization to `Table`\n\n**Watch out:** Converting to `Ephemeral`; injects code as a CTE 5 times, multiplying compute cost.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "be8bba4a"
+    },
+    {
+      "q": "Ensure model builds into 'finance' schema for all users. Where?",
+      "a": "Model config block or `dbt_project.yml`\n\n**Watch out:** profiles.yml; profiles set default schema for a user, not mandatory schema for a model.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "7a817e3a"
+    },
+    {
+      "q": "Developer confused why Seed isn't in lineage. They used 'FROM raw.manual_mapping'. Fix?",
+      "a": "Use `{{ ref(`manual_mapping`) }}`\n\n**Watch out:** Using `{{ source(`raw`, `manual_mapping`) }}`; seeds must be referenced with `ref`.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "339086df"
+    },
+    {
+      "q": "Prevent 'Full Refresh' on specific prod table via CLI. Config?",
+      "a": "`full_refresh: false` in model config\n\n**Watch out:** Relying on developer training; someone will eventually run --full-refresh accidentally.",
+      "group": "Safety",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "6feda25a"
+    },
+    {
+      "q": "Source recently added a column. Incremental run failing. Resolve automatically?",
+      "a": "Set `on_schema_change: append_new_columns`\n\n**Watch out:** Manually running ALTER TABLE; dbt should manage schema to stay in sync.",
+      "group": "Incremental",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a79d45c0"
+    },
+    {
+      "q": "BigQuery incremental still scanning entire 500GB table. What's missing?",
+      "a": "Configure `partition_by` on a date column in config\n\n**Watch out:** Assuming `is_incremental` alone reduces scan cost; BigQuery requires partitions.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "82dd038b"
+    },
+    {
+      "q": "Snowflake function not supported by BigQuery. How to keep multi-platform?",
+      "a": "Use `adapter.dispatch` macro pattern\n\n**Watch out:** Hardcoding Snowflake syntax; breaks project if migrating warehouses.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "335642e5"
+    },
+    {
+      "q": "Incremental accumulating duplicates despite 'unique_key'. Cause?",
+      "a": "Verify `unique_key` is actually unique in source data\n\n**Watch out:** Assuming `unique_key` creates a constraint; dbt only uses it for join logic.",
+      "group": "Incremental",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "244ef01d"
+    },
+    {
+      "q": "Sales and Marketing share source data. Folder structure?",
+      "a": "Shared `Staging` layer, separate `Marts` folders\n\n**Watch out:** Duplicate Staging models; leads to `logic drift` in raw column definitions.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "23025b7a"
+    },
+    {
+      "q": "Incremental failed and data is out of sync. Safest fix?",
+      "a": "`dbt run --select my_model --full-refresh`\n\n**Watch out:** Manually deleting rows; non-reproducible and risks warehouse/dbt conflict.",
+      "group": "Incremental",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c200c970"
+    },
+    {
+      "q": "Moving 100-line CTE into its own model. Why?",
+      "a": "Improve modularity and enable testing\n\n**Watch out:** Keeping as CTE to `keep model count low`; hides logic and prevents unit testing.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2a813a68"
+    },
+    {
+      "q": "Run model and only its immediate parents. Command?",
+      "a": "`dbt run --select 1+my_model`\n\n**Watch out:** `dbt run --select +my_model`; selects *all* ancestors, wasting compute.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f7e1a4c7"
+    },
+    {
+      "q": "CSV column '00123' loaded as integer '123' by BigQuery. Fix?",
+      "a": "Set column type to `string` in `dbt_project.yml` seed config\n\n**Watch out:** Changing CSV to include quotes; dbt seeds often ignore CSV-level quoting.",
+      "group": "Seeds",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1affb406"
+    },
+    {
+      "q": "BigQuery 'insert_overwrite'. What if 'partitions' config is missing?",
+      "a": "dbt will overwrite `entire table`\n\n**Watch out:** Thinking dbt will `guess` partition; BQ performs full-table replacement without it.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "09de2c6d"
+    },
+    {
+      "q": "Generate dynamic list of columns for SELECT based on source. How?",
+      "a": "Use `adapter.get_columns_in_relation()`\n\n**Watch out:** Hardcoding column names; makes model brittle if source changes.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8e1fa862"
+    },
+    {
+      "q": "Late Arriving Fact in incremental model. Filter adjustment?",
+      "a": "Use `look-back` window (e.g. 3 days) in `is_incremental` block\n\n**Watch out:** Using `>= max(date)`; misses data arriving with older timestamp after run.",
+      "group": "Incremental",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "84166202"
+    },
+    {
+      "q": "Refactoring into dbt Mesh. Ensure 'Producer' doesn't break 'Consumer'. How?",
+      "a": "Implement `Model Contract` and `Versioning`\n\n**Watch out:** Setting access to `public` only; visibility doesn't protect from breaking changes.",
+      "group": "Lineage",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "570f4f95"
+    },
+    {
+      "q": "Execute macro BEFORE models are parsed (e.g. create schema). How?",
+      "a": "Use `on-run-start` hook in `dbt_project.yml`\n\n**Watch out:** Putting logic in model file; models only execute during `run` phase.",
+      "group": "Hooks",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "52fec7ef"
+    },
+    {
+      "q": "Run only models that failed AND were modified in branch. Command?",
+      "a": "`dbt run --select state:failed,state:modified --state path`\n\n**Watch out:** Space instead of comma; space is UNION, comma is INTERSECTION.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c32e48f9"
+    },
+    {
+      "q": "Hitting 'Maximum query length' with many Ephemeral models. Fix?",
+      "a": "Change Ephemeral to `Table` or `View`\n\n**Watch out:** Trying to `minify` SQL; issue is sheer size of CTEs being injected.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8a83c264"
+    },
+    {
+      "q": "Capture exact dbt run start time in a column. Variable?",
+      "a": "`run_started_at`\n\n**Watch out:** `current_timestamp()`; evaluated by warehouse at execution, not fixed dbt value.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "7f3b25ca"
+    },
+    {
+      "q": "Using 'sync_all_columns'. Column dropped in source. Target outcome?",
+      "a": "dbt will `drop` column from target table\n\n**Watch out:** Assuming `sync` only adds; sync_all_columns makes target an exact mirror.",
+      "group": "Incremental",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f385265b"
+    },
+    {
+      "q": "Create custom materialization not in dbt. Where?",
+      "a": "`macros/` folder using `{% materialization %}` block\n\n**Watch out:** Editing dbt core source; custom logic belongs in project macro layer.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3bf1faee"
+    },
+    {
+      "q": "Run model and all parents, but only parents tagged 'finance'. Command?",
+      "a": "`dbt run --select +my_model,tag:finance`\n\n**Watch out:** `dbt run --select +my_model tag:finance`; runs all parents OR finance nodes.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "71655805"
+    }
+  ]
+}

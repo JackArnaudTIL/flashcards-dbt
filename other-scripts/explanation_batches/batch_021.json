@@ -1,0 +1,445 @@
+{
+  "deck": "Snowflake",
+  "cards": [
+    {
+      "q": "How would you implement exactly-once semantics when loading from Kafka to Snowflake?",
+      "a": "The Snowflake Kafka Connector uses offset tracking: after successfully writing a batch to Snowflake (via Snowpipe or INSERT), it commits the Kafka offset. On failure, it replays from the last committed offset. Because Snowflake deduplicates by file metadata (for Snowpipe) or by MERGE key, replayed messages don't duplicate rows.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "7ab27bb3"
+    },
+    {
+      "q": "What is the difference between Snowpipe auto-ingest and REST API ingest?",
+      "a": "Auto-ingest (AUTO_INGEST = TRUE) uses cloud event notifications (SQS for S3, Event Grid for Azure, Pub/Sub for GCP) to trigger Snowpipe automatically when files land. REST API ingest requires the pipeline to explicitly call Snowpipe's insertFiles endpoint with file paths. REST API suits cases where event notifications aren't available or you need programmatic control.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "ff9dec08"
+    },
+    {
+      "q": "What is a Snowflake Task's error-handling behaviour?",
+      "a": "By default, a failed task run (exception in the SQL/procedure) suspends the task after a configurable number of consecutive failures (SUSPEND_TASK_AFTER_NUM_FAILURES, default 10 for serverless, configurable). Child tasks in a DAG are skipped if their parent fails. Use Snowflake Alerts or TASK_HISTORY to detect and notify on failures.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "20de4cd1"
+    },
+    {
+      "q": "What is TASK_HISTORY and how do you query it?",
+      "a": "INFORMATION_SCHEMA.TASK_HISTORY() table function (last 7 days, near real-time) or SNOWFLAKE.ACCOUNT_USAGE.TASK_HISTORY view (365 days, ~45 min latency). Returns task name, run state, start/end time, error message, and query ID for each run. Useful for monitoring pipeline SLAs.",
+      "group": "Streams & Tasks",
+      "difficulty": "medium",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "e94dfc72"
+    },
+    {
+      "q": "How do you backfill a Dynamic Table?",
+      "a": "ALTER DYNAMIC TABLE my_table REFRESH; triggers an immediate full or incremental refresh. For a full recompute from scratch (e.g., after changing the definition), you can DROP and recreate the Dynamic Table, which re-initialises from the current source data.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "78641865"
+    },
+    {
+      "q": "What is the DOWNSTREAM keyword in Dynamic Table TARGET_LAG?",
+      "a": "TARGET_LAG = 'DOWNSTREAM' tells Snowflake to refresh this Dynamic Table only when a downstream Dynamic Table that depends on it requests a refresh. It removes the fixed lag from intermediate tables in a dependency chain, letting the leaf's lag drive the whole pipeline.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "161db21b"
+    },
+    {
+      "q": "What are the performance tuning options for a Snowflake Task that runs heavy SQL?",
+      "a": "Switch to a serverless task (Snowflake auto-sizes compute). If using a warehouse-based task, size the warehouse appropriately. Add AFTER to chain the task only when upstream is ready. Use SYSTEM$STREAM_HAS_DATA() to skip runs when there's nothing to process. Partition MERGE keys on the target table's clustering key.",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "85767ac7"
+    },
+    {
+      "q": "What is an append-only stream and how does it differ in performance from a standard stream?",
+      "a": "Append-only streams track only INSERT operations, incurring lower storage overhead because they don't need to store before/after row images for UPDATEs and DELETEs. Consuming an append-only stream is faster when the source table is insert-only (e.g., event log, Snowpipe landing table).",
+      "group": "Streams & Tasks",
+      "difficulty": "medium",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "fe0afed2"
+    },
+    {
+      "q": "How do you reset a Snowflake Stream's offset?",
+      "a": "You cannot directly reset a stream's offset. Options: (1) Drop and recreate the stream (offset resets to current). (2) Create a new stream at a historical point using AT/BEFORE (if within Time Travel window): CREATE STREAM my_stream ON TABLE my_table AT(TIMESTAMP => ...).",
+      "group": "Streams & Tasks",
+      "difficulty": "hard",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "86e1160d"
+    },
+    {
+      "q": "What are Snowflake External Functions and what are their latency implications?",
+      "a": "External Functions invoke remote HTTPS endpoints (via API Gateway + Lambda/Azure Functions/GCP Functions) during query execution. Each batch of rows is sent as an HTTP request. Latency is much higher than native UDFs — suitable for enrichment or scoring APIs that can't be brought into Snowflake, but not for high-throughput transformations.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "4cef90ff"
+    },
+    {
+      "q": "What is the Snowflake dbt integration and how does it work?",
+      "a": "dbt (data build tool) connects to Snowflake via the dbt-snowflake adapter using a profile configuration (account, warehouse, database, schema, role, credentials). dbt compiles SQL models into COPY GRANTS or CREATE TABLE/VIEW statements and runs them against Snowflake. Snowflake-specific features like CLUSTER BY and dynamic materializations are configurable via dbt configs.",
+      "group": "Data Ingestion",
+      "difficulty": "medium",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "c12592cf"
+    },
+    {
+      "q": "What is COPY_HISTORY in ACCOUNT_USAGE and how long does it retain data?",
+      "a": "SNOWFLAKE.ACCOUNT_USAGE.COPY_HISTORY records every COPY INTO operation (bulk and Snowpipe) account-wide, retaining up to 365 days. Columns include: file name, table name, status, rows loaded, rows parsed, errors, and first/last error messages. Essential for auditing and debugging data load issues.",
+      "group": "Data Ingestion",
+      "difficulty": "medium",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "7a7715e2"
+    },
+    {
+      "q": "What is a Vectorized (Batch) Python UDF in Snowflake?",
+      "a": "A Python UDF decorated with @udf(packages=['pandas']) that receives and returns pandas Series/DataFrames instead of scalar values. Vectorized UDFs are significantly faster than row-by-row Python UDFs because they process batches of rows in a single Python call, reducing per-row interpreter overhead.",
+      "group": "Snowpark",
+      "difficulty": "hard",
+      "category": "Snowpark",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "9778be1c"
+    },
+    {
+      "q": "What is Snowpark ML and what does it enable?",
+      "a": "A Snowpark library extension for machine learning. Provides: a scikit-learn-compatible Preprocessing API that runs in Snowflake, a Model Registry (store, version, deploy ML models), and ML Functions (FORECAST, ANOMALY_DETECTION) that apply pre-built models without writing Python. Keeps ML compute and data in Snowflake.",
+      "group": "Snowpark",
+      "difficulty": "hard",
+      "category": "Snowpark",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "1072c2df"
+    },
+    {
+      "q": "How does Snowpark for Python differ from running Python outside Snowflake?",
+      "a": "Snowpark for Python pushes computation to Snowflake — transformations defined in the Python DataFrame API are translated to SQL and run on Snowflake's compute. Data never needs to leave Snowflake; you get warehouse scalability without moving data to a local machine or external cluster.",
+      "group": "Snowpark",
+      "difficulty": "hard",
+      "category": "Snowpark",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "f87afd55"
+    },
+    {
+      "q": "What is SYSTEM$STREAM_HAS_DATA() and why is it used in Tasks?",
+      "a": "A system function that returns TRUE if the named stream contains unconsumed change records. Used as the WHEN condition in a Task: WHEN SYSTEM$STREAM_HAS_DATA('my_stream'). Prevents the task from running (and consuming warehouse credits) when there is nothing to process.",
+      "group": "Streams & Tasks",
+      "difficulty": "medium",
+      "category": "Streams & Tasks",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "5e188876"
+    },
+    {
+      "q": "What is the difference between a table stage and a named internal stage for Snowpipe?",
+      "a": "Snowpipe requires a named internal stage or an external stage — it does not support user stages or table stages. Named stages are grantable, configurable, and reusable across pipes and COPY INTO statements. Table stages are tied to a specific table and are not suitable for Snowpipe.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "d7cb6c72"
+    },
+    {
+      "q": "What is data skew and how does it manifest in Snowflake query performance?",
+      "a": "Data skew is uneven distribution of values in a join or GROUP BY key — a small number of values hold a disproportionately large number of rows. In Snowflake, this causes some worker nodes to process far more data than others, becoming bottlenecks. Visible in Query Profile as partitioned steps with wildly uneven row counts per thread.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "category": "Performance",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "33fff387"
+    },
+    {
+      "q": "How do you implement a slowly changing dimension (SCD Type 2) in Snowflake?",
+      "a": "Option 1: Snowflake Streams + Task MERGE — detect changes in the stream, MERGE into the SCD table inserting new versions and closing old ones with dbt_valid_to. Option 2: Snowflake Snapshots (if using dbt). Option 3: Native snapshots (dbt snapshot command). Snowflake's Time Travel can also query historical states without SCD if retention period is sufficient.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "category": "Performance",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "eab51204"
+    },
+    {
+      "q": "What is PIPE_EXECUTION_PAUSED and how do you resume a Snowpipe pipe?",
+      "a": "PIPE_EXECUTION_PAUSED status means the pipe has been explicitly paused (ALTER PIPE ... PAUSE) or suspended due to errors. Resume with: ALTER PIPE my_pipe RESUME; then confirm with SYSTEM$PIPE_STATUS('my_pipe'). After resuming, Snowpipe reprocesses files that arrived while paused.",
+      "group": "Data Ingestion",
+      "difficulty": "hard",
+      "category": "Data Ingestion",
+      "module": "SnowPro Data Engineer",
+      "certification": "snowpro advanced data engineer",
+      "id": "3802681b"
+    },
+    {
+      "q": "What is the Snowflake Native App Framework and how is it different from data sharing?",
+      "a": "Native Apps package application logic (stored procedures, Streamlit UIs, UDFs) along with data and run inside the consumer's Snowflake account. Unlike data sharing (which shares read-only data), Native Apps can write to the consumer's account, show UI, and interact with consumer data under a controlled permission model. Published via the Snowflake Marketplace.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "337e07dd"
+    },
+    {
+      "q": "What is a Snowflake Listing on the Marketplace and what can it contain?",
+      "a": "A published product entry. Listings can contain: (1) A data share (live read-only access to provider tables). (2) A Native App. (3) A collaboration listing (both parties share data). Listings can be free, request-based, or paid (via Snowflake billing). Global or regional availability can be configured.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "80ff52ec"
+    },
+    {
+      "q": "How would you design a multi-tenant SaaS application on Snowflake?",
+      "a": "Options: (1) Separate database per tenant — strong isolation, easier offboarding, but high object count. (2) Shared database, separate schema per tenant — moderate isolation. (3) Shared schema with tenant_id column + Row Access Policy filtering per tenant — simplest but lowest isolation. Choice depends on compliance requirements, tenant count, and query patterns.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "d0b1297f"
+    },
+    {
+      "q": "What is a Snowflake Virtual Private Snowflake (VPS) and when is it required?",
+      "a": "VPS is a fully dedicated, single-tenant deployment of Snowflake on dedicated cloud infrastructure — no shared resources with other Snowflake customers. Required by organisations with the strictest data isolation requirements (government, defence, certain financial institutions). Not available for self-service sign-up; requires a Snowflake enterprise contract.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "e237225f"
+    },
+    {
+      "q": "What is the Business Critical edition's key differentiator over Enterprise?",
+      "a": "Business Critical adds: HIPAA and PCI-DSS compliance support, Tri-Secret Secure (customer-managed key encryption), Private Connectivity (PrivateLink/Private Endpoints), enhanced encryption (all data encrypted with customer-dedicated keys), and enhanced Data Protection SLA. Required for regulated industries.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "48839b04"
+    },
+    {
+      "q": "What is a Snowflake Failover Group and what objects does it replicate?",
+      "a": "A named group of account objects that are replicated together from primary to secondary account for DR. Can include: databases, integrations, network policies, resource monitors, roles, users, warehouses, and parameters. On failover, the secondary account is promoted and can serve both reads and writes.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "43e7a7b9"
+    },
+    {
+      "q": "What is the difference between replication and data sharing in Snowflake?",
+      "a": "Replication physically copies data to a secondary account — the consumer has their own copy, can write to it (after failover), and no live dependency on the primary. Data sharing provides a live pointer to the provider's data — no copy, always current, consumer is read-only, and the connection depends on the provider's account being available.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "670db948"
+    },
+    {
+      "q": "What are Connection Objects (Redirects) in Snowflake DR?",
+      "a": "A global, stable URL that can be pointed to a primary or secondary account. When failover occurs, you update the Connection Object's pointer to the secondary — applications using the connection URL automatically reconnect to the new primary without changing connection strings.",
+      "group": "Replication & DR",
+      "difficulty": "hard",
+      "category": "Replication & DR",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "135171ff"
+    },
+    {
+      "q": "How should an architect design warehouse configuration for a workload with both ETL and BI queries?",
+      "a": "Separate virtual warehouses by workload: a large ETL warehouse (L–XL) for heavy transformations, a medium analytics warehouse (M, multi-cluster) for concurrent BI users, and a small ad-hoc warehouse (XS–S) for interactive exploration. Separate warehouses prevent BI queuing from being blocked by ETL and allow independent scaling/suspension.",
+      "group": "Performance Architecture",
+      "difficulty": "hard",
+      "category": "Performance Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "a4d6404d"
+    },
+    {
+      "q": "What is warehouse query tagging and how is it used for cost attribution?",
+      "a": "SET QUERY_TAG = 'team:finance;project:month_end'; attaches a label to all subsequent queries in the session. Query tags appear in QUERY_HISTORY. Used to attribute compute costs to teams or projects when they share a warehouse — report on QUERY_HISTORY grouped by QUERY_TAG and WAREHOUSE_NAME.",
+      "group": "Cost Architecture",
+      "difficulty": "hard",
+      "category": "Cost Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "dba416d5"
+    },
+    {
+      "q": "What Snowflake views would an architect use to analyse monthly storage costs?",
+      "a": "SNOWFLAKE.ACCOUNT_USAGE.STORAGE_USAGE — daily storage totals by storage type (database, stage, fail-safe). SNOWFLAKE.ACCOUNT_USAGE.TABLE_STORAGE_METRICS — per-table storage breakdown including Time Travel and Fail-Safe bytes. Combine with DATA_RETENTION_TIME settings to identify tables with expensive Time Travel retention.",
+      "group": "Cost Architecture",
+      "difficulty": "hard",
+      "category": "Cost Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "bf0c4ead"
+    },
+    {
+      "q": "What is the Snowflake data mesh architecture pattern?",
+      "a": "Apply data mesh principles on Snowflake: each domain team owns a Snowflake database (or account). Cross-domain data products are shared via Secure Data Sharing or a private Data Exchange. Governance is enforced centrally via Tags, Row Access Policies, and Data Classification applied across all accounts in the organisation.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "58a014da"
+    },
+    {
+      "q": "How do you implement column-level lineage tracking in Snowflake?",
+      "a": "Snowflake provides OBJECT_DEPENDENCIES in ACCOUNT_USAGE to track object-level references (views, tasks, pipes). For column-level lineage, use ACCESS_HISTORY in ACCOUNT_USAGE (Enterprise+) which records which columns were read by each query. Combine with a data catalog (Atlan, OpenMetadata) that ingests ACCESS_HISTORY for visual lineage.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "edaec959"
+    },
+    {
+      "q": "What is the Snowflake Governance tri-layer model?",
+      "a": "1. Discover: classify sensitive data using Data Classification + Object Tags. 2. Manage: apply masking policies, row access policies, and network policies to control access. 3. Audit: review ACCESS_HISTORY, LOGIN_HISTORY, and POLICY_REFERENCES to verify policies are effective and data is being accessed appropriately.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "b0f4a22d"
+    },
+    {
+      "q": "What is a custom RBAC hierarchy design pattern for large enterprises?",
+      "a": "Create three role types: (1) Functional roles (ANALYST, ENGINEER, REPORTER) — granted to users, define what a person does. (2) Object roles (DB_PROD_READ, SCHEMA_RAW_WRITE) — granted to functional roles, own and grant on specific objects. (3) System roles (SYSADMIN, SECURITYADMIN) — managed by the security team only, never granted to end users.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "41206bd6"
+    },
+    {
+      "q": "When would you use a Private Data Exchange vs. the public Snowflake Marketplace?",
+      "a": "A Private Data Exchange is appropriate when sharing data with a defined, invitation-only group (partners, subsidiaries, regulated consumers). The public Marketplace is appropriate for monetising data at scale with any Snowflake customer. Private exchanges allow the provider to control who can discover and request access.",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "e35ef1b1"
+    },
+    {
+      "q": "What is Snowflake's approach to cross-cloud data access without replication?",
+      "a": "For cross-cloud access without copying data, Snowflake Marketplace with Cross-Cloud Auto-Fulfillment automatically replicates the share to the consumer's cloud/region on demand. Alternatively, Snowflake External Tables can read data stored on one cloud from a Snowflake account on another cloud (with appropriate network routing).",
+      "group": "Data Sharing",
+      "difficulty": "hard",
+      "category": "Data Sharing",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "bd156916"
+    },
+    {
+      "q": "How does an architect ensure that a Snowflake deployment meets GDPR requirements?",
+      "a": "1. Choose an EU Snowflake region and enable data residency. 2. Use Business Critical edition for private connectivity and enhanced encryption. 3. Apply Data Classification to identify PII columns. 4. Apply Dynamic Data Masking on PII columns. 5. Implement Row Access Policies to restrict access to personal data by role. 6. Enable Access History auditing. 7. Define Data Retention Time policies to support the right to erasure.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "d02f04bf"
+    },
+    {
+      "q": "What are Snowflake Budgets and how do they complement Resource Monitors?",
+      "a": "Budgets (introduced 2023) set a monthly credit spending limit for a scope (account, or a custom spending group of objects). They can monitor serverless feature costs (Automatic Clustering, Tasks, Snowpipe, Search Optimisation) which Resource Monitors cannot track. Resource Monitors only track virtual warehouse credit consumption. Use both: Resource Monitors per warehouse for real-time suspension, Budgets for account-level serverless cost caps.",
+      "group": "Cost Architecture",
+      "difficulty": "hard",
+      "category": "Cost Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "f4b5ca0d"
+    },
+    {
+      "q": "What is the Snowflake Cost Management Console?",
+      "a": "A section of Snowsight that provides visual credit consumption breakdowns by service type (warehouses, serverless, cloud services), over time. Architects use it alongside ACCOUNT_USAGE queries for chargeback reporting, anomaly detection, and capacity planning.",
+      "group": "Cost Architecture",
+      "difficulty": "medium",
+      "category": "Cost Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "0c7937d7"
+    },
+    {
+      "q": "How would you architect Snowflake for a global company with users in US, EU, and APAC?",
+      "a": "Deploy three Snowflake accounts — one per region (e.g., AWS us-east-1, eu-west-1, ap-southeast-1). Replicate reference/master data to each account. Regional transactional data stays in its home account. BI tools connect to the local account for low-latency queries. Use Marketplace or cross-account sharing for cross-regional reporting. This respects data residency and minimises query latency for local users.",
+      "group": "Account Design",
+      "difficulty": "hard",
+      "category": "Account Design",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "cea8e223"
+    },
+    {
+      "q": "What is Snowflake's model for handling PII under the right-to-erasure requirement?",
+      "a": "Snowflake does not support deleting individual rows from micro-partitions without rewriting them. Options: (1) DELETE + re-cluster (or CLUSTER BY maintenance) to purge the data. (2) Store PII in a separate table and replace with a pseudonym/token — dropping the PII table satisfies erasure. (3) After deletion, wait for Time Travel and Fail-Safe to expire (up to 97 days) before the data is fully purged from Snowflake infrastructure.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "category": "Governance",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "ff03e82b"
+    },
+    {
+      "q": "What is the Snowflake Feature Store and how is it used?",
+      "a": "Part of Snowpark ML — a centralised repository for storing, versioning, and serving ML features (pre-computed feature columns) as Snowflake tables or dynamic tables. Data scientists register feature pipelines; model training retrieves consistent features; inference retrieves the same features at prediction time. Ensures train/serve consistency without copying data outside Snowflake.",
+      "group": "Data Architecture",
+      "difficulty": "hard",
+      "category": "Data Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "41db94e7"
+    },
+    {
+      "q": "What is a Snowflake Streamlit app and how does it integrate with the platform?",
+      "a": "Streamlit in Snowflake lets you deploy Python Streamlit web applications that run natively inside Snowflake. The app accesses Snowflake data without exporting it, runs with a specified warehouse for compute, and is governed by Snowflake roles and network policies. Used for internal dashboards, data exploration tools, and Native App UIs.",
+      "group": "Data Architecture",
+      "difficulty": "hard",
+      "category": "Data Architecture",
+      "module": "SnowPro Architect",
+      "certification": "snowpro advanced architect",
+      "id": "01de8451"
+    }
+  ]
+}

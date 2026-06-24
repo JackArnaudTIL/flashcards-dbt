@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "Your 'accepted_values' test is failing due to a trailing space in the data. Best fix?",
+      "a": "Add `trim(column)` to your Staging model SQL\n\n**Watch out:** Adding the value with a space to the YAML list; this `hides` the data quality issue instead of cleaning it.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "07a6d1b5"
+    },
+    {
+      "q": "You want to run tests for only the models that have been 'modified'. Command?",
+      "a": "`dbt test --select state:modified --state path/to/artifacts`\n\n**Watch out:** `dbt build --select state:modified`; build would also rebuild the models, whereas `test` only executes the validations.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bd60bc2c"
+    },
+    {
+      "q": "You want to create a documentation 'Test Summary' for stakeholders. Tool?",
+      "a": "dbt Explorer (Tests tab)\n\n**Watch out:** `manifest.json`; too technical for business stakeholders.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d12c4027"
+    },
+    {
+      "q": "You want to test if a 'JSON' column contains a specific key. Implementation?",
+      "a": "A `Singular` test using the warehouse-specific JSON extract functions\n\n**Watch out:** `accepted_values`; this test only works on standard scalar values, not nested structures.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f1688d1d"
+    },
+    {
+      "q": "You want to apply a 'severity: error' config to ALL tests in the project. Where?",
+      "a": "In `dbt_project.yml` under the `tests:` key\n\n**Watch out:** In the `profiles.yml`; profiles do not control dbt resource configurations.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "91ab29c0"
+    },
+    {
+      "q": "You want a 'unique' test to ignore '0' values because they are used as placeholders. Implementation?",
+      "a": "Add `where: \"column_name != 0\"` to the test config\n\n**Watch out:** Filtering the whole model; you want the `0` values in the table, just not validated for uniqueness.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "10863ecb"
+    },
+    {
+      "q": "You want to run a build and skip tests for any 'Source' that is failing freshness. Is this automatic?",
+      "a": "No, you must explicitly check freshness and handle the logic in your orchestrator\n\n**Watch out:** Assuming `dbt build` includes a built-in freshness gate.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "60d41b65"
+    },
+    {
+      "q": "You want to see 'Tests' in the lineage graph. Where do they appear?",
+      "a": "By default, they are hidden in the graph; you must toggle the `Tests` filter in the docs/Explorer UI\n\n**Watch out:** Thinking tests aren't part of the DAG.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5dc1a075"
+    },
+    {
+      "q": "You want to write a test that ensures no rows are lost between two joins. Which test?",
+      "a": "A `Singular` test comparing the row count of the source vs. the joined model\n\n**Watch out:** `relationships` test; this only checks if the keys match, not if rows were filtered out during the join.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fd631702"
+    },
+    {
+      "q": "You are using 'Unit Tests'. You want to mock a 'Macro' used in the model. Is this possible?",
+      "a": "No, dbt unit tests mock inputs (Sources/Refs), not logic (Macros)\n\n**Watch out:** Trying to define a `mock macro` in the YAML file.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a3baa5fc"
+    },
+    {
+      "q": "You want to run only 'Generic' tests. Command?",
+      "a": "`dbt test --select test_type:generic`\n\n**Watch out:** `dbt test --select schema`; `schema` was the old term, but `generic` is the current standard.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d87706de"
+    },
+    {
+      "q": "You want to store test failures in a specific custom schema. Configuration?",
+      "a": "Set the `schema` config within the test block or `dbt_project.yml`\n\n**Watch out:** Setting `target.schema` in `profiles.yml`; this changes where models are built, not specifically the test audit schema.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b3549274"
+    },
+    {
+      "q": "You want to ensure a 'discount_amount' column is never greater than the 'original_price'. Implementation?",
+      "a": "Use `dbt_utils.expression_is_true` with `expression: \"discount_amount <= original_price\"`\n\n**Watch out:** Creating a `not_null` test; a value can be not null but still logically incorrect compared to another column.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a9b4851e"
+    },
+    {
+      "q": "You want to run a unit test for a model that contains a 'current_timestamp' call. How do you ensure the test is deterministic?",
+      "a": "Use the `overrides` or `macros` block in the unit test to mock the timestamp to a fixed string\n\n**Watch out:** Running the test against the live warehouse; the test will fail intermittently as the `actual` time moves forward.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "6ffb77d5"
+    },
+    {
+      "q": "You want to test if a 'phone_number' column matches a specific Regex pattern. Best approach?",
+      "a": "Use `dbt_expectations.expect_column_values_to_match_regex`\n\n**Watch out:** Writing a custom Singular test for every model; using a package like dbt_expectations standardizes regex testing across the project.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "78a140af"
+    },
+    {
+      "q": "You are using 'dbt build'. A test fails on a 'Seed' file. What happens to the models that ref() that seed?",
+      "a": "The models are `skipped` and not executed\n\n**Watch out:** Thinking dbt will build the models anyway; `dbt build` treats seeds as nodes in the DAG that can block downstream work.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "318440f8"
+    },
+    {
+      "q": "You want to run all tests except for 'Relationship' tests. Command?",
+      "a": "`dbt test --exclude test_name:relationships`\n\n**Watch out:** `dbt test --exclude relationships`; you must use the `test_name:` prefix to target the generic test type.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b2907128"
+    },
+    {
+      "q": "You want to check that the 'sum' of orders today is within 10% of the sum of orders yesterday. Which tool?",
+      "a": "A `Singular` test that compares aggregates or `dbt_expectations`\n\n**Watch out:** Generic `unique` or `not_null` tests; these cannot compare data across different time slices.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f96852cc"
+    },
+    {
+      "q": "You want to apply a test to a 'Column' that is created inside a Macro. Where do you define the test?",
+      "a": "In the YAML file for the model that *calls* the macro\n\n**Watch out:** Trying to define the test inside the macro code itself; dbt tests are properties of models/sources, not macros.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bc94e194"
+    },
+    {
+      "q": "You want to verify that a 'Staging' model has the same number of rows as its 'Source'. Implementation?",
+      "a": "A Singular test selecting count difference from source and staging\n\n**Watch out:** `relationships` test; relationship tests check for key existence, not row-for-row parity.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "472f867c"
+    },
+    {
+      "q": "You want to test a 'Snapshot' table for uniqueness on the 'dbt_updated_at' and 'id' columns. Where is this defined?",
+      "a": "In the `snapshots` directory within a YAML file\n\n**Watch out:** In `models/schema.yml`; snapshots must have their properties defined in their own resource blocks.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "72f61cba"
+    },
+    {
+      "q": "You want to run a test and automatically 'Fix' the data if it fails. Is this possible?",
+      "a": "No, dbt tests are read-only validations\n\n**Watch out:** Assuming `dbt build` has an `auto-correct` feature; transformations must happen in the model SQL.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4f5a37e6"
+    },
+    {
+      "q": "You want to run only 'Singular' tests that contain the word 'revenue' in the filename. Command?",
+      "a": "`dbt test --select revenue`\n\n**Watch out:** `dbt test --select tag:revenue`; this only works if you manually added the tag to the test file.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "784d1fcf"
+    },
+    {
+      "q": "You have a 'Unit Test' failing because of a data type mismatch in the mock data. Fix?",
+      "a": "Use the `cast` function or explicit types in the unit test YAML rows\n\n**Watch out:** Changing the model SQL to accommodate the test; the test should mirror the expected warehouse types.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fb2d009d"
+    },
+    {
+      "q": "You want to ensure that 'Developer A' cannot disable a 'Critical' test in a Pull Request. Strategy?",
+      "a": "Use `CI Checks` and `CODEOWNERS` to require lead approval for YAML changes\n\n**Watch out:** Trying to set `permanent: true` in dbt; dbt config can always be changed by anyone with code access.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "add986fe"
+    },
+    {
+      "q": "You want to test if a 'Boolean' column has a proper distribution (e.g. at least 10% are TRUE). Tool?",
+      "a": "`dbt_expectations.expect_column_values_to_be_in_type_list` or a custom Singular test\n\n**Watch out:** `accepted_values`; this only checks if values are in the list, not their frequency or percentage.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3f64e175"
+    },
+    {
+      "q": "You want to run tests for all models in the 'Marts' folder, including the tests of their parents. Command?",
+      "a": "`dbt test --select +marts`\n\n**Watch out:** `dbt test --select marts`; this only tests the Marts, ignoring the data quality of the upstream Staging/Intermediate models.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e9eb48f1"
+    },
+    {
+      "q": "You want to see 'Test Coverage' by model in a single view. Tool?",
+      "a": "dbt Explorer (Cloud) or `dbt-project-evaluator`\n\n**Watch out:** `dbt docs generate`; the standard docs site does not aggregate coverage percentages into a dashboard.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "89331747"
+    },
+    {
+      "q": "A 'unique' test is failing on a column with only one NULL value. Why?",
+      "a": "A single NULL does not fail a `unique` test; the failure means there is at least one other duplicate non-null value or another NULL\n\n**Watch out:** Assuming `unique` fails on any NULL; it only fails if the NULL is repeated.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "17fe4f32"
+    },
+    {
+      "q": "You want to run a test on a 'Source' table that is a 'View' in the warehouse. Will it work?",
+      "a": "Yes, dbt tests run against the relation regardless of whether it is a physical table or a view\n\n**Watch out:** Thinking `Source Freshness` is the only thing you can run on a Source.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c1e4aabe"
+    },
+    {
+      "q": "You are using 'Unit Tests'. You want to mock a 'ref()' that points to a model in a different project (Mesh). How?",
+      "a": "Use the fully qualified name in the `input` block: `project_name.model_name`\n\n**Watch out:** Using only `model_name`; unit tests must be able to uniquely identify the node being mocked.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "9dfee876"
+    },
+    {
+      "q": "You want to run a build but only execute the tests, not the models. Command?",
+      "a": "`dbt test`\n\n**Watch out:** `dbt build --test-only`; no such flag exists, `test` is its own command.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ed0a3480"
+    },
+    {
+      "q": "You want to capture 'Test Failures' in a table that never gets overwritten. Configuration?",
+      "a": "This requires a custom post-hook or a wrapper script; `store-failures` overwrites the audit table on every run\n\n**Watch out:** Expecting `--store-failures` to keep historical logs by default.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c2ddd6d8"
+    },
+    {
+      "q": "You want to write a test that ensures a column contains only 'valid' email formats. Implementation?",
+      "a": "A Singular test with a `REGEXP_LIKE` check\n\n**Watch out:** `accepted_values`; impossible to list every valid email as an accepted value.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "cc83f4f0"
+    },
+    {
+      "q": "You want to run tests for all models EXCEPT those with the tag 'long_running'. Command?",
+      "a": "`dbt test --exclude tag:long_running`\n\n**Watch out:** `dbt test --select !tag:long_running`; dbt uses the exclude flag for negative selection in CLI.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bc822468"
+    },
+    {
+      "q": "You want to apply a test to a 'Source' table using a variable for the column name. Possible?",
+      "a": "Yes, use `{{ var(\"col_name\") }}` in the YAML key for the test\n\n**Watch out:** Hardcoding the column name in YAML; this makes the source definition less flexible.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2198707e"
+    },
+    {
+      "q": "You want to see the 'Lineage' of a test in the CLI. Command?",
+      "a": "`dbt ls --select test_name --output json`\n\n**Watch out:** `dbt list tests`; this only shows names, not the DAG connections.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "945676c0"
+    },
+    {
+      "q": "A 'Unit Test' is passing in 'Dev' but failing in 'Prod'. Why?",
+      "a": "Check for `Target-specific` logic in the model SQL (e.g. different timezones or logic)\n\n**Watch out:** Assuming the mock data changed; unit tests use static data defined in the project, not warehouse data.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "44952749"
+    },
+    {
+      "q": "You want to run a build and fail only if 'Critical' tests fail, but still run 'Warning' tests. Configuration?",
+      "a": "Set non-critical tests to `severity: warn`\n\n**Watch out:** Using `dbt build --select severity:error`; this would skip running the warnings entirely.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "951373e4"
+    },
+    {
+      "q": "You want to write a test that checks if a table is 'empty'. Why?",
+      "a": "To ensure a `deleted` or `archived` model actually has 0 rows\n\n**Watch out:** Using `not_null`; not_null checks columns, not the presence of rows.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "861fc2dd"
+    },
+    {
+      "q": "You want to run tests on 'Seeds' only. Command?",
+      "a": "`dbt test --select resource_type:seed`\n\n**Watch out:** `dbt test --select seeds`; while this works if your folder is named `seeds`, resource_type is more robust.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "86ee58fe"
+    },
+    {
+      "q": "Your Generic test macro is failing with a 'Relation not found' error. Why?",
+      "a": "Check that the macro uses the `model` argument to correctly `ref` the table being tested\n\n**Watch out:** Hardcoding a table name inside a Generic test macro; Generic tests must be dynamic.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4323a30c"
+    },
+    {
+      "q": "You want to run a test that ensures 'start_date' is always before 'end_date' for every row. Implementation?",
+      "a": "Use `dbt_utils.expression_is_true` or a Singular test: `select * from table where start_date > end_date`\n\n**Watch out:** Using `relationships` test; relationships compare two different tables, not two columns in the same row.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "65e6aef0"
+    },
+    {
+      "q": "You want to see the 'Historical Pass Rate' for a specific test. Tool?",
+      "a": "dbt Explorer (Cloud)\n\n**Watch out:** `catalog.json`; the catalog stores schema info, not run history or test results.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fde9250f"
+    },
+    {
+      "q": "You want to run a test that validates the 'Row count' doesn't drop by more than 20% compared to the previous run. How?",
+      "a": "Use `dbt_expectations.expect_table_row_count_to_be_between` or a custom script\n\n**Watch out:** dbt core `Generic` tests; standard generic tests only look at the *current* state of the data.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ddbb8172"
+    },
+    {
+      "q": "You want to run a 'Relationship' test against a 'Source' that is updated via an external pipeline. Best practice?",
+      "a": "Run `dbt source freshness` before the test to ensure you aren't testing against stale data\n\n**Watch out:** Assuming the relationship test will fail if the source data is old; it only checks for key matches.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1ee7832f"
+    },
+    {
+      "q": "You want to use 'Unit Testing' to test a model that uses a 'Source'. How do you mock the source?",
+      "a": "Define the source name and mock rows in the `given` block of the unit test\n\n**Watch out:** Using `ref()` in the unit test to point to a seed; unit tests should mock the source directly.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e6359887"
+    },
+    {
+      "q": "You want to run tests for a single model but NOT its parents. Command?",
+      "a": "`dbt test --select my_model`\n\n**Watch out:** `dbt test --select +my_model`; this would run tests for every ancestor in the DAG.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "96b81ef5"
+    },
+    {
+      "q": "You want to write a test that fails if a 'String' column contains any non-numeric characters. Implementation?",
+      "a": "A Singular test using `REGEXP_LIKE` for non-digits\n\n**Watch out:** `accepted_values`; impossible to list every possible number string.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "299eb258"
+    },
+    {
+      "q": "Your 'store-failures' audit tables are taking up too much storage. Fix?",
+      "a": "Configure a `TTL` or cleanup script in the warehouse for the audit schema\n\n**Watch out:** Disabling tests; data quality is worth the storage cost, you just need a lifecycle policy.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "58005d0c"
+    },
+    {
+      "q": "You want to run a test only on 'Mondays'. Possible?",
+      "a": "Yes, use Jinja logic inside a `Singular` test to check the date and `select` 0 rows if it is not Monday\n\n**Watch out:** Trying to schedule a single test in dbt Cloud; schedules apply to jobs, not individual tests.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "27fae80e"
+    },
+    {
+      "q": "You want to see 'Tests' for a specific 'Tag' in dbt Explorer. How?",
+      "a": "Search/Filter Explorer by tag and then click the `Tests` tab\n\n**Watch out:** Expecting the tags to appear on the tests automatically; tests only inherit tags from the model if configured to do so.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "0784870a"
+    },
+    {
+      "q": "You want to ensure that a 'Percentage' column is always between 0 and 1. Implementation?",
+      "a": "`dbt_utils.expression_is_true` with `expression: \"col >= 0 and col <= 1\"`\n\n**Watch out:** `accepted_values`; percentages are continuous, not a discrete list.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "04112e34"
+    },
+    {
+      "q": "You want to run a 'Singular' test but exclude a specific failing row from it temporarily. Fix?",
+      "a": "Add a `where` clause to the test SQL to filter out that specific ID\n\n**Watch out:** Deleting the failing row from the warehouse; dbt is the source of truth, the test should reflect reality.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "458ce08c"
+    },
+    {
+      "q": "You are using 'dbt build'. One test fails. Does dbt 'Roll Back' the entire build?",
+      "a": "No, dbt keeps the tables it successfully built but stops any downstream work\n\n**Watch out:** Assuming dbt has `Transactional` DAG builds; warehouse objects persist even after a build failure.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "31fab059"
+    },
+    {
+      "q": "You want to write a test that checks for 'Silent Failures' (e.g. logic is valid but result is 0 rows). Which test?",
+      "a": "A Singular test: `select count(*) from my_model having count(*) = 0`\n\n**Watch out:** `not_null`; not_null will pass if the table is empty because there are no rows to be null.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "0af19331"
+    },
+    {
+      "q": "You want to run tests for only the models that are 'Public' in a Mesh setup. Command?",
+      "a": "`dbt test --select access:public`\n\n**Watch out:** `dbt test --select tag:public`; `access` is a configuration property, not a tag.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ee8f4c01"
+    },
+    {
+      "q": "You want to see the 'SQL' executed for a Unit Test. Where?",
+      "a": "In `target/compiled/[project]/unit_tests/`\n\n**Watch out:** Unit tests create `dummy` SQL that doesn`t hit your real tables, so it won`t appear in standard model run logs.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2757aa8a"
+    },
+    {
+      "q": "You want to run a test that fails if the 'Avg Order Value' drops by 50%. Tool?",
+      "a": "`dbt_expectations` or a custom script comparing to a `Summary` table\n\n**Watch out:** `accepted_values`; generic tests cannot perform cross-run historical comparisons.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "993d31ee"
+    },
+    {
+      "q": "You want to run all tests in the project. Command?",
+      "a": "`dbt test`\n\n**Watch out:** `dbt run`; run does not execute data tests or singular tests.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "28325d2e"
+    }
+  ]
+}

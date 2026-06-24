@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You have two projects: Sales and Inventory. Both need a 'dim_dates' table. Governance plan?",
+      "a": "Build `dim_dates` in a `Core` project and expose it as a `public` model for both\n\n**Watch out:** Copy-pasting the SQL into both projects, leading to logic drift over time.",
+      "group": "Mesh",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "5de785b9"
+    },
+    {
+      "q": "You want to signal if a dashboard is 'Production Ready' or 'Experimental' in dbt. Config?",
+      "a": "Set the `maturity` field in the Exposure definition\n\n**Watch out:** Using `tags`; maturity levels are a first-class property of Exposures specifically for this purpose.",
+      "group": "Exposures",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "1df45ae1"
+    },
+    {
+      "q": "A team needs to use your model but wants to rename columns for their tool. Best practice?",
+      "a": "Let them create an `Intermediate` model in their project that aliases your public model\n\n**Watch out:** Changing names in your Producer model; this breaks all existing consumers.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "a83d5ff3"
+    },
+    {
+      "q": "You want to apply a 'not_null' test to every column in a table automatically. Possible?",
+      "a": "No, you must define it for each column in YAML (or use a macro to generate YAML)\n\n**Watch out:** Thinking `dbt build` implies column-level null checks automatically.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f8c8e32e"
+    },
+    {
+      "q": "You are using 'Model Versions'. How do you point a ref to 'v2' specifically?",
+      "a": "`{{ ref(`model_name`, version=2) }}`\n\n**Watch out:** `{{ ref(`model_name_v2`) }}`; dbt uses the version argument to resolve the correct versioned node.",
+      "group": "Versioning",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "a1d8eae3"
+    },
+    {
+      "q": "You want to hide a specific folder from dbt Explorer lineage. Possible?",
+      "a": "No, dbt shows all nodes in lineage; you can only hide `descriptions` from the UI\n\n**Watch out:** Setting `docs: {show: false}` and expecting the node to disappear from the graph.",
+      "group": "Discovery",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "97ee604a"
+    },
+    {
+      "q": "You want to track 'GDPR' sensitive models in your project. Best config?",
+      "a": "Use `meta` tags in YAML (e.g., meta: {pii: true})\n\n**Watch out:** Using `tags: [pii]`; `meta` is better for structured metadata consumed by external security tools.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "9f642018"
+    },
+    {
+      "q": "You have a Seed used in production. You want to ensure data types are locked. How?",
+      "a": "Define the seed and column types in `dbt_project.yml`\n\n**Watch out:** Relying on CSV headers; dbt auto-detection can change types if the CSV data shifts slightly.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "273cd027"
+    },
+    {
+      "q": "What is the primary role of the 'Architect' in a dbt Mesh organization?",
+      "a": "To define project boundaries, public interfaces, and global governance standards\n\n**Watch out:** To write the SQL for all departmental Marts; Mesh is about decentralizing development.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "fe5e614e"
+    },
+    {
+      "q": "You want to check for 'undocumented' models. What tool provides this metric out of the box?",
+      "a": "dbt Explorer or the `dbt-project-evaluator` package\n\n**Watch out:** Manually scanning `manifest.json`; Explorer provides a visual dashboard for health metrics.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "a89b7eed"
+    },
+    {
+      "q": "You want to see the 'Lineage' of a Snapshot. Where?",
+      "a": "Snapshots appear as their own nodes in dbt Explorer lineage\n\n**Watch out:** Assuming snapshots are `invisible` metadata; they are fully-fledged nodes in the DAG.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "c3d89f94"
+    },
+    {
+      "q": "You want to use a 'Macro' from 'dbt_utils'. First step?",
+      "a": "Add `dbt-labs/dbt_utils` to `packages.yml` and run `dbt deps`\n\n**Watch out:** Copy-pasting the macro code into your project; this loses the benefit of package updates.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5537b67a"
+    },
+    {
+      "q": "A team is using your public model. You delete the model. What happens to them?",
+      "a": "Their next build will fail during compilation\n\n**Watch out:** Thinking they will keep using `cached` data; dbt validates all refs at the start of every run.",
+      "group": "Mesh",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "7698789d"
+    },
+    {
+      "q": "You have a 'Consumer' project referencing a 'Producer' project. Both use Snowflake. Does Mesh move data?",
+      "a": "No, dbt Mesh uses cross-database/schema SQL references in the same warehouse\n\n**Watch out:** Thinking Mesh `copies` data between projects; it only shares metadata and SQL paths.",
+      "group": "Mesh",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "f170051b"
+    },
+    {
+      "q": "You want to enforce that a 'Total' column matches 'Items' sum. Where is this 'governed'?",
+      "a": "In a Singular Test or a Unit Test\n\n**Watch out:** In an enforced contract; contracts check schema/types, not business logic or data values.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5a44e649"
+    },
+    {
+      "q": "You want to group models by 'Business Domain' (e.g., Marketing). Feature?",
+      "a": "Use `Groups` in YAML\n\n**Watch out:** Using `Tags`; groups allow for formal ownership and organizational structure in dbt Explorer.",
+      "group": "Governance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2bcf8d1c"
+    },
+    {
+      "q": "You want to see the 'Status' of models across 5 different projects. Where?",
+      "a": "dbt Explorer's Mesh view\n\n**Watch out:** Checking 5 separate `dbt docs` sites; Explorer centralizes metadata from all interconnected projects.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "cdf5907a"
+    },
+    {
+      "q": "You set 'persist_docs: {relation: true}'. Where does the model description appear?",
+      "a": "In the data warehouse (e.g., as a COMMENT on the table)\n\n**Watch out:** Only in dbt Explorer; persist_docs explicitly pushes metadata to the physical warehouse.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "78998005"
+    },
+    {
+      "q": "You want to reference a model in a different database. How?",
+      "a": "Use the `database` and `schema` configs in conjunction with `ref()`\n\n**Watch out:** Hardcoding `db.schema.table` in SQL; this breaks environment-specific target resolution.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "471b24f6"
+    },
+    {
+      "q": "You want to track the 'maturity' of a model (e.g., Seed, Alpha, Beta). Config?",
+      "a": "Use a custom `meta` field in YAML\n\n**Watch out:** Using `maturity` in a model; maturity is a specific property for Exposures, not Models.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "247554f7"
+    },
+    {
+      "q": "You want to see 'Column-level Lineage' for a specific model. Requirement?",
+      "a": "dbt Cloud (Explorer) is required for native column-level lineage\n\n**Watch out:** Expecting it in dbt Core; Core only provides model-level lineage in the docs UI.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "27d385f5"
+    },
+    {
+      "q": "A Consumer project is building. It needs the Producer's manifest. How does it get it?",
+      "a": "dbt Cloud automatically fetches it from the Producer`s designated `Production' job\n\n**Watch out:** You must manually upload `manifest.json` to the Consumer project's folder.",
+      "group": "Mesh",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "4eb72708"
+    },
+    {
+      "q": "You want to ensure 'Naming Conventions' (stg_, fct_) are followed. Strategy?",
+      "a": "Use `dbt-project-evaluator` to flag models that don't match prefixes\n\n**Watch out:** Manually checking every Pull Request; this is not scalable as the project grows.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "18fb0b46"
+    },
+    {
+      "q": "You want to see 'Data Freshness' results alongside your lineage. Where?",
+      "a": "dbt Explorer provides a freshness overlay on the lineage graph\n\n**Watch out:** Checking `manifest.json`; the manifest doesn't store the *result* of the freshness run, only the config.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "68a545e7"
+    },
+    {
+      "q": "You want to define a 'Business Term' (e.g., LTV) once and use it across projects. How?",
+      "a": "Use the dbt Semantic Layer (Metrics)\n\n**Watch out:** Writing the definition in a `doc block`; doc blocks provide context but don't enforce calculation logic across BI tools.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "8dcd4e7d"
+    },
+    {
+      "q": "You are versioning a model (v1, v2). Both are live. How does dbt handle the table names?",
+      "a": "dbt appends the version to the identifier (e.g., my_model_v1, my_model_v2)\n\n**Watch out:** Both are named `my_model` and dbt overwrites the one that runs last.",
+      "group": "Versioning",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d5975e4d"
+    },
+    {
+      "q": "You want to see the 'Downstream Impact' of a Source change. Tool?",
+      "a": "dbt Explorer's lineage graph, starting at the Source node\n\n**Watch out:** Checking the `Exposures` list; exposures only show the end-points, not the full intermediate impact.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "7d38a519"
+    },
+    {
+      "q": "You want to prevent any 'internal' models from being accidentally made 'public'. Strategy?",
+      "a": "Use a custom `dbt-project-evaluator` rule to flag unexpected `access` configs\n\n**Watch out:** Relying on YAML defaults; you must explicitly govern the `access` property.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d2108c89"
+    },
+    {
+      "q": "You are designing a Mesh. Where should 'Common Macros' live?",
+      "a": "In a shared dbt Package installed by all projects\n\n**Watch out:** In the `Core` project and shared via Mesh; Mesh shares data, not code (macros).",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "de1909db"
+    },
+    {
+      "q": "You want to see 'Query Performance' metrics in dbt Cloud. Where?",
+      "a": "dbt Explorer under the `Performance` tab for a specific model\n\n**Watch out:** Checking the `run_results.json` file locally; Explorer provides historical trends, not just a single run.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "aad5ec18"
+    },
+    {
+      "q": "You want to ensure 'Documentation' is updated for every PR. Strategy?",
+      "a": "Use a CI check that fails if a new model is missing a `description` in YAML\n\n**Watch out:** Encouraging developers to `write good docs` without an automated enforcement mechanism.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "7a5e84f6"
+    },
+    {
+      "q": "You want to see how many dashboards are 'at risk' due to a failed model. Tool?",
+      "a": "dbt Explorer Lineage (Exposures nodes downstream of the failure)\n\n**Watch out:** Checking the `Tableau` interface; Tableau only shows that data is missing, not *why* it failed in dbt.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "61e42d14"
+    },
+    {
+      "q": "You want to use a 'Macro' to generate the 'Alias' for every model. Where?",
+      "a": "Override the `generate_alias_name` macro in your project\n\n**Watch out:** Manually editing `alias` in 500 model files; this is not scalable governance.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b56e32b3"
+    },
+    {
+      "q": "You want to restrict who can see the 'Source code' of a model in dbt Explorer. How?",
+      "a": "Use Account-level RBAC groups in dbt Cloud\n\n**Watch out:** Setting `access: private`; this restricts `ref()` capability but doesn't hide metadata from authorized users.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "efa90271"
+    },
+    {
+      "q": "You want to use dbt Mesh. A producer model has 'enforced: true' for its contract. It fails. What happens to the consumer?",
+      "a": "The consumer`s build will likely skip or fail because the producer`s production state was never updated\n\n**Watch out:** Assuming the consumer will just use the `previous` day's version automatically without a skip status.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "e1d31d27"
+    },
+    {
+      "q": "You want to see 'Lineage-as-a-Service'. What tool does dbt provide?",
+      "a": "dbt Explorer\n\n**Watch out:** `dbt docs serve`; the docs site is a static artifact, whereas Explorer is a live, interconnected service.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "db6b3629"
+    },
+    {
+      "q": "You want to see 'Column Data Types' in Explorer. Where?",
+      "a": "Select a model and navigate to the `Columns` tab in the details pane\n\n**Watch out:** Checking the SQL code; SQL doesn`t show the warehouse`s *actual* resolved data types.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "e4e43b4e"
+    },
+    {
+      "q": "Your project uses 'Snapshots'. You want to document the 'dbt_valid_from' column. Where?",
+      "a": "In the YAML file where the snapshot is defined\n\n**Watch out:** In the model `schema.yml`; snapshots have their own YAML properties and shouldn't be mixed with standard models.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b7fee685"
+    },
+    {
+      "q": "You want to ensure 'Finance' models are built into a specific database. How?",
+      "a": "Set the `database` config for the finance folder in `dbt_project.yml`\n\n**Watch out:** Changing the `profile` in profiles.yml; this affects the whole user, not a specific team's folder.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "cbda2c6d"
+    },
+    {
+      "q": "You want to see 'Cross-Project Lineage' in your local IDE. Possible?",
+      "a": "No, local IDEs only show the current project's DAG\n\n**Watch out:** Trying to configure `dependencies.yml` to force it into the local graph.",
+      "group": "Discovery",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "de073791"
+    },
+    {
+      "q": "You want to find 'Public Model' documentation. Where?",
+      "a": "In dbt Explorer, filtering by the `Public` access level\n\n**Watch out:** In the Producer's Git repository; documentation should be consumed via the Explorer UI for ease of access.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0b94c67c"
+    },
+    {
+      "q": "You want to ensure 'Gross Margin' is never changed without approval. Strategy?",
+      "a": "Require Code Reviews on the `metrics` YAML files\n\n**Watch out:** Locking the `model` SQL; metrics are defined in YAML and can be changed without touching the SQL.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "35766fa5"
+    },
+    {
+      "q": "You want to see 'Historical Build Times' for a model. Tool?",
+      "a": "dbt Explorer`s `Performance' tab\n\n**Watch out:** `manifest.json`; the manifest only knows about the *structure*, not the *execution history*.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "8c0e68bc"
+    },
+    {
+      "q": "You want to define 'Maturity' for a model. Is there a built-in field?",
+      "a": "No, you must use `meta`\n\n**Watch out:** Trying to use `maturity: high`; this only works for Exposures.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "62bd6026"
+    },
+    {
+      "q": "You want to see 'Dependencies' on a Source. Command?",
+      "a": "`dbt ls --select source:raw_data.*+`\n\n**Watch out:** `dbt ls --select +source:raw_data.*`; sources have no parents, so the prefix does nothing.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "9cba6d96"
+    },
+    {
+      "q": "You want to use a 'Variable' in dbt_project.yml. Syntax?",
+      "a": "`{{ var(\"my_var\") }}`\n\n**Watch out:** Using nested quotes e.g. \"{{ var(\"my_var\") }}\"; this results in a YAML parsing error.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f01856f1"
+    },
+    {
+      "q": "You want to track 'Personal Identifiable Information' (PII). Tag vs Meta?",
+      "a": "Use `meta` for structured auditing; `tags` for run-time selection\n\n**Watch out:** Using `tags` exclusively for security auditing; tags are strings and harder to parse programmatically.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "423a9773"
+    },
+    {
+      "q": "You want to see 'Column-level Lineage' for a Source. Possible?",
+      "a": "Yes, in dbt Explorer (Cloud)\n\n**Watch out:** Expecting it in `dbt docs generate`; the static docs do not support column-level lineage.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "3b9fdc22"
+    },
+    {
+      "q": "You want to ensure 'Marketing' models never reference 'Internal' finance tables. How?",
+      "a": "Set finance models to `access: internal`\n\n**Watch out:** Setting finance models to `access: private`; private is for within-folder only, internal is for within-project.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "cb915291"
+    },
+    {
+      "q": "You want to automate 'Freshness' alerts to Slack. How?",
+      "a": "Configure dbt Cloud notifications for the Freshness job\n\n**Watch out:** Trying to write a Jinja macro inside `sources.yml` to send the alert; alerts are handled by the orchestrator.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2b4831b1"
+    },
+    {
+      "q": "You want to see 'Exposures' in your lineage graph. Requirement?",
+      "a": "They must be defined in a YAML file\n\n**Watch out:** They are automatically detected from BI tool logs; dbt requires manual Exposure definitions.",
+      "group": "Exposures",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "9c166247"
+    },
+    {
+      "q": "You want to use a 'Macro' to generate the 'Schema' for every model. How?",
+      "a": "Override the `generate_schema_name` macro in your project\n\n**Watch out:** Setting the schema manually in every model config; this is prone to error and hard to update.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "27c66e0c"
+    },
+    {
+      "q": "You want to see the 'Compiled SQL' for a model in Explorer. Where?",
+      "a": "Select the model and click the `Code` tab\n\n**Watch out:** Checking the `run_results.json` download; Explorer renders it directly for ease of use.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0f8c0657"
+    },
+    {
+      "q": "You want to ensure 'Documentation' is never missing for Public models. How?",
+      "a": "Use `dbt-project-evaluator` to flag public models without descriptions\n\n**Watch out:** Relying on a `not_null` test; tests are for data, not metadata.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b9f83f04"
+    },
+    {
+      "q": "You want to see 'Lineage' for a specific column. Tool?",
+      "a": "dbt Explorer (Column-level lineage)\n\n**Watch out:** Lineage Graph in dbt Core; that graph only shows model-to-model connections.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d2c94715"
+    },
+    {
+      "q": "You want to define 'Entities' for the Semantic Layer. Where?",
+      "a": "In the `semantic_models` section of your YAML\n\n**Watch out:** In the `metrics` section; entities define the joins, whereas metrics define the calculations.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "7e9cb4ff"
+    },
+    {
+      "q": "You want to see 'Freshness' for 100 Sources. Best view?",
+      "a": "dbt Explorer Freshness dashboard\n\n**Watch out:** Running `dbt source freshness` locally and reading the terminal output.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "137fac66"
+    },
+    {
+      "q": "You want to reference a 'Versioned' model. What is the syntax?",
+      "a": "`{{ ref(`my_model`, version=1) }}`\n\n**Watch out:** `{{ ref(`my_model_v1`) }}`; dbt uses the version argument to find the specific version node.",
+      "group": "Versioning",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "adb55034"
+    },
+    {
+      "q": "You want to see 'Downstream' consumers of your public model. Tool?",
+      "a": "dbt Explorer (Cross-project lineage)\n\n**Watch out:** `dbt list` on your local project; local list doesn't know about other projects.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "dbt Mesh & Multi-Project",
+      "module": "dbt Architect",
+      "id": "cd7ca710"
+    },
+    {
+      "q": "You want to apply 'RBAC' to dbt Explorer. Where?",
+      "a": "dbt Cloud Group permissions\n\n**Watch out:** Setting `access` levels in YAML; access levels control `ref()` ability, not UI visibility.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 2: Data Governance & Metadata",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "3da84196"
+    }
+  ]
+}

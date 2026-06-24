@@ -207,6 +207,15 @@
         </div>
       </div>
 
+      <!-- Schema Reference Panel -->
+      <div id="schemaPanel" class="schema-panel" style="display:none">
+        <div class="schema-panel-header" onclick="toggleSchema()">
+          <span class="schema-panel-title">Schema Reference</span>
+          <svg class="schema-panel-chevron" id="schemaPanelChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+        <div class="schema-panel-body" id="schemaPanelBody"></div>
+      </div>
+
       <!-- IDE Code Drafting Area (CodeMirror 6 Target) -->
       <div class="code-input-container" id="codeInputContainer">
         <label class="label" for="editorContainer" style="margin-bottom: 6px; display: block;">Draft your answer:</label>

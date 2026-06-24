@@ -1,0 +1,494 @@
+{
+  "dbt Foundations": {
+    "section": "Professional Development",
+    "icon": "assets/icons/dbt-bit-standalone.png",
+    "schemas": {
+      "jaffle_shop": {
+        "tables": [
+          {
+            "name": "orders",
+            "columns": [
+              { "name": "id", "type": "integer" },
+              { "name": "customer_id", "type": "integer" },
+              { "name": "order_date", "type": "date" },
+              { "name": "status", "type": "varchar" },
+              { "name": "amount", "type": "numeric" },
+              { "name": "_etl_loaded_at", "type": "timestamp" }
+            ]
+          },
+          {
+            "name": "customers",
+            "columns": [
+              { "name": "id", "type": "integer" },
+              { "name": "first_name", "type": "varchar" },
+              { "name": "last_name", "type": "varchar" }
+            ]
+          }
+        ]
+      },
+      "stripe": {
+        "tables": [
+          {
+            "name": "payment",
+            "columns": [
+              { "name": "id", "type": "integer" },
+              { "name": "orderid", "type": "integer" },
+              { "name": "paymentmethod", "type": "varchar" },
+              { "name": "status", "type": "varchar" },
+              { "name": "amount", "type": "integer" },
+              { "name": "created", "type": "timestamp" }
+            ]
+          }
+        ]
+      }
+    },
+    "modules_ordered": [
+      "What is dbt",
+      "Models & the DAG",
+      "Materializations",
+      "Sources & Seeds",
+      "Testing",
+      "Documentation",
+      "Jinja & Macros",
+      "Project Structure"
+    ],
+    "cards": [
+      {
+        "q": "What is dbt?",
+        "a": "dbt (data build tool) is an open-source transformation framework. You write SELECT statements; dbt compiles them into CREATE TABLE/VIEW statements and runs them in your data warehouse.",
+        "id": "f1e2d3c4",
+        "module": "What is dbt",
+        "category": "Introduction",
+        "group": "Introduction",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is ELT, and where does dbt fit?",
+        "a": "ELT = Extract, Load, Transform. A tool like Fivetran extracts data from sources and loads it into the warehouse; dbt handles the T — transforming raw data into analytics-ready models inside the warehouse.",
+        "id": "b5a6f7e8",
+        "module": "What is dbt",
+        "category": "Introduction",
+        "group": "Introduction",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is the difference between dbt Core and dbt Cloud?",
+        "a": "dbt Core is the open-source CLI. dbt Cloud is a hosted SaaS product that adds a web IDE, job scheduling, CI/CD, and observability on top of Core.",
+        "id": "d9c0b1a2",
+        "module": "What is dbt",
+        "category": "Introduction",
+        "group": "Introduction",
+        "difficulty": "easy"
+      },
+      {
+        "q": "Which data platforms does dbt support?",
+        "a": "Any modern SQL warehouse with an adapter: Snowflake, BigQuery, Redshift, Databricks, DuckDB, Postgres, and many more. dbt compiles SQL and executes it via the platform's adapter.",
+        "id": "f3e4d5c6",
+        "module": "What is dbt",
+        "category": "Introduction",
+        "group": "Introduction",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What are the five core software engineering practices dbt brings to data transformation?",
+        "a": "Modularity (models reference each other via ref()), Testing (data quality assertions), Documentation (auto-generated docs site), Version control (plain SQL/YAML files in git), and Lineage (a DAG of all dependencies).",
+        "id": "b7a8f9e0",
+        "module": "What is dbt",
+        "category": "Introduction",
+        "group": "Introduction",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is a dbt model?",
+        "a": "A `.sql` file in the `models/` directory containing a single SELECT statement. dbt wraps it in CREATE TABLE/VIEW AS and runs it in the warehouse. One file = one relation.",
+        "id": "d1c2b3a4",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What command runs your dbt models?",
+        "a": "`dbt run`. Target specific models with `--select`: `dbt run --select model_name`, `dbt run --select +model_name` (model + all upstream), or `dbt run --select model_name+` (model + all downstream).",
+        "id": "f5e6d7c8",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is the `ref()` function?",
+        "a": "`{{ ref('model_name') }}` is how one model references another. dbt resolves it to the correct schema and table at compile time, and uses ref() calls to build the dependency graph.",
+        "id": "b9a0f1e2",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is the dbt DAG?",
+        "a": "The Directed Acyclic Graph — the dependency graph of all models, built automatically from `ref()` calls. dbt uses it to determine execution order, ensuring every model runs after its upstream dependencies.",
+        "id": "d3c4b5a6",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "easy"
+      },
+      {
+        "q": "Why must the dbt DAG be acyclic?",
+        "a": "A cycle (A depends on B depends on A) creates an infinite loop with no valid execution order. dbt raises an error if it detects a cycle in your ref() dependencies.",
+        "id": "f7e8d9c0",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is `{{ this }}` in a dbt model?",
+        "a": "A Jinja variable that refers to the model's own relation in the warehouse (schema.table). Most commonly used in incremental models to query the table's existing rows.",
+        "id": "b1a2f3e4",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What file defines project-wide model configuration like default materializations?",
+        "a": "`dbt_project.yml`. Under the `models:` key you set default materializations, tags, and schema names per folder. Individual models can override these with a `{{ config() }}` block.",
+        "id": "d5c6b7a8",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What does `{{ config(materialized='table') }}` at the top of a model do?",
+        "a": "Overrides the project default to materialize that specific model as a physical table. Config set in the model file always takes precedence over `dbt_project.yml` settings.",
+        "id": "f9e0d1c2",
+        "module": "Models & the DAG",
+        "category": "Models",
+        "group": "Models",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What are the four standard dbt materializations?",
+        "a": "`view` (default), `table`, `incremental`, and `ephemeral`.",
+        "id": "b3a4f5e6",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is the `view` materialization?",
+        "a": "The model is created as a database view — the SELECT logic is stored but not executed until queried. Fast to build, but every query re-runs the full SQL. Best for lightweight or frequently-changing logic.",
+        "id": "d7c8b9a0",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "easy"
+      },
+      {
+        "q": "When would you choose `table` over `view`?",
+        "a": "When the model's query is expensive and downstream consumers need fast reads. Tables persist results physically so queries are fast, at the cost of longer build times on `dbt run`.",
+        "id": "f1e2d3c7",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is the `ephemeral` materialization?",
+        "a": "The model is never written to the warehouse. Instead, dbt inlines it as a CTE in any downstream model that `ref()`s it. Good for reusable intermediate logic that doesn't need to exist as its own relation.",
+        "id": "b5a6f7ea",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "medium"
+      },
+      {
+        "q": "How does the `incremental` materialization work?",
+        "a": "On first run it builds the full table. On subsequent runs it only processes new/changed rows (defined by your filter logic), then inserts or merges them. Much faster and cheaper for large, append-friendly datasets.",
+        "id": "d9c0b1a5",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is the `is_incremental()` macro?",
+        "a": "Returns `true` only when the model already exists in the warehouse and is running incrementally. Wrap your row filter in `{% if is_incremental() %}` to limit processing to only new records on subsequent runs.",
+        "id": "f3e4d5c9",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What does `unique_key` do in an incremental model?",
+        "a": "Identifies existing rows for deduplication. If a new row shares a `unique_key` with an existing one, dbt updates/replaces the old row instead of inserting a duplicate. Can be a single column or a list for a composite key.",
+        "id": "b7a8f9e3",
+        "module": "Materializations",
+        "category": "Materializations",
+        "group": "Materializations",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is a dbt source?",
+        "a": "A declaration in a `sources:` YAML block that names a raw table already in your warehouse (e.g. loaded by Fivetran). It gives the table a logical name, enables the `source()` function, and unlocks freshness checks and documentation.",
+        "id": "d1c2b3a7",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "easy"
+      },
+      {
+        "q": "Write a staging model for the `jaffle_shop` orders table. Rename `id` → `order_id`, cast `amount` to dollars (it's stored in cents), and reference the source correctly.",
+        "a": "```sql\nwith source as (\n\n    select * from {{ source('jaffle_shop', 'orders') }}\n\n),\n\nrenamed as (\n\n    select\n        id              as order_id,\n        customer_id,\n        order_date,\n        status,\n        amount / 100.0  as amount_usd\n\n    from source\n\n)\n\nselect * from renamed\n```",
+        "id": "a2c4e6f8",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "medium",
+        "requires_code": true,
+        "schema_ref": "jaffle_shop"
+      },
+      {
+        "q": "Write a staging model for the `stripe` payment table. Rename `id` → `payment_id`, `orderid` → `order_id`, and cast `amount` from cents to dollars. Reference the source correctly.",
+        "a": "```sql\nwith source as (\n\n    select * from {{ source('stripe', 'payment') }}\n\n),\n\nrenamed as (\n\n    select\n        id              as payment_id,\n        orderid         as order_id,\n        paymentmethod   as payment_method,\n        status,\n        amount / 100.0  as amount_usd,\n        created         as created_at\n\n    from source\n\n)\n\nselect * from renamed\n```",
+        "id": "b3d5f7a9",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "medium",
+        "requires_code": true,
+        "schema_ref": "stripe"
+      },
+      {
+        "q": "What is the `source()` function, and how does it differ from `ref()`?",
+        "a": "`{{ source('source_name', 'table_name') }}` references a raw table not created by dbt. Unlike `ref()`, which links dbt models together, `source()` is the entry point into your DAG from external raw data.",
+        "id": "f5e6d7cb",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is source freshness in dbt?",
+        "a": "A check that a source table was loaded recently enough. Configure a `loaded_at_field` and `warn_after`/`error_after` thresholds in YAML; `dbt source freshness` queries the table and fails if the data is stale.",
+        "id": "b9a0f1e5",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is a dbt seed?",
+        "a": "A CSV file in the `seeds/` directory that dbt loads as a table with `dbt seed`. Use it for small, static reference data like country codes or mapping tables that belong in version control alongside your code.",
+        "id": "d3c4b5aa",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Seeds",
+        "difficulty": "easy"
+      },
+      {
+        "q": "Why should staging models use `source()` rather than hardcoded table names?",
+        "a": "`source()` adds the raw table to the DAG (making lineage visible), enables freshness checks, and centralises the physical location — change database/schema in YAML rather than hunting through SQL files.",
+        "id": "f7e8d9c3",
+        "module": "Sources & Seeds",
+        "category": "Sources & Seeds",
+        "group": "Sources",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is a dbt test?",
+        "a": "A SQL query that asserts something about your data. If the query returns any rows, the test fails. There are two kinds: generic tests (reusable, config-driven in YAML) and singular tests (one-off SQL files).",
+        "id": "b1a2f3e7",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What command runs dbt tests?",
+        "a": "`dbt test`. Use `--select` to target a model: `dbt test --select model_name`. Use `dbt build` to run models and their tests together in dependency order.",
+        "id": "d5c6b7ab",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What are dbt's four built-in generic tests?",
+        "a": "`not_null`, `unique`, `accepted_values`, and `relationships`.",
+        "id": "f9e0d1c5",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What does the `relationships` generic test check?",
+        "a": "Referential integrity — that every value in a column exists in a specified column of another model. Equivalent to a foreign key check.",
+        "id": "b3a4f5e9",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is a singular test?",
+        "a": "A `.sql` file in the `tests/` directory containing a custom SQL assertion. If the query returns any rows, the test fails. Use when the assertion is too specific for a generic test.",
+        "id": "d7c8b9a3",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "medium"
+      },
+      {
+        "q": "Where do you configure generic tests in a dbt project?",
+        "a": "In a YAML file alongside your models (e.g. `schema.yml`), under `models:` > `columns:` > `tests:`. Tests can also be applied at the model level for multi-column assertions.",
+        "id": "f1e2d3c9",
+        "module": "Testing",
+        "category": "Testing",
+        "group": "Testing",
+        "difficulty": "easy"
+      },
+      {
+        "q": "How do you add a description to a dbt model?",
+        "a": "In a YAML file alongside the model, under `models:` > `description:`. Add column-level descriptions under `columns:` > `description:`. These appear in the auto-generated docs site.",
+        "id": "b5a6f7ec",
+        "module": "Documentation",
+        "category": "Documentation",
+        "group": "Documentation",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What are dbt doc blocks?",
+        "a": "Reusable Markdown descriptions stored in `.md` files, referenced with `{{ doc('doc_name') }}`. Write a long description once and reference it across multiple models or columns instead of repeating it.",
+        "id": "d9c0b1a8",
+        "module": "Documentation",
+        "category": "Documentation",
+        "group": "Documentation",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What do `dbt docs generate` and `dbt docs serve` do?",
+        "a": "`generate` compiles a JSON artifact of your whole project (models, tests, descriptions, lineage). `serve` launches a local web server where you can browse the docs and explore the DAG interactively.",
+        "id": "f3e4d5cb",
+        "module": "Documentation",
+        "category": "Documentation",
+        "group": "Documentation",
+        "difficulty": "easy"
+      },
+      {
+        "q": "Why is documentation-as-code valuable in dbt?",
+        "a": "Descriptions live in the same repo as the SQL — they're versioned, reviewed in PRs, and always in sync with the models they describe. No separate wiki that drifts out of date.",
+        "id": "b7a8f9e6",
+        "module": "Documentation",
+        "category": "Documentation",
+        "group": "Documentation",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is Jinja in dbt?",
+        "a": "A Python templating language embedded in dbt SQL. It enables dynamic SQL through value output (`{{ }}`), control flow (`{% if %}`, `{% for %}`), and macros — all resolved at compile time before SQL hits the warehouse.",
+        "id": "d1c2b3aa",
+        "module": "Jinja & Macros",
+        "category": "Jinja & Macros",
+        "group": "Jinja",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is the difference between `{{ }}` and `{% %}` in Jinja?",
+        "a": "`{{ expression }}` outputs a value into the SQL (e.g. a ref or variable result). `{% statement %}` executes logic (if/for/set) without producing any output text.",
+        "id": "f5e6d7cd",
+        "module": "Jinja & Macros",
+        "category": "Jinja & Macros",
+        "group": "Jinja",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What does the `var()` function do?",
+        "a": "Reads a project variable defined in `dbt_project.yml` under `vars:`, or passed at runtime with `--vars '{\"key\": \"value\"}'`. Useful for environment-specific configs, date cutoffs, or feature flags.",
+        "id": "b9a0f1e8",
+        "module": "Jinja & Macros",
+        "category": "Jinja & Macros",
+        "group": "Jinja",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is a dbt macro?",
+        "a": "A reusable Jinja function defined in a `.sql` file in the `macros/` directory. Called with `{{ macro_name(args) }}`, it generates SQL at compile time — like a SQL function, but for code generation rather than runtime execution.",
+        "id": "d3c4b5ad",
+        "module": "Jinja & Macros",
+        "category": "Jinja & Macros",
+        "group": "Macros",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is dbt-utils, and how do you install it?",
+        "a": "A popular open-source package of macros and generic tests (e.g. `generate_surrogate_key`, `date_spine`, `not_empty_string`). Add it to `packages.yml` and run `dbt deps` to install.",
+        "id": "f7e8d9c6",
+        "module": "Jinja & Macros",
+        "category": "Jinja & Macros",
+        "group": "Macros",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is the staging layer in a dbt project?",
+        "a": "Models (`stg_*`) that do light, source-faithful transformation only: rename columns, cast types, basic filters. One staging model per source table, referencing raw data via `source()`. No business logic.",
+        "id": "b1a2f3ea",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Layers",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is the marts layer?",
+        "a": "The final, business-facing layer — wide tables or fact/dim tables optimised for BI tools and end users. These use `ref()` to pull from staging or intermediate models and are where business logic lives.",
+        "id": "d5c6b7ae",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Layers",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is the intermediate layer, and when do you need it?",
+        "a": "Optional models between staging and marts for complex joins or logic that would make marts unreadable. They're not exposed to BI tools — they exist to keep mart models clean.",
+        "id": "f9e0d1c8",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Layers",
+        "difficulty": "medium"
+      },
+      {
+        "q": "What is `profiles.yml` in dbt Core?",
+        "a": "A file at `~/.dbt/profiles.yml` (outside the project repo) containing connection credentials for each target environment (dev, prod). Kept out of version control to avoid committing secrets.",
+        "id": "b3a4f5ec",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Configuration",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What does `dbt compile` do?",
+        "a": "Resolves all Jinja, `ref()`, and `source()` calls and writes the resulting pure SQL to `target/compiled/` — without executing anything. Use it to inspect exactly what SQL dbt will run, or to debug templating issues.",
+        "id": "d7c8b9a6",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Commands",
+        "difficulty": "easy"
+      },
+      {
+        "q": "What is `dbt debug` used for?",
+        "a": "Tests your connection to the data warehouse and validates your `profiles.yml` configuration. Run it first when setting up a new project or troubleshooting connection issues.",
+        "id": "f1e2d3cc",
+        "module": "Project Structure",
+        "category": "Project Structure",
+        "group": "Commands",
+        "difficulty": "easy"
+      }
+    ]
+  }
+}

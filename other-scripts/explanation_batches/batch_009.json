@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "A 'unique' test is failing, but there are no duplicate rows in the table. How?",
+      "a": "The test is only on one column; check if that specific column has duplicates, even if the rest of the row is different\n\n**Watch out:** Thinking `unique` means the `whole row` is unique; it only applies to the specific column(s) tested.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0d7f97c6"
+    },
+    {
+      "q": "You are using 'Unit Tests' and the test is failing with 'SQL Error'. Why?",
+      "a": "Check the `target/compiled/[unit_test].sql`; the error is usually a syntax mistake in your mock data or the model's logic\n\n**Watch out:** Thinking the unit test is hitting the real warehouse data.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "c173fdd0"
+    },
+    {
+      "q": "You want to debug why 'Partial Parsing' was skipped. Where?",
+      "a": "Look for the `Partial parsing not enabled` or `Partial parsing out of sync` message in the dbt terminal logs\n\n**Watch out:** Checking `dbt_project.yml`; partial parsing is a run-time behavior, not just a static config.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "06f7ab0a"
+    },
+    {
+      "q": "You are seeing 'Table not found' for a model that was just built. Why?",
+      "a": "Check if the model is being built into a different `Schema` than what you are querying in your SQL editor\n\n**Watch out:** Running `dbt clean`; the table is in the warehouse, not your local project.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b7fb6dbd"
+    },
+    {
+      "q": "You want to find all 'Singular' tests that are currently disabled. How?",
+      "a": "Use `dbt ls --select test_type:singular --state path/to/manifest` (if using state comparison)\n\n**Watch out:** Manually opening every .sql file in `tests/`.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b255015b"
+    },
+    {
+      "q": "A dbt Cloud job is 'Queued' for an hour. Why?",
+      "a": "Check if you have reached your `Slot` or `Concurrency` limit in the dbt Cloud account settings\n\n**Watch out:** Restarting the warehouse; the delay is in dbt Cloud's scheduler, not the warehouse compute.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "cc6d485b"
+    },
+    {
+      "q": "You are seeing 'None' values in a 'Source Freshness' report. Why?",
+      "a": "The freshness command couldn`t find the `loaded_at_field' or the table is empty\n\n**Watch out:** Thinking the data is `infinitely fresh`; `None` means the check couldn't be performed.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "ecf2842c"
+    },
+    {
+      "q": "You want to debug a 'Macro' that generates YAML. How?",
+      "a": "Use the `dbt run-operation` command to execute the macro and print the result to the console\n\n**Watch out:** Calling the macro in a model; models expect SQL, not YAML, and will fail to compile.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "99e8bc8e"
+    },
+    {
+      "q": "You are seeing 'Deadlock detected' in a dbt run. What is the architectural fix?",
+      "a": "Reduce the number of `threads` to minimize concurrent DDL operations on the same schema\n\n**Watch out:** Changing models to `View`; views also require metadata locks in many warehouses.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "18c14d75"
+    },
+    {
+      "q": "You want to see the 'Catalog' of your warehouse without running dbt docs. Where?",
+      "a": "Query the `information_schema.columns` directly in your warehouse\n\n**Watch out:** Checking `manifest.json`; the manifest only has dbt`s view of the project, not the warehouse`s physical state.",
+      "group": "Warehouse",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "41b1a254"
+    },
+    {
+      "q": "A 'relationships' test fails, but you know the data is there. What's the hidden fix?",
+      "a": "Check for trailing spaces or hidden characters in the keys using `trim()` in your staging models\n\n**Watch out:** Manually `inserting` missing keys into the parent table; fix the data pipeline, not the symptom.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "a2b02de3"
+    },
+    {
+      "q": "You are seeing 'Unexpected keyword' in a Jinja block. How to troubleshoot?",
+      "a": "Check if you are using a Python-only function that isn`t supported in Jinja`s restricted sandbox\n\n**Watch out:** Checking the SQL syntax; `Unexpected keyword` is a Jinja compilation error.",
+      "group": "Jinja",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "40669323"
+    },
+    {
+      "q": "You want to debug the 'Selection' of models for a CI job. Command?",
+      "a": "Use `dbt ls --select state:modified --state path/to/prod/manifest`\n\n**Watch out:** Running `dbt build`; you only want to `list` the nodes to verify your selector logic.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "264af448"
+    },
+    {
+      "q": "You are getting 'profile not found' when running dbt. You have a profiles.yml. Why?",
+      "a": "Ensure the `profile:` name in `dbt_project.yml` matches the profile name in `profiles.yml` exactly\n\n**Watch out:** Checking the warehouse credentials; the error is about the `connection` between the project and the profile.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "19d34f5b"
+    },
+    {
+      "q": "You want to find the 'slowest' model in your project. Tool?",
+      "a": "Sort the models in dbt Explorer by `Average Execution Time`\n\n**Watch out:** Checking `logs/dbt.log`; the log is a stream of text and is very hard to use for aggregate performance analysis.",
+      "group": "Performance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "6ebf3ad1"
+    },
+    {
+      "q": "You see '0 tests passed, 0 failed' after running 'dbt test'. You have 50 tests. Why?",
+      "a": "Check your `--select` flag; you likely selected a model that has no tests defined\n\n**Watch out:** Assuming the tests `deleted` themselves; selectors are the primary reason for `empty` test runs.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f7ad8e6c"
+    },
+    {
+      "q": "You want to see the 'Diff' between local and production data. Tool?",
+      "a": "Use the `dbt-audit-helper` package and the `compare_relations` macro\n\n**Watch out:** Manually scrolling through two SQL editors; `audit-helper` automates the comparison and provides a percentage match.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b677d9db"
+    },
+    {
+      "q": "A dbt job is slow because it's fetching the 'Manifest' from S3/Cloud. Fix?",
+      "a": "Ensure the environment is using `Partial Parsing` to avoid a full manifest rebuild every time\n\n**Watch out:** Moving dbt to a `larger machine`; the bottleneck is network latency and parsing, not CPU/RAM.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5d850083"
+    },
+    {
+      "q": "You are seeing 'Invalid datetime' in a Mart. How to debug?",
+      "a": "Run a Singular test checking for `0000-00-00` or other invalid date strings in the source\n\n**Watch out:** Using `not_null`; an invalid date is often not NULL, it`s just garbage data that the warehouse can`t parse.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "86e1eea6"
+    },
+    {
+      "q": "You want to debug a 'Macro' that uses 'graph' object. How?",
+      "a": "Use `{{ log(graph.nodes.values() | list, info=True) }}` to see the metadata available for all models\n\n**Watch out:** Looking in the `target/manifest.json` while the run is active; the manifest is only written *after* the run finishes.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "04acdfc1"
+    },
+    {
+      "q": "You see 'Compiled SQL' using 'database_a' instead of 'database_b'. Why?",
+      "a": "Check if `database_a` is hardcoded in the model config or `dbt_project.yml`\n\n**Watch out:** Changing the profile; the profile target is the *fallback*, but explicit config always wins.",
+      "group": "Configuration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f3711573"
+    },
+    {
+      "q": "You want to see 'Dependencies' for a model that was just deleted. Possible?",
+      "a": "Yes, if you have a copy of the previous `manifest.json`, you can use it to see what *was* dependent on it\n\n**Watch out:** Using `dbt ls`; the current project no longer contains the model, so dbt doesn't know its history.",
+      "group": "Lineage",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "cad67a10"
+    },
+    {
+      "q": "You are getting 'Jinja error: expected token 'end of print statement'. Fix?",
+      "a": "Check for a missing closing brace `}}` or an extra opening brace in the SQL\n\n**Watch out:** Checking the SQL syntax; this is a Jinja delimiter error.",
+      "group": "Jinja",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "e9ee747b"
+    },
+    {
+      "q": "You want to see 'Tests' for a Source in dbt docs. Where?",
+      "a": "Navigate to the `Sources` section in the docs sidebar and select the table\n\n**Watch out:** Searching in the `Models` section; source tests are attached to the source node, not the downstream models.",
+      "group": "Documentation",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "c0f77379"
+    },
+    {
+      "q": "A 'not_null' test is failing, but you only care if the column is null for 'Premium' customers. Fix?",
+      "a": "Add `config: {where: \"customer_type = `Premium`\"}` to the test in YAML\n\n**Watch out:** Creating a custom Singular test; adding a `where` clause to a generic test is cleaner and built-in.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "807a8259"
+    },
+    {
+      "q": "You are hitting BigQuery 'concurrent slot' limits. fix?",
+      "a": "Reduce the number of `threads` in your dbt profile\n\n**Watch out:** Switching to `Ephemeral` models; Ephemeral models are CTEs and don't reduce the number of slots used by the parent query.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0a5fbe86"
+    },
+    {
+      "q": "You want to debug the 'Freshness' of a specific Source table. Command?",
+      "a": "`dbt source freshness --select source:[source_name].[table_name]`\n\n**Watch out:** `dbt run`; run doesn't gather or report on freshness metadata.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d2b8a290"
+    },
+    {
+      "q": "You are seeing 'Identifier too long' in a warehouse. Architect's fix?",
+      "a": "Use `alias:` in the model config to provide a shorter physical name for the table\n\n**Watch out:** Renaming the `.sql` file; some warehouses have limits that are shorter than a nested dbt folder path.",
+      "group": "Configuration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "33d406e3"
+    },
+    {
+      "q": "You see '0 tests found' for a model that has tests defined in YAML. Why?",
+      "a": "Ensure the model name in the YAML (under the `models:` key) matches the SQL filename exactly\n\n**Watch out:** Assuming dbt `guesses` the link based on folder proximity; the name must match.",
+      "group": "DAG",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2ee14cf7"
+    },
+    {
+      "q": "You want to see 'Historical Pass/Fail' rates for a dbt Cloud job. Where?",
+      "a": "Job `Run History` page in dbt Cloud\n\n**Watch out:** `Explorer`; Explorer shows the *current health* of the project, while Run History shows the *performance of a job* over time.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f826b5b8"
+    },
+    {
+      "q": "You are getting 'Circular reference' with a model that refs a Snapshot of itself. Fix?",
+      "a": "Break the loop by creating an `Intermediate` model that acts as the source for the snapshot\n\n**Watch out:** Using `source()` to point to the snapshot; this hides the lineage but still causes a circular DDL dependency.",
+      "group": "DAG",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "868e4cb3"
+    },
+    {
+      "q": "A model is slow. You suspect 'Broadcasting' in the join. How to verify?",
+      "a": "View the `Query Plan` in the warehouse to see the join type and data movement\n\n**Watch out:** Changing the materialization to `Table`; this won't change the underlying SQL join efficiency.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f2e73ed4"
+    },
+    {
+      "q": "You want to debug a failing PR in 'Slim CI'. How to see the models dbt selected?",
+      "a": "Download the `manifest.json` and `run_results.json` artifacts from the CI run\n\n**Watch out:** Checking the dbt Cloud IDE; the IDE shows your *current* branch code, not the *result* of the CI run.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "bd953399"
+    },
+    {
+      "q": "You are seeing '0 models found' after setting 'model-paths' to a new folder. Why?",
+      "a": "Ensure the new folder is relative to the `dbt_project.yml` file and contains .sql files\n\n**Watch out:** Restarting the warehouse; this is a local pathing/parsing issue.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "68900301"
+    },
+    {
+      "q": "You want to see 'Tests' for an Ephemeral model. Where?",
+      "a": "You cannot test Ephemeral models directly; you must test the `downstream` models that consume them\n\n**Watch out:** Defining tests in YAML for an Ephemeral model; dbt will throw an error or skip them.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "eac93b87"
+    },
+    {
+      "q": "A model is materializing in 'dev' but should be in 'prod'. You are using '--target prod'. Why?",
+      "a": "Check if your `profiles.yml` has the `prod` target correctly defined and pointing to the right schema\n\n**Watch out:** Assuming dbt uses the `active` target in the IDE; you must pass the flag explicitly in the CLI.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f94875fd"
+    },
+    {
+      "q": "You want to debug 'Jinja' logic without running a whole model. Tool?",
+      "a": "Use the `dbt compile` command and check the `target/compiled/` folder\n\n**Watch out:** Running `dbt build`; you only want to see the *text generation*, not execute the SQL.",
+      "group": "Jinja",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "3e9adfba"
+    },
+    {
+      "q": "You are seeing 'Deadlock' during 'dbt seed'. fix?",
+      "a": "Set threads to 1 for the seed run or ensure seeds don't share a schema with models running concurrently\n\n**Watch out:** Splitting the seed into 10 smaller files; this actually *increases* the number of concurrent DDL locks.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "e53c3e3c"
+    },
+    {
+      "q": "You need to generate a dynamic list of columns to exclude from a 'SELECT *' statement in a Mart. Which utility macro is the best practice?",
+      "a": "Use `dbt_utils.star(from=ref(...), except=[...])`\n\n**Watch out:** Writing a custom Jinja loop to fetch column names from the warehouse; dbt_utils is pre-optimized and handles warehouse-specific quoting automatically.",
+      "group": "Macros",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1496c8b1"
+    },
+    {
+      "q": "You want to run a specific piece of SQL *only* if the project is running against the 'Prod' target. How do you implement this check?",
+      "a": "Use `{% if target.name == `prod` %}`\n\n**Watch out:** Hardcoding the database name in the SQL; this makes the model non-portable and breaks developer isolation in personal schemas.",
+      "group": "Targeting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "21c3385b"
+    },
+    {
+      "q": "You are creating a macro that needs to work on both BigQuery and Snowflake for string concatenation. How do you handle the different syntax?",
+      "a": "Use the `adapter.dispatch` pattern to define `concat` macros for each adapter\n\n**Watch out:** Using `||` or `CONCAT()`; these are syntax-specific and will cause a compilation error on at least one of the two platforms.",
+      "group": "Cross-Database",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b8d1923b"
+    },
+    {
+      "q": "You need to check if a table already exists in the warehouse before attempting a 'DROP' in a macro. Which object is most reliable?",
+      "a": "Use the `adapter` object (e.g., `adapter.get_relation(...)`)\n\n**Watch out:** Querying `information_schema` manually via `run_query`; the adapter object is faster and abstracts away warehouse-specific schema naming.",
+      "group": "Adapter",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ee072cee"
+    },
+    {
+      "q": "You want to strip whitespace from the start and end of a Jinja block to keep the compiled SQL clean for logs. Syntax?",
+      "a": "Use `{%- ... -%}` with dashes on both sides of the percentage signs\n\n**Watch out:** Using standard `{% ... %}`; this leaves multiple newlines and spaces in the final SQL, making it harder to debug in warehouse history.",
+      "group": "Syntax",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8172fef0"
+    },
+    {
+      "q": "You want to iterate over a list of regions ('US', 'EU', 'APAC') to create separate columns in a model. How?",
+      "a": "Use a `{% for region in [`US`, `EU`, `APAC`] %}` loop\n\n**Watch out:** Hardcoding `select case when region = `US`...` for every line; this is repetitive and violates the DRY (Don't Repeat Yourself) principle.",
+      "group": "Control Flow",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "869f4b62"
+    },
+    {
+      "q": "Your macro uses 'run_query' to get a list of IDs. It fails during 'dbt compile' but works during 'dbt run'. Why?",
+      "a": "Wrap the logic in an `{% if execute %}` block\n\n**Watch out:** Assuming `run_query` works during the compilation phase; dbt only connects to the warehouse during the `execution` phase.",
+      "group": "Execution",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ed69e462"
+    },
+    {
+      "q": "You want to use a 'Variable' defined in 'dbt_project.yml' inside your model. Syntax?",
+      "a": "`{{ var(\"my_variable\") }}`\n\n**Watch out:** `{{ my_variable }}`; Jinja variables must be accessed via the `var` or `env_var` functions if they are defined in project config.",
+      "group": "Variables",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c3c04f4f"
+    },
+    {
+      "q": "You need to access the 'Tag' of a model from within a macro. Which object contains this metadata?",
+      "a": "The `model` or `graph` object (e.g., `model.config.tags`)\n\n**Watch out:** Querying the `information_schema`; dbt tags only exist in the dbt manifest, not in the physical warehouse tables.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b0cbc349"
+    },
+    {
+      "q": "You want to create a macro that calculates 'Profit Margin'. Where should this file be saved?",
+      "a": "In the `macros/` directory with a `.sql` extension\n\n**Watch out:** In the `models/` directory; models must return a result set (SELECT), whereas macros are reusable logic blocks.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "dd785342"
+    },
+    {
+      "q": "You want to join two strings together in Jinja. What is the operator?",
+      "a": "Use the tilde `~` (e.g., `string1 ~ string2`)\n\n**Watch out:** Using the plus `+` sign; in Jinja, `+` is for mathematical addition, whereas `~` forces string concatenation.",
+      "group": "Syntax",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "7c5f79e1"
+    },
+    {
+      "q": "You want to find all models in the project that have a specific 'meta' property using Jinja. Which object do you iterate over?",
+      "a": "`graph.nodes.values()`\n\n**Watch out:** `model.config`; the `model` object only has access to the *current* model`s metadata, not the entire project`s.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3169a6fd"
+    },
+    {
+      "q": "You want to create a 'Global' variable that can be overridden by a command-line argument. How?",
+      "a": "Define it in `vars` in `dbt_project.yml` and access with `{{ var(\"name\") }}`\n\n**Watch out:** Hardcoding it in a macro; macros are harder to override at runtime than project variables.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "87134826"
+    },
+    {
+      "q": "Your macro needs to return a 'List' of column names from a specific table. Which adapter method do you use?",
+      "a": "`adapter.get_columns_in_relation(ref(`my_model`))`\n\n**Watch out:** `run_query(\"show columns...\")`; the adapter method is more portable and returns a structured list of column objects.",
+      "group": "Adapter",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "38c5e12f"
+    },
+    {
+      "q": "You want to print a debug message to the terminal during a dbt run. Syntax?",
+      "a": "`{{ log(\"my message\", info=True) }}`\n\n**Watch out:** `{{ print(\"my message\") }}`; Jinja does not have a native `print` function that pipes to the dbt CLI console.",
+      "group": "Debugging",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "815d1524"
+    },
+    {
+      "q": "You want to check if a specific dbt Package is installed from within a macro. How?",
+      "a": "Check for the package name in the `graph.nodes` or use the `adapter.dispatch` check\n\n**Watch out:** Assuming `ref()` will work; ref() only works for models, not for verifying package installation.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3d258d7b"
+    },
+    {
+      "q": "You need to escape a reserved keyword (like 'order') in a dynamic SELECT statement. Which macro helps?",
+      "a": "`adapter.quote(\"order\")`\n\n**Watch out:** Manually adding double quotes like `\"order\"`; this will break if you switch to a warehouse like BigQuery that uses backticks.",
+      "group": "Adapter",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2da1ae19"
+    },
+    {
+      "q": "You want to convert a Jinja string to all uppercase. Filter?",
+      "a": "`{{ my_string | upper }}`\n\n**Watch out:** Using `upper(my_string)`; Jinja uses pipe syntax for most string transformations (filters).",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1d65e3e9"
+    },
+    {
+      "q": "You want to create a macro that only runs on Snowflake. How do you guard it?",
+      "a": "`{% if target.type == `snowflake` %}`\n\n**Watch out:** `{% if adapter == `snowflake` %}`; the `adapter` is a Python object, while `target.type` is the string name of the warehouse.",
+      "group": "Targeting",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "73af7f5a"
+    },
+    {
+      "q": "You want to get the 'database' name of a specific source. Syntax?",
+      "a": "`{{ source(`my_source`, `my_table`).database }}`\n\n**Watch out:** Hardcoding `raw_prod_db`; if the source database changes in the YAML, your macro will break.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b43e26ce"
+    },
+    {
+      "q": "You are using a loop to generate SQL. How do you prevent a trailing comma on the last item?",
+      "a": "Use `{% if not loop.last %},{% endif %}`\n\n**Watch out:** Putting the comma outside the loop; this results in a comma before the first item or after every single item.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cd38f3b0"
+    },
+    {
+      "q": "You want to access the 'invocation_id' in a post-hook for auditing. Why?",
+      "a": "To uniquely identify the specific dbt run that executed the model\n\n**Watch out:** Using `run_started_at`; the start time might be the same for multiple runs, but the `invocation_id` is a unique UUID.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5a8aeba8"
+    }
+  ]
+}

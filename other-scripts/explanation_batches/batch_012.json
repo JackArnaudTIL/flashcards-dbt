@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "Build a model but skip its tests. Command?",
+      "a": "`dbt run --select my_model`\n\n**Watch out:** `dbt build --skip-tests`; build includes tests by design, use `run` to bypass.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1e1db973"
+    },
+    {
+      "q": "You want to run seeds, models, and tests in one go. Command?",
+      "a": "`dbt build`\n\n**Watch out:** `dbt run`; run skips seeds and tests.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "6bd44e32"
+    },
+    {
+      "q": "Ensure 'Staging' models always run as Views. Where?",
+      "a": "In `dbt_project.yml` under the staging path: `+materialized: view`\n\n**Watch out:** Setting it in every .sql file; folder-level config is the best practice for governance.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "826c2f70"
+    },
+    {
+      "q": "See historical pass/fail rates for a Job. Tool?",
+      "a": "Job `Run History` page in dbt Cloud\n\n**Watch out:** `Explorer`; Explorer shows current project health, while Run History is job-specific.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "707587ed"
+    },
+    {
+      "q": "Run a specific 'Snapshot' via CLI. Command?",
+      "a": "`dbt snapshot --select my_snapshot`\n\n**Watch out:** `dbt run`; standard run ignores snapshot resources.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "880bee51"
+    },
+    {
+      "q": "PR merge is slow due to 'Parsing'. Fix?",
+      "a": "Enable `Partial Parsing` in dbt Cloud settings\n\n**Watch out:** Deleting the `target/` folder; this forces a full re-parse every time.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cc4a6f98"
+    },
+    {
+      "q": "You want to see 'Tests' for a Source in docs. Where?",
+      "a": "Navigate to `Sources` in the sidebar and select the table\n\n**Watch out:** Searching `Models`; source tests are attached to the source node.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "09a0e00d"
+    },
+    {
+      "q": "Trigger a job only when a specific file changes in Git. How?",
+      "a": "dbt Cloud Slim CI (state:modified) handles this automatically by comparing the manifest\n\n**Watch out:** Manually writing custom Git hooks.",
+      "group": "CI/CD",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5f96bdc2"
+    },
+    {
+      "q": "You want to use 'v2' of a versioned model in CI. Command?",
+      "a": "`{{ ref(`model_name`, version=2) }}`\n\n**Watch out:** `{{ ref(`model_name_v2`) }}`; dbt uses the version argument for resolution.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4ef81ae0"
+    },
+    {
+      "q": "Use a specific dbt version for one specific job. Where?",
+      "a": "Job settings in dbt Cloud UI\n\n**Watch out:** `dbt_project.yml`; YAML only restricts versions, it doesn't provision them.",
+      "group": "Environments",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b7d6815f"
+    },
+    {
+      "q": "See 'Lineage' of a Source. Command?",
+      "a": "`dbt ls --select source:raw_data.orders+`\n\n**Watch out:** `dbt ls --select +source...`; the prefix is for parents, sources have none.",
+      "group": "Discovery",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "6593e85e"
+    },
+    {
+      "q": "Set a 'Timeout' for a Cloud job. Why?",
+      "a": "To prevent wasting compute credits if a warehouse query hangs indefinitely\n\n**Watch out:** To speed up the dbt run; timeouts stop jobs, they don't optimize them.",
+      "group": "Performance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1f0aea92"
+    },
+    {
+      "q": "PR merge blocks on 'authentication' error. Why?",
+      "a": "The dbt Cloud CI user/role lacks permissions in the CI schema\n\n**Watch out:** Checking the developer's personal warehouse permissions.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "85937d72"
+    },
+    {
+      "q": "Exclude 'Snapshots' from build. Command?",
+      "a": "`dbt build --exclude resource_type:snapshot`\n\n**Watch out:** `--exclude snapshots`; resource type must be specified.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "35c09c82"
+    },
+    {
+      "q": "Run only models modified in the PR. Command?",
+      "a": "`dbt run --select state:modified --state path/to/manifest`\n\n**Watch out:** `dbt run`; this runs everything, wasting compute.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "bfbf2f62"
+    },
+    {
+      "q": "You see 'Duplicates' in prod but CI tests passed. Why?",
+      "a": "CI only tested modified models; the duplicate was introduced in a downstream join not modified in the PR\n\n**Watch out:** Assuming CI is a `full` data proof.",
+      "group": "CI/CD",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "da04ab96"
+    },
+    {
+      "q": "See 'Data Quality' scores in Cloud. Tool?",
+      "a": "dbt Explorer dashboards\n\n**Watch out:** Reading `run_results.json` manually.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "40bc3b42"
+    },
+    {
+      "q": "Move from Core to Cloud.profiles.yml?",
+      "a": "Cloud handles connections in the UI; stop using local profiles.yml\n\n**Watch out:** Committing the file to Git.",
+      "group": "Environments",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5892976a"
+    },
+    {
+      "q": "Trigger job via external tool. API?",
+      "a": "dbt Cloud Administrative API v2\n\n**Watch out:** Bash commands in Airflow.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "bf60836b"
+    },
+    {
+      "q": "Slack alert on 'Failure' only. Configuration?",
+      "a": "Notification settings in Job UI for `On Failure`\n\n**Watch out:** Webhooks for `On Run`.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "596d2104"
+    },
+    {
+      "q": "Rotate DB password in Cloud. Where?",
+      "a": "Environment Credentials section\n\n**Watch out:** profiles.yml in Git.",
+      "group": "Security",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "7dd8c454"
+    },
+    {
+      "q": "Block PR merge on test fail. How?",
+      "a": "Set dbt CI as a `Required Check` in Git provider\n\n**Watch out:** Manual dashboard checks.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4f8fa57e"
+    },
+    {
+      "q": "Git Clone Failed. First check?",
+      "a": "PAT or Deploy Key permissions\n\n**Watch out:** Re-running immediately.",
+      "group": "Troubleshooting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b4447714"
+    },
+    {
+      "q": "Run models modified OR tagged 'finance'. Command?",
+      "a": "`dbt run --select state:modified tag:finance` (space-separated)\n\n**Watch out:** Comma-separated (which is AND).",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1fb18575"
+    },
+    {
+      "q": "Fail job immediately on first error. Flag?",
+      "a": "`--fail-fast`\n\n**Watch out:** Thinking it's default behavior.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e7779558"
+    },
+    {
+      "q": "Use dbt Cloud on 'Isolated' network. Feature?",
+      "a": "Private Link\n\n**Watch out:** IP whitelisting.",
+      "group": "Security",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c396ccdb"
+    },
+    {
+      "q": "Docs Generate slow on PR. Optimization?",
+      "a": "Disable for CI jobs\n\n**Watch out:** Reducing model count.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "88af81dc"
+    },
+    {
+      "q": "Build and skip Unit Tests. Command?",
+      "a": "`dbt build --exclude resource_type:unit_test`\n\n**Watch out:** Searching for --skip flag.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "41700f3b"
+    },
+    {
+      "q": "Run only models with Enforced Contracts. Selection?",
+      "a": "`dbt ls --select config.contract.enforced:true`\n\n**Watch out:** Thinking selection only works on tags.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ec0e5ba0"
+    },
+    {
+      "q": "Stale data alert in BI but dbt job Success. Why?",
+      "a": "Source Freshness check; the data was old before dbt even started\n\n**Watch out:** Assuming SQL success means data is current.",
+      "group": "Freshness",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d6f51669"
+    },
+    {
+      "q": "Run job every 15 mins. Trigger?",
+      "a": "Interval/Cron trigger in Job UI\n\n**Watch out:** dbt_project.yml.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "94046630"
+    },
+    {
+      "q": "Personal schema for local dev. Target?",
+      "a": "profiles.yml `dev` target\n\n**Watch out:** dbt_project.yml.",
+      "group": "Environments",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b089e39e"
+    },
+    {
+      "q": "Build Marts only if Staging tests pass. Command?",
+      "a": "`dbt build`\n\n**Watch out:** `dbt run`.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d244700c"
+    },
+    {
+      "q": "PR merge blocks on Auth error. Cause?",
+      "a": "Cloud CI user lacks CI schema permissions\n\n**Watch out:** Checking dev personal permissions.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "dabcb72c"
+    },
+    {
+      "q": "Run only modified models. Command?",
+      "a": "`dbt run --select state:modified --state path`\n\n**Watch out:** `dbt run`.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "42beaed1"
+    },
+    {
+      "q": "Deferral building in Dev but ref() prod. Correct?",
+      "a": "Yes, cost-saving behavior\n\n**Watch out:** Assuming it's a bug.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e3a74801"
+    },
+    {
+      "q": "Run build using Monday manifest. Command?",
+      "a": "`dbt build --state path/to/monday`\n\n**Watch out:** Assuming dbt stores manifest history natively.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3a2e0ed9"
+    },
+    {
+      "q": "Standardize Staging views in prod. Where?",
+      "a": "dbt_project.yml path config\n\n**Watch out:** config() in each .sql file.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4aad8f51"
+    },
+    {
+      "q": "Run models in specific schema. Selection?",
+      "a": "`dbt build --select schema:name`\n\n**Watch out:** Path selection only.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "fcf84643"
+    },
+    {
+      "q": "Build all models children of Source. Command?",
+      "a": "`dbt build --select source:name+`\n\n**Watch out:** Prefix select.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "943e90e7"
+    },
+    {
+      "q": "PR taking long due to Parsing. Fix?",
+      "a": "Enable Partial Parsing\n\n**Watch out:** Deleting target/ folder.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d40f1bb1"
+    },
+    {
+      "q": "Run models parents of fct_orders AND children of stg_users. Command?",
+      "a": "`dbt run --select +fct_orders,stg_users+`\n\n**Watch out:** Space separator.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "08c7e47c"
+    },
+    {
+      "q": "Rotate DB password. Where?",
+      "a": "Cloud Environment Credentials\n\n**Watch out:** profiles.yml in Git.",
+      "group": "Security",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "279c27b1"
+    },
+    {
+      "q": "Track GDPR sensitive models. Config?",
+      "a": "meta: {pii: true} in YAML\n\n**Watch out:** tags: [pii].",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4c59025b"
+    },
+    {
+      "q": "Skip Staging models if exist. Possible?",
+      "a": "No, run always builds\n\n**Watch out:** --skip-if-exists.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e9405433"
+    },
+    {
+      "q": "PR blocks on Auth error. Cause?",
+      "a": "CI role lacks CI schema permissions\n\n**Watch out:** Checking dev personal warehouse permissions.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "070d10da"
+    },
+    {
+      "q": "See tests for Source in docs. Where?",
+      "a": "Sources section of docs sidebar\n\n**Watch out:** Models section.",
+      "group": "Discovery",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8272dee2"
+    },
+    {
+      "q": "PR take 30 mins because all models build. Fix?",
+      "a": "Slim CI (state:modified+)\n\n**Watch out:** Manual tagging.",
+      "group": "CI/CD",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "112a9257"
+    },
+    {
+      "q": "Run only failed models from previous run. Selection?",
+      "a": "state:failed\n\n**Watch out:** dbt retry.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 7: dbt Cloud & Deployment",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f064218c"
+    },
+    {
+      "q": "You need to define a 'Revenue' metric that sums a column in your Marts. Where is the best place to define this logic?",
+      "a": "Define it as a `measure` within a `semantic_model` YAML file\n\n**Watch out:** Hardcoding the sum() in a dbt model; the Semantic Layer allows for dynamic aggregation based on different dimensions.",
+      "group": "Definitions",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "2d6c9438"
+    },
+    {
+      "q": "You want to join 'Orders' and 'Customers' in the Semantic Layer. How do you define the connection?",
+      "a": "Define `Entities` in both semantic models and specify their relationship (e.g., primary vs foreign)\n\n**Watch out:** Writing a SQL JOIN in a dbt model; the Semantic Layer handles joins dynamically via Entity resolution.",
+      "group": "Entities",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "3be894d4"
+    },
+    {
+      "q": "You need a 'Gross Margin' metric calculated as (Revenue - Cost) / Revenue. Which metric type is this?",
+      "a": "A `derived` metric\n\n**Watch out:** A `simple` metric; simple metrics only perform direct aggregations on single columns.",
+      "group": "Metric Types",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "f90c5526"
+    },
+    {
+      "q": "You want to calculate 'Cumulative Revenue' over all time. Which metric type should you use?",
+      "a": "A `cumulative` metric\n\n**Watch out:** A `derived` metric; derived metrics are for mathematical operations on other metrics, not for running totals.",
+      "group": "Metric Types",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "4e2131a2"
+    },
+    {
+      "q": "You are seeing a 'fan-out' error when querying a metric. How do you fix the join logic?",
+      "a": "Ensure the `Entity` types are correctly defined as `primary` or `unique` to let MetricFlow handle the grain\n\n**Watch out:** Manually adding `DISTINCT` to the SQL; the Semantic Layer generates the SQL, so you must fix the metadata definition.",
+      "group": "Troubleshooting",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "eb462e10"
+    },
+    {
+      "q": "You want to filter a metric to only show 'Completed' orders. Implementation?",
+      "a": "Define a `filter` on the metric or use a `dimension` with a restricted grain\n\n**Watch out:** Creating a separate dbt model called `fct_completed_orders`; this creates DAG bloat when filters can be handled semantically.",
+      "group": "Filters",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "354291a5"
+    },
+    {
+      "q": "You need to access metrics from a BI tool that doesn't natively support dbt. How?",
+      "a": "Use the dbt Semantic Layer JDBC or GraphQL API\n\n**Watch out:** Exporting the metric data to a CSV and uploading it; this breaks the `Single Source of Truth` benefit.",
+      "group": "Integration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "01571e35"
+    },
+    {
+      "q": "You want to define a metric that calculates 'Average Order Value'. Logic?",
+      "a": "Define a `ratio` metric using the Revenue metric as the numerator and the Order Count metric as the denominator\n\n**Watch out:** Using a `measure` with an `avg()` aggregation; ratios should be calculated at the end of the aggregation to avoid mathematical errors.",
+      "group": "Metric Types",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "95e5a02e"
+    },
+    {
+      "q": "You changed a column name in your Marts, and now the Semantic Layer is broken. Fix?",
+      "a": "Update the `expr` or `name` mapping in the Semantic Model YAML to match the new warehouse column\n\n**Watch out:** Renaming the metric itself; the metric name used by BI tools should stay consistent even if the underlying column changes.",
+      "group": "Maintenance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "00aa02e6"
+    },
+    {
+      "q": "You want to ensure that 'LTV' is only queried by the 'Finance' team. Where is this governed?",
+      "a": "Warehouse-level RBAC or dbt Cloud Group permissions (depending on the Semantic Layer gateway)\n\n**Watch out:** Trying to set `access: private` in the semantic model YAML; private access limits `ref()` in dbt but doesn't block BI queries.",
+      "group": "Governance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "b440d2a5"
+    },
+    {
+      "q": "You want to calculate 'Daily Active Users'. Which aggregation type?",
+      "a": "count_distinct\n\n**Watch out:** count; standard count would count sessions or events rather than unique user IDs.",
+      "group": "Measures",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Semantic Layer",
+      "module": "dbt Architect",
+      "id": "8451bd14"
+    }
+  ]
+}

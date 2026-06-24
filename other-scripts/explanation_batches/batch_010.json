@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You want to use a macro from 'dbt_utils' but your project has its own macro with the same name. How to specify?",
+      "a": "`{{ dbt_utils.star(...) }}`\n\n**Watch out:** `{{ star(...) }}`; without the package prefix, dbt will prioritize the local project macro over the package macro.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3829a9f5"
+    },
+    {
+      "q": "You want to get a count of all models in your project from a macro. How?",
+      "a": "`{{ graph.nodes.values() | selectattr(\"resource_type\", \"equalto\", \"model\") | list | length }}`\n\n**Watch out:** Trying to query the `information_schema`; the warehouse doesn`t know about dbt `models', only tables.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "165d442c"
+    },
+    {
+      "q": "You want to set a default value for an environment variable. Syntax?",
+      "a": "`{{ env_var(\"MY_VAR\", \"default_value\") }}`\n\n**Watch out:** `{{ env_var(\"MY_VAR\") or \"default_value\" }}`; the env_var function expects the default as its second argument.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "ea4e45e6"
+    },
+    {
+      "q": "You want to create a macro that executes a DDL statement directly. Which macro do you call?",
+      "a": "`run_query(my_ddl_sql)`\n\n**Watch out:** `adapter.execute(my_ddl_sql)`; while `adapter.execute` works, `run_query` is a higher-level wrapper that is generally preferred.",
+      "group": "Execution",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "975ae27c"
+    },
+    {
+      "q": "You want to check if a 'ref()' is valid before using it in a macro. How?",
+      "a": "Use `graph.nodes` to see if the model exists in the manifest\n\n**Watch out:** Wrapped the ref in a `try/except`; Jinja doesn't support standard Python-style error handling blocks.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8e618ee6"
+    },
+    {
+      "q": "You want to get the 'Current Timestamp' from dbt, not the warehouse. Syntax?",
+      "a": "`{{ run_started_at }}`\n\n**Watch out:** `{{ current_timestamp() }}`; current_timestamp is a macro that generates warehouse SQL, whereas `run_started_at` is a dbt-native object.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "dfc8c9c3"
+    },
+    {
+      "q": "You want to use a 'Macro' as a default value for a variable. Possible?",
+      "a": "No, project variables must be static values (Strings, Ints, Lists)\n\n**Watch out:** Trying to put `{{ my_macro() }}` in the `dbt_project.yml` vars section.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f973d0c7"
+    },
+    {
+      "q": "You want to find the 'Primary Key' of a model from its YAML configuration in a macro. Path?",
+      "a": "`model.config.meta.primary_key` (assuming it was defined in `meta`)\n\n**Watch out:** `model.primary_key`; dbt does not have a first-class `primary_key` attribute on model objects.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2a861e34"
+    },
+    {
+      "q": "You want to generate a series of UNION ALL statements dynamically. Loop syntax?",
+      "a": "Iterate over a list and use `{% if not loop.last %} UNION ALL {% endif %}`\n\n**Watch out:** Hardcoding `UNION ALL` after every select; the final query will have a syntax error due to a trailing `UNION ALL`.",
+      "group": "Control Flow",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "77ca710d"
+    },
+    {
+      "q": "You want to access the 'Package Name' from within a macro. Property?",
+      "a": "`project_name`\n\n**Watch out:** `package_name`; in dbt context, `project_name` refers to the name of the project/package where the macro resides.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "270a0df7"
+    },
+    {
+      "q": "You want to see the 'Compiled SQL' for a macro. Where?",
+      "a": "In the `target/compiled/` folder for a *model* that calls the macro\n\n**Watch out:** Looking in `target/compiled/macros/`; dbt doesn't compile macros individually, only when they are called by models.",
+      "group": "Debugging",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8ad9c112"
+    },
+    {
+      "q": "You want to pass a 'List' as a variable from the CLI. Syntax?",
+      "a": "`dbt run --vars `{\"my_list\": [\"a\", \"b\"]}''\n\n**Watch out:** `dbt run --vars `my_list=a,b''; CLI variables must be valid JSON strings to be parsed as complex types like lists.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "9d7c1232"
+    },
+    {
+      "q": "You want to check if a model has a specific 'Tag' before applying logic in a macro. How?",
+      "a": "`{% if \"my_tag\" in model.config.tags %}`\n\n**Watch out:** `{% if model.tags == \"my_tag\" %}`; tags are always returned as a list, so you must check for inclusion.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "212998aa"
+    },
+    {
+      "q": "You want to create a macro that calculates the 'Diff' between two timestamps. Why use a macro?",
+      "a": "To handle the different `DATEDIFF` syntax between Snowflake and BigQuery\n\n**Watch out:** Writing `timestamp_diff` directly in the SQL; this will fail if the warehouse is changed.",
+      "group": "Cross-Database",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "a33ebcf2"
+    },
+    {
+      "q": "You want to use a 'Conditional' block to choose between two different SELECT statements. Syntax?",
+      "a": "`{% if ... %} SELECT A {% else %} SELECT B {% endif %}`\n\n**Watch out:** Putting the `if` block *inside* the SELECT list; Jinja should wrap the entire SQL block for structural changes.",
+      "group": "Control Flow",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "bbb6fdd5"
+    },
+    {
+      "q": "You want to access the 'Original SQL' (uncompiled) of a model from a macro. Property?",
+      "a": "`model.raw_code`\n\n**Watch out:** `model.compiled_code`; raw_code contains the Jinja, while compiled_code contains the final SQL.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f6547447"
+    },
+    {
+      "q": "You want to create a macro that returns a 'Relation' object. Why?",
+      "a": "To allow dbt to correctly identify the database/schema/table for use in an `adapter` call\n\n**Watch out:** Returning a string like `my_db.my_schema.my_table`; strings don't have the metadata needed for adapter methods.",
+      "group": "Adapter",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "0cda85e3"
+    },
+    {
+      "q": "You want to use 'Comments' in Jinja that don't appear in the compiled SQL. Syntax?",
+      "a": "`{# my comment #}`\n\n**Watch out:** `-- my comment`; double-dash comments are SQL-level and will appear in the compiled SQL and warehouse logs.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b91e9e60"
+    },
+    {
+      "q": "You want to get the 'Thread ID' currently executing the model. Variable?",
+      "a": "dbt does not expose the thread ID to Jinja\n\n**Watch out:** Trying to find a `thread.id` variable for auditing.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "74fdebd5"
+    },
+    {
+      "q": "You want to check if a macro is being called from a 'Test' vs a 'Model'. How?",
+      "a": "Check `model.resource_type`\n\n**Watch out:** Checking `target.name`; target.name tells you the environment, not the type of dbt resource being built.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "692c0d3c"
+    },
+    {
+      "q": "You want to create a macro that generates a 'Drop Table' statement but *only* in the 'Dev' environment. How?",
+      "a": "`{% if target.name == `dev` %} DROP TABLE... {% endif %}`\n\n**Watch out:** Running the macro without a guard; this could accidentally drop production tables.",
+      "group": "Targeting",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "cd7193f8"
+    },
+    {
+      "q": "You want to convert a 'Result' object from 'run_query' into a list of dictionaries. Filter?",
+      "a": "Use `results.table.to_dicts()`\n\n**Watch out:** Manually looping through `results.columns` to build a dictionary; the `to_dicts()` method is a built-in convenience.",
+      "group": "Execution",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f62583dd"
+    },
+    {
+      "q": "You want to use a 'Variable' in the 'dbt_project.yml' file. Requirement?",
+      "a": "You must use the `var` function; you cannot use `ref` or `source` in the project YAML\n\n**Watch out:** Trying to use `{{ ref(`my_model`) }}` to set a project-level variable.",
+      "group": "Variables",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "5fadf3ea"
+    },
+    {
+      "q": "You want to get the 'Schema' of a model from within a macro. Property?",
+      "a": "`model.schema`\n\n**Watch out:** `model.config.schema`; model.schema returns the *final* resolved schema, which might differ from the config if an alias macro is used.",
+      "group": "Metadata",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "48ef824e"
+    },
+    {
+      "q": "You want to 'indent' a block of SQL generated by a macro. Filter?",
+      "a": "`{{ generated_sql | indent(width=4) }}`\n\n**Watch out:** Manually adding spaces to every line in the macro; the `indent` filter is cleaner and handles multiple lines.",
+      "group": "Syntax",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3b14374b"
+    },
+    {
+      "q": "You want to check if the current warehouse is BigQuery. Syntax?",
+      "a": "`{% if target.type == `bigquery` %}`\n\n**Watch out:** `{% if adapter == `bigquery` %}`; remember, `adapter` is a Python class instance, not a string.",
+      "group": "Targeting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "dce6adcc"
+    },
+    {
+      "q": "You want to use a macro to generate the 'Unique Key' for an incremental model. Where?",
+      "a": "In the model`s `config()` block: `unique_key=my_macro()'\n\n**Watch out:** In the middle of the SQL; the unique_key must be part of the configuration metadata.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "7c16e509"
+    },
+    {
+      "q": "You want to see the 'Jinja' version dbt is using. How?",
+      "a": "dbt does not expose the Jinja version directly, but it is typically tied to the dbt Core version\n\n**Watch out:** Trying to run `{{ jinja_version }}`.",
+      "group": "Debugging",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b557ce5d"
+    },
+    {
+      "q": "You want to ensure a macro returns a 'String' even if the input is an Integer. Filter?",
+      "a": "`{{ my_int | string }}`\n\n**Watch out:** Assuming Jinja handles this automatically in SQL; explicit casting prevents `NoneType` or `Int` errors in concatenation.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "10414899"
+    },
+    {
+      "q": "You want to access the 'Search Path' from your dbt profile in a macro. Property?",
+      "a": "dbt does not expose the warehouse `search path` to Jinja\n\n**Watch out:** Trying to find `target.search_path`.",
+      "group": "Variables",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "65692274"
+    },
+    {
+      "q": "You want to use a 'Macro' to determine which 'Source' to use. Logic?",
+      "a": "`{{ source(my_macro(), `my_table`) }}`\n\n**Watch out:** Trying to put `source` *inside* the macro; the source function should wrap the macro call for clarity.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "08f62922"
+    },
+    {
+      "q": "You want to get a list of all 'Tags' used in the entire project. How?",
+      "a": "Loop through `graph.nodes.values()` and collect `config.tags`\n\n**Watch out:** Checking the warehouse; warehouse objects don't store dbt tags.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c4f171ac"
+    },
+    {
+      "q": "You want to create a 'Post-Hook' that runs a macro. Syntax?",
+      "a": "`config(post_hook=\"{{ my_macro() }}\")`\n\n**Watch out:** `config(post_hook=my_macro())`; hooks must be passed as strings containing the Jinja expression.",
+      "group": "Hooks",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "6c6953eb"
+    },
+    {
+      "q": "You want to check if a 'Column' exists in the source table before selecting it. How?",
+      "a": "Use `adapter.get_columns_in_relation` and check the column list\n\n**Watch out:** Using `SELECT *`; this is unsafe and could pull unwanted or breaking data.",
+      "group": "Adapter",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "98df23c6"
+    },
+    {
+      "q": "You want to see the 'Call Stack' of macros during a failure. How?",
+      "a": "dbt does not provide a macro call stack; you must use `log` statements to trace the execution\n\n**Watch out:** Looking for a `traceback` in the compiled SQL.",
+      "group": "Debugging",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "98b24d6c"
+    },
+    {
+      "q": "You want to convert a 'List' to a comma-separated string for a 'WHERE IN' clause. Filter?",
+      "a": "`{{ my_list | join(\", \") }}`\n\n**Watch out:** Manually looping through the list; the `join` filter is the built-in way to handle list-to-string conversion.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e9f12b42"
+    },
+    {
+      "q": "You want to check if dbt is running in 'Full Refresh' mode from a macro. How?",
+      "a": "`{% if flags.FULL_REFRESH %}`\n\n**Watch out:** `{% if full_refresh %}`; `full_refresh` is a config, whereas `flags.FULL_REFRESH` is the actual CLI state.",
+      "group": "Execution",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1cbe9362"
+    },
+    {
+      "q": "You want to get the 'Model Name' from within a macro. Property?",
+      "a": "`model.name`\n\n**Watch out:** `model.identifier`; identifier is the physical table name, which might be different if an alias is used.",
+      "group": "Metadata",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "0c505249"
+    },
+    {
+      "q": "You want to create a macro that generates a 'Date Spine'. Requirement?",
+      "a": "A loop that generates multiple SELECT statements joined by `UNION ALL`\n\n**Watch out:** Writing one long SELECT with 365 hardcoded dates; this is not maintainable.",
+      "group": "Control Flow",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e066807e"
+    },
+    {
+      "q": "You want to access the 'Project ID' for Google BigQuery in a macro. Property?",
+      "a": "`target.project`\n\n**Watch out:** `target.database`; in BigQuery, `project` is the top-level identifier, not database.",
+      "group": "Targeting",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "74180469"
+    },
+    {
+      "q": "You want to ensure a 'Macro' doesn't produce any output text unless called. How?",
+      "a": "Ensure all logic is wrapped inside the `{% macro %}` block and avoid text outside it\n\n**Watch out:** Putting comments outside the macro block; these will be injected into every model that imports the file.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "d473f73a"
+    },
+    {
+      "q": "You want to get the 'Alias' of a model. Property?",
+      "a": "`model.alias`\n\n**Watch out:** `model.name`; remember, name is the dbt filename, alias is the physical warehouse table name.",
+      "group": "Metadata",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "7c2c6320"
+    },
+    {
+      "q": "You want to check if a 'Variable' is even or odd. Logic?",
+      "a": "`{% if my_int % 2 == 0 %}`\n\n**Watch out:** Using Python`s `is_even()'; Jinja uses standard mathematical operators for these checks.",
+      "group": "Control Flow",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3fa37d33"
+    },
+    {
+      "q": "You want to access 'Environmental Variables' on a machine without dbt. Possible?",
+      "a": "No, `env_var` is a dbt-specific Jinja function\n\n**Watch out:** Trying to use `env_var` in a raw .sql script.",
+      "group": "Variables",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "a2d92a6f"
+    },
+    {
+      "q": "You want to get the 'SQL' of a 'Macro' itself. Possible?",
+      "a": "No, macros are not nodes in the graph with a `raw_code` property\n\n**Watch out:** Trying to find `graph.macros.my_macro.raw_code`.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "c4ecc5d3"
+    },
+    {
+      "q": "You want to use a 'Macro' to determine the 'Materialization' of a model. Possible?",
+      "a": "Yes, `materialized=my_macro()`\n\n**Watch out:** Putting the macro inside quotes like `materialized=\"{{ my_macro() }}\"`; this will pass the string, not execute the logic.",
+      "group": "Structuring",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "3489fcfe"
+    },
+    {
+      "q": "You want to get the 'Schema' of a Source. Syntax?",
+      "a": "`{{ source(`my_source`, `my_table`).schema }}`\n\n**Watch out:** Hardcoding `raw_schema`; if the YAML changes, the macro breaks.",
+      "group": "Metadata",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2151f526"
+    },
+    {
+      "q": "You want to check if dbt is running in 'CI' mode. Logic?",
+      "a": "`{% if target.name == `ci` %}` (assuming you named your CI target `ci`)\n\n**Watch out:** `{% if flags.CI %}`; dbt does not have a native `CI` flag.",
+      "group": "Targeting",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2826cac4"
+    },
+    {
+      "q": "You want to find all 'Tests' associated with a specific model in a macro. How?",
+      "a": "Loop through `graph.nodes` and filter for `resource_type: test` and `attached_node`\n\n**Watch out:** Checking the model`s `config'; tests are separate nodes in the graph, not properties of the model.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "2e1d77fc"
+    },
+    {
+      "q": "You want to use a 'Macro' to generate a 'Case When' statement. Logic?",
+      "a": "Loop through a dictionary of `key: value` pairs and generate the `WHEN` clauses\n\n**Watch out:** Writing 50 `WHEN` lines manually; macros are meant to automate these repetitive SQL structures.",
+      "group": "Control Flow",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "495ea58e"
+    },
+    {
+      "q": "You want to access the 'Warehouse' name (e.g. 'compute_wh'). Property?",
+      "a": "`target.warehouse`\n\n**Watch out:** `target.name`; name is the dbt profile target name, not the physical warehouse resource.",
+      "group": "Targeting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "8b0a7e3a"
+    },
+    {
+      "q": "You want to get the 'Count' of items in a Jinja list. Filter?",
+      "a": "`{{ my_list | length }}`\n\n**Watch out:** `{{ my_list.count() }}`; count is a Python method, whereas `length` is the standard Jinja filter.",
+      "group": "Syntax",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "1cc93b4c"
+    },
+    {
+      "q": "You want to ensure a macro 'returns' a value like a function. Syntax?",
+      "a": "Macros in dbt don`t have a `return' statement; they simply output text\n\n**Watch out:** Trying to use `{% return my_val %}`.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "f2f19538"
+    },
+    {
+      "q": "You want to get the 'Lineage' (parents) of the current model in a macro. Property?",
+      "a": "`model.depends_on.nodes`\n\n**Watch out:** `model.refs`; depends_on is the actual list of unique node IDs in the manifest.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "b8d3d3f5"
+    },
+    {
+      "q": "You want to check if a 'Variable' is defined before using it. Filter?",
+      "a": "`{% if my_var is defined %}`\n\n**Watch out:** `{% if my_var %}`; if the variable is defined but False, this check will fail incorrectly.",
+      "group": "Syntax",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "024a44d8"
+    },
+    {
+      "q": "You want to use 'Regex' in a Jinja string replacement. Possible?",
+      "a": "No, Jinja`s `replace' filter only handles literal strings\n\n**Watch out:** Trying to use `{{ my_string | replace(regex, \"\") }}`.",
+      "group": "Syntax",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "4ad7e7ae"
+    },
+    {
+      "q": "You want to access the 'dbt version' from a macro. Variable?",
+      "a": "`{{ dbt_version }}`\n\n**Watch out:** `{{ version }}`; dbt_version is the specific global variable for the Core version.",
+      "group": "Variables",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "85026365"
+    },
+    {
+      "q": "You want to use a 'Macro' to generate a 'Where' clause. Requirement?",
+      "a": "Ensure the macro handles `None` or empty inputs to avoid `WHERE AND...` syntax errors\n\n**Watch out:** Returning an empty string; if the macro is followed by an `AND`, the SQL will break.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "e760b561"
+    },
+    {
+      "q": "You want to find all 'Exposures' in the project. Object?",
+      "a": "`graph.exposures.values()`\n\n**Watch out:** `graph.nodes`; nodes usually only include models, seeds, and snapshots.",
+      "group": "Metadata",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "153cd153"
+    },
+    {
+      "q": "You want to get the 'Database' of the current target. Property?",
+      "a": "`target.database`\n\n**Watch out:** `target.project` (on Snowflake); on Snowflake it`s database, on BigQuery it`s project.",
+      "group": "Targeting",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 6: Jinja & Macros",
+      "module": "Developer Cert: Jinja & Cloud",
+      "id": "66f5bf5c"
+    }
+  ]
+}

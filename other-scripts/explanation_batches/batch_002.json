@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "Access graph metadata (tag list) DURING run. How?",
+      "a": "Use `graph` object in Jinja\n\n**Watch out:** Querying `information_schema`; warehouse doesn't know about dbt tags.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1551a91b"
+    },
+    {
+      "q": "Circular Dependency between two models. Resolution?",
+      "a": "Break loop using `Source` or `Intermediate` model\n\n**Watch out:** Using `ref()` on both sides; dbt cannot compile a DAG with a cycle.",
+      "group": "Lineage",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5160f418"
+    },
+    {
+      "q": "Use dbt to manage a 'Dynamic' table that updates every 5 mins. Strategy?",
+      "a": "Incremental with a `merge` strategy\n\n**Watch out:** View materialization; at 5-min update frequency, the query cost on a View becomes prohibitive.",
+      "group": "Materializations",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "afff249d"
+    },
+    {
+      "q": "Standardize USER_ID_99. Layer?",
+      "a": "Staging model with alias\n\n**Watch out:** Marts layer; causes inconsistent naming in other models referencing the raw source.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4c6fb72f"
+    },
+    {
+      "q": "Join stg_customers and stg_orders. Where?",
+      "a": "Intermediate or Mart model\n\n**Watch out:** Staging layer; joining here violates staging modularity and complicates debugging.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1fd7c1ca"
+    },
+    {
+      "q": "Updated 'Staging'. Run it and all downstream children. Command?",
+      "a": "`dbt run --select stg_model_name+`\n\n**Watch out:** `dbt run --select +stg_model_name`; prefix selects parents, suffix selects children.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "42420d4b"
+    },
+    {
+      "q": "Refactoring 400-line subquery. Best practice?",
+      "a": "Separate `Intermediate` model\n\n**Watch out:** Nested subquery; makes logic brittle and prevents leveraging shared logic.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a49b0a4f"
+    },
+    {
+      "q": "BigQuery scanning 500GB on incremental. Fix?",
+      "a": "`partition_by` config\n\n**Watch out:** `cluster_by` only; partitioning is primary way BQ reduces scan volume by date.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "99d0589b"
+    },
+    {
+      "q": "Change column name in Staging. Identify breaks command?",
+      "a": "`dbt build --select stg_model+`\n\n**Watch out:** `dbt run --select stg_model+`; run doesn't execute tests, misses breakage.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "9e381e47"
+    },
+    {
+      "q": "You need a model to run logic only when it is an incremental build. Macro?",
+      "a": "`{% if is_incremental() %}`\n\n**Watch out:** Using `{% if materialized == `incremental` %}`; this checks config, not warehouse state.",
+      "group": "Jinja",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ab9d24f7"
+    },
+    {
+      "q": "Grant statement every table rebuild. Where?",
+      "a": "`post-hook` in model config\n\n**Watch out:** Adding GRANT SQL to bottom of model file; causes syntax error (dbt expects one SELECT).",
+      "group": "Hooks",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a4f8c5d7"
+    },
+    {
+      "q": "Prevent specific folder from appearing in dbt docs. How?",
+      "a": "Set `docs: {show: false}` in `dbt_project.yml`\n\n**Watch out:** Removing descriptions; model still appears in lineage and search unless hidden via config.",
+      "group": "Documentation",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2f23dc26"
+    },
+    {
+      "q": "Move model from 'dev' to 'prod'. Change SQL?",
+      "a": "No, dbt handles via `Target` in `profiles.yml`\n\n**Watch out:** Manually editing schema names; makes code non-portable and risks prod corruption.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "6d2f704a"
+    },
+    {
+      "q": "2hr Table build, query once daily. Saves storage fix?",
+      "a": "Use `View` if query time is acceptable\n\n**Watch out:** Keeping as `Table` if never queried; wastes storage and compute for the build.",
+      "group": "Performance",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "994e58be"
+    },
+    {
+      "q": "model depends on a Seed. Jinja function?",
+      "a": "`{{ ref(`seed_name`) }}`\n\n**Watch out:** Using `{{ source(`seed_name`) }}`; seeds are managed nodes and must be referenced with `ref`.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4d495a8e"
+    },
+    {
+      "q": "Run a model and its immediate parents. Command?",
+      "a": "`dbt run --select 1+my_model`\n\n**Watch out:** Using `+my_model`; selects *all* ancestors, wasting compute.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "cc2c64e0"
+    },
+    {
+      "q": "dim_employees with 500 rows rebuilt nightly. Materialization?",
+      "a": "`Table`\n\n**Watch out:** `Incremental`; at 500 rows, incremental logic overhead > simple full replacement.",
+      "group": "Materializations",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fb803f08"
+    },
+    {
+      "q": "Seasonal threshold passed to model without changing SQL. How?",
+      "a": "Use `{{ var(`threshold`) }}` and pass via `--vars`\n\n**Watch out:** Hardcoding; requires code commit for every seasonal change.",
+      "group": "Variables",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "763cd1e7"
+    },
+    {
+      "q": "stg_orders used by 10 Marts. Should it be Ephemeral?",
+      "a": "No, View or Table\n\n**Watch out:** `Ephemeral`; injects logic as CTE 10 times, making final queries massive/slow.",
+      "group": "Materializations",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3d23a195"
+    },
+    {
+      "q": "Find models with 'finance' OR 'marketing' tags. Command?",
+      "a": "`dbt run --select tag:finance tag:marketing`\n\n**Watch out:** Using comma; comma is INTERSECTION, space is UNION.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "0feaba46"
+    },
+    {
+      "q": "Incremental model fails because source added a column. Strategy?",
+      "a": "`on_schema_change: append_new_columns`\n\n**Watch out:** `full-refresh`; usually too expensive/slow for a simple column addition.",
+      "group": "Incremental",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "992e04e1"
+    },
+    {
+      "q": "Test logic on dummy data before model is built. Feature?",
+      "a": "Unit Tests (dbt v1.8+)\n\n**Watch out:** Generic Tests; they require the table to exist in the DB first.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "737a4296"
+    },
+    {
+      "q": "Capture UUID of the specific dbt run in a column. Variable?",
+      "a": "`invocation_id`\n\n**Watch out:** `run_started_at`; run_started_at is a timestamp, invocation_id is the unique execution string.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "873a7585"
+    },
+    {
+      "q": "You need a model to build into a schema named after the user (e.g. dbt_jsmith). Where is this controlled?",
+      "a": "In the `profiles.yml` file for the `dev` target\n\n**Watch out:** In `dbt_project.yml`; project-level schema configs override personal user schemas.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3324d2b3"
+    },
+    {
+      "q": "A model is failing because a column name has a space. Best fix?",
+      "a": "Alias the column in the Staging model\n\n**Watch out:** Renaming it in the Marts layer; this leaves the broken name available in Staging for other models to use.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a4a8ea1d"
+    },
+    {
+      "q": "You want to run a model and only the tests associated with it. Command?",
+      "a": "`dbt build --select my_model`\n\n**Watch out:** `dbt test --select my_model`; this only runs tests, it doesn't build the actual model first.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "af5011cb"
+    },
+    {
+      "q": "A Seed CSV is too large for GitHub (over 100MB). How to handle?",
+      "a": "Move the data to the warehouse as a raw table and reference as a `Source`\n\n**Watch out:** Splitting it into 10 smaller seeds; this makes lineage and maintenance extremely difficult.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "a9e0975a"
+    },
+    {
+      "q": "You want to set a 'quota' on rows processed in Dev. How?",
+      "a": "Handle at warehouse level (e.g. BQ limit); dbt cannot enforce row quotas natively\n\n**Watch out:** Searching for `limit` config in dbt_project.yml.",
+      "group": "Safety",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bde50100"
+    },
+    {
+      "q": "You want to build a model only if the yesterday's build succeeded. Command?",
+      "a": "Use `dbt build --select state:failed --state path/to/manifest`\n\n**Watch out:** Running a full `dbt build`; this wastes compute on already-successful nodes.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "54f0cfe6"
+    },
+    {
+      "q": "Your project has 500 models. You want to see only 'Mart' models in lineage. Command?",
+      "a": "`dbt ls --select path:models/marts`\n\n**Watch out:** `dbt ls --select mart`; this only works if all models have `mart` in their filename.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e010beb4"
+    },
+    {
+      "q": "You need a macro to perform a different join based on the value of a variable. Logic?",
+      "a": "Use `{% if var(`join_type`) == `inner` %}`\n\n**Watch out:** Using `{{ var(`join_type`) }}` directly in the JOIN clause; this risks SQL injection or syntax errors if the variable is null.",
+      "group": "Macros",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8cf93b2b"
+    },
+    {
+      "q": "Your model needs access to a table in another project's schema. Best practice?",
+      "a": "Define it as a `Source` in your project\n\n**Watch out:** Hardcoding `other_db.other_schema.table`; this obscures lineage and environment management.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b45d35bc"
+    },
+    {
+      "q": "You want to use the 'Insert-Overwrite' strategy on Snowflake. Requirement?",
+      "a": "You must specify a `unique_key` or `partitions` to ensure dbt knows what to replace\n\n**Watch out:** Thinking Snowflake does this by `date` automatically; dbt needs explicit logic for overwriting.",
+      "group": "Materializations",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1fcf624c"
+    },
+    {
+      "q": "You want to run all models that depend on 'stg_orders', but NOT 'stg_orders' itself. Command?",
+      "a": "`dbt run --select stg_orders+`\n\n**Watch out:** `dbt run --select +stg_orders`; this runs the model and its parents, the exact opposite.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b6da4af5"
+    },
+    {
+      "q": "You have a model that is a Table, but you want to force it to build as a View for one run. Command?",
+      "a": "You cannot force a materialization change via CLI; you must change the code or use a variable-based config\n\n**Watch out:** Searching for `--materialized=view` flag.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4f9f545f"
+    },
+    {
+      "q": "You want to apply a 'Tag' to all models in a folder. Where?",
+      "a": "In `dbt_project.yml` under the folder path\n\n**Watch out:** In the `schema.yml` for each model; this is repetitive and prone to missing new models.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2c7c274a"
+    },
+    {
+      "q": "Your model is failing because of a 'divide by zero' error in SQL. Best fix?",
+      "a": "Use `nullif(column, 0)` in the SQL\n\n**Watch out:** Trying to fix this with a dbt `not_null` test; tests run after the failure happens.",
+      "group": "Structuring",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f2a749b0"
+    },
+    {
+      "q": "You want to use a custom 'Schema' for one specific model only. How?",
+      "a": "Set `schema: my_custom_name` in the model's config\n\n**Watch out:** Changing the profile target; this changes the schema for the *entire run*.",
+      "group": "Configuration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e4e82b39"
+    },
+    {
+      "q": "You need a model to reference a 'View' created by another team outside of dbt. How?",
+      "a": "Define it as a `Source`\n\n**Watch out:** Using `ref()`; ref only works for models managed within the dbt project.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "238818c1"
+    },
+    {
+      "q": "Your DAG is too deep (15 layers). Performance is slow. Architect's fix?",
+      "a": "Collapse redundant layers by using `Views` for light transformations and `Tables` only for heavy ones\n\n**Watch out:** Making everything `Ephemeral`; this makes the final query plan too complex for the warehouse.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c03ebc36"
+    },
+    {
+      "q": "You want to run only models that have been 'modified' but NOT their children. Command?",
+      "a": "`dbt run --select state:modified`\n\n**Watch out:** `dbt run --select state:modified+`; the `+` includes all downstream children.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "54bb78ac"
+    },
+    {
+      "q": "You want to see column-level lineage in dbt Explorer. Requirement?",
+      "a": "You must have a dbt Cloud account and have run a successful discovery job\n\n**Watch out:** Assuming it's in dbt Core; Core docs only provide model-level lineage.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "08994284"
+    },
+    {
+      "q": "Your 'Seed' load is failing because of a special character in a column name. Fix?",
+      "a": "Rename the column in the CSV to follow standard SQL naming conventions\n\n**Watch out:** Trying to `quote` the column in the CSV; warehouse loaders often ignore CSV quotes for DDL naming.",
+      "group": "Seeds",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e3ee113c"
+    },
+    {
+      "q": "You want to ensure that 'Marketing' cannot see the 'Finance' staging tables. Layer?",
+      "a": "Warehouse RBAC; dbt handles model creation, but the warehouse handles access permissions\n\n**Watch out:** Trying to hide folders in dbt_project.yml; this doesn't protect the actual data.",
+      "group": "Structuring",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d938524c"
+    },
+    {
+      "q": "You want to run a build and stop immediately if any node fails. Command?",
+      "a": "`dbt build --fail-fast`\n\n**Watch out:** `dbt run --fail-fast`; run doesn`t check tests, so it won`t fail fast on data quality issues.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "be1f8094"
+    },
+    {
+      "q": "Your project uses a lot of 'Union All' on the same source. Efficiency fix?",
+      "a": "Create a single `Base` model for that source and ref() it in the unions\n\n**Watch out:** Hardcoding the source in every sub-model; if the source schema changes, you have to edit every model.",
+      "group": "Structuring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d47bded2"
+    },
+    {
+      "q": "You want to check for 'NULL' values in a column before it is used in a join. Best test?",
+      "a": "`not_null` test on the Staging model\n\n**Watch out:** `not_null` test on the Mart; by the time it reaches the Mart, the join has already failed or produced wrong data.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f534b2d5"
+    },
+    {
+      "q": "You want to use a 'Macro' that returns a table. Usage syntax?",
+      "a": "`select * from {{ my_macro() }}`\n\n**Watch out:** `{{ my_macro() }}` (without the select); macros are just text generators and must be used within valid SQL syntax.",
+      "group": "Macros",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "9bd16fe5"
+    },
+    {
+      "q": "Your incremental build is much slower than a full-refresh. Why?",
+      "a": "The `unique_key` is not indexed or the `merge` overhead is higher than the benefit of skipping rows\n\n**Watch out:** Assuming incremental is always faster; for small tables, full-refresh is often more efficient.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d980a869"
+    },
+    {
+      "q": "You want to change a model from 'Table' to 'Incremental'. First run requirement?",
+      "a": "You should run with `--full-refresh` to ensure the initial table structure and data are correct\n\n**Watch out:** Just running `dbt run`; if the old table exists, the incremental logic might fail or skip data.",
+      "group": "Materializations",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "eecb7e08"
+    },
+    {
+      "q": "You want to run all models that were NOT modified in the last PR. Command?",
+      "a": "`dbt run --exclude state:modified --state path/to/manifest`\n\n**Watch out:** `dbt run --select !state:modified`; dbt uses the exclude flag for negative selection.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "62feaea8"
+    },
+    {
+      "q": "You want to use a 'Seed' that contains emojis. Requirement?",
+      "a": "Ensure your warehouse and the dbt file encoding are set to UTF-8\n\n**Watch out:** Assuming dbt handles this `magically`; character encoding is a physical requirement of the loader.",
+      "group": "Seeds",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "31dc855b"
+    },
+    {
+      "q": "You want to run a build and skip any tests for models that didn't rebuild. Is this possible?",
+      "a": "No, `dbt build` runs all tests for the selected models\n\n**Watch out:** Searching for a `--skip-tests-on-unchanged` flag.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "babcc83c"
+    },
+    {
+      "q": "You want to track 'GDPR' sensitive models in your project. How?",
+      "a": "Use a `meta` tag in the YAML (e.g. meta: {pii: true})\n\n**Watch out:** Using `tags: [pii]`; `meta` is better for structured metadata that needs to be consumed by external security tools.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b9d7cd8e"
+    },
+    {
+      "q": "You want to run a specific 'Snapshot' via the CLI. Command?",
+      "a": "`dbt snapshot --select my_snapshot`\n\n**Watch out:** `dbt run --select my_snapshot`; run does not execute snapshots.",
+      "group": "Selection",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "38eeb897"
+    },
+    {
+      "q": "You want to use a 'Macro' that is only defined in one specific project. How?",
+      "a": "Macros are project-scoped; use `{{ my_project.my_macro() }}`\n\n**Watch out:** Using `{{ my_macro() }}` if there's a name conflict with a package macro.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b49a82cf"
+    },
+    {
+      "q": "You want to build a model that uses a 'Window Function' on a 10TB table. Efficient materialization?",
+      "a": "Incremental (if possible) or a Table; window functions on 10TB inside a View will be extremely slow for every user query\n\n**Watch out:** View materialization.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "1e3bedd9"
+    },
+    {
+      "q": "You want to see the 'Lineage' of a Source. Command?",
+      "a": "`dbt ls --select source:raw_data.*+`\n\n**Watch out:** `dbt ls --select +source:raw_data.*`; sources have no parents, so the `+` prefix does nothing.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3c0e0725"
+    },
+    {
+      "q": "You want to ensure that all 'Marts' models are built as Tables by default. Where?",
+      "a": "In `dbt_project.yml` under the `marts` folder path config\n\n**Watch out:** In the global `models` config; this would force Staging views to be Tables too, wasting storage.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "920eaf3e"
+    },
+    {
+      "q": "You want to run a 'Seed' but only if it has changed. Command?",
+      "a": "dbt doesn`t have `seed:modified`; you must run `dbt seed' or build it manually into your DAG logic\n\n**Watch out:** `dbt seed --select state:modified`.",
+      "group": "Selection",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 1: Developing dbt Models",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "18d38644"
+    }
+  ]
+}

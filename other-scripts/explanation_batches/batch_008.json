@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You are seeing 'Duplicates' in a downstream Mart, but the 'unique' test on the upstream Staging model is passing. How do you troubleshoot?",
+      "a": "Check the `Join` logic in the Intermediate/Mart layer for a 1-to-many fan-out\n\n**Watch out:** Re-running the Staging test; if the parent is unique, the error is almost certainly introduced during the join in the child model.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "ccc637dc"
+    },
+    {
+      "q": "A dbt Cloud job fails with 'Warehouse overloaded'. You have 32 threads configured. What is the fix?",
+      "a": "Reduce the `Threads` count in the dbt profile to match the warehouse's concurrency limit\n\n**Watch out:** Increasing the `Timeout` setting; a longer timeout won't solve resource exhaustion and will only increase idle credit costs.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "8d7b6b6c"
+    },
+    {
+      "q": "You added a column to a CSV Seed file, but it's not appearing in the warehouse after 'dbt run'. Why?",
+      "a": "Run `dbt seed`\n\n**Watch out:** Running `dbt run`; run only compiles SQL models and does not re-upload or alter the physical tables created by seeds.",
+      "group": "Seeds",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "940aad1a"
+    },
+    {
+      "q": "A Jinja macro is returning 'None' in the compiled SQL. How do you find the bug?",
+      "a": "Use the `{{ log(...) }}` macro to print variable states to the console during execution\n\n**Watch out:** Checking `target/compiled/`; that only shows the result of the failure, not the logic state that caused the `None` value.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0a60e900"
+    },
+    {
+      "q": "dbt throws a 'Cycle detected' error between 'Model A' and 'Model B'. How do you resolve this?",
+      "a": "Identify which model`s `ref()` is unnecessary and replace it with a `source()' or break the logic into a third model\n\n**Watch out:** Trying to use a hardcoded table name; while it bypasses the error, it breaks the DAG and lineage tracking.",
+      "group": "DAG",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "e152bdad"
+    },
+    {
+      "q": "A model build fails with 'Permission Denied' on a specific source table. You can query the table in your SQL editor. Why is dbt failing?",
+      "a": "Verify that the `Role` or `User` defined in your dbt profile has the same permissions as your SQL editor login\n\n**Watch out:** Assuming dbt `inherits` your personal permissions; dbt uses the specific credentials provided in `profiles.yml`.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "cad40622"
+    },
+    {
+      "q": "You changed a YAML file, and now dbt won't run due to a 'ScannerError'. How do you find the line?",
+      "a": "Check for improper indentation or a missing colon in the YAML file mentioned in the error message\n\n**Watch out:** Editing the SQL code; `ScannerError` is strictly a YAML syntax issue, not a SQL logic issue.",
+      "group": "YAML",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "b33ff6cd"
+    },
+    {
+      "q": "An incremental model on BigQuery is scanning 10x more data than expected. What is the primary check?",
+      "a": "Ensure the `is_incremental()` block contains a filter that utilizes the `partition_by` column\n\n**Watch out:** Adding a `limit` clause; limits in BigQuery do not reduce the data scan cost, only partitions do.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "144cd03d"
+    },
+    {
+      "q": "Your project builds locally but fails in dbt Cloud with 'Dependencies not found'. Fix?",
+      "a": "Ensure all required packages are listed in `packages.yml` and the CI job includes `dbt deps`\n\n**Watch out:** Manually uploading the `dbt_packages` folder to Git; this folder should be ignored and managed by dbt deps.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "3501b300"
+    },
+    {
+      "q": "You see '0 records processed' in a Snapshot run, but you know the source data changed. Why?",
+      "a": "Check if the `updated_at` column in the source has actually moved forward\n\n**Watch out:** Assuming Snapshot `checks` all columns by default; it only triggers if the specific `updated_at` or `check_cols` show a change.",
+      "group": "Snapshots",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "24737342"
+    },
+    {
+      "q": "A model fails with 'Column not found' after you renamed a column in an upstream model. How to identify all affected files?",
+      "a": "Use `dbt grep` or IDE search to find all instances of the old column name across the `models/` folder\n\n**Watch out:** Running `dbt build` and fixing them one by one; this is inefficient and risks missing logic in Ephemeral models.",
+      "group": "Refactoring",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d402537b"
+    },
+    {
+      "q": "You are seeing 'NoneType' errors when trying to access a variable. How to provide a fallback?",
+      "a": "Use the `default()` filter: `{{ var(\"my_var\", default=\"fallback\") }}`\n\n**Watch out:** Wrapping the variable in an `if` block without an `else`; this leaves the SQL syntax broken if the variable is missing.",
+      "group": "Jinja",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "78e76ab4"
+    },
+    {
+      "q": "A 'not_null' test is failing on a column, but 'select count(*) where col is null' returns 0. Why?",
+      "a": "Check for empty strings ('') or whitespace that dbt/warehouse might be treating differently than a true NULL\n\n**Watch out:** Assuming dbt is `hallucinating`; tests look for specific binary NULLs unless customized.",
+      "group": "Data Integrity",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "dc6674ee"
+    },
+    {
+      "q": "You want to debug a failing Singular test. How do you see the rows that caused the failure?",
+      "a": "Copy the SQL from `target/compiled/[test_name].sql` and run it manually in your warehouse\n\n**Watch out:** Re-running `dbt test`; dbt only returns the `count` of failures, not the actual row data.",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "46c6b9eb"
+    },
+    {
+      "q": "A model is materializing in the 'public' schema instead of 'analytics'. Precedence check?",
+      "a": "Check if the `schema` is hardcoded in the model`s `config()' block, which overrides the project YAML\n\n**Watch out:** Editing `profiles.yml`; the profile sets the base, but the model config always has the final word.",
+      "group": "Configuration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "4d7a778b"
+    },
+    {
+      "q": "You get a 'Tox' or environment error in a local dbt run. What is the first step?",
+      "a": "Delete the `target/` and `dbt_packages/` folders and run `dbt deps`\n\n**Watch out:** Reinstalling dbt entirely; most local errors are caused by stale artifacts in the local project folders.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "d80c05f9"
+    },
+    {
+      "q": "An 'Epemeral' model is causing a 'Query too complex' error. Fix?",
+      "a": "Change the materialization to `View` or `Table`\n\n**Watch out:** Trying to simplify the SQL logic; the issue is that Ephemeral models are CTEs, and nesting them too deep exceeds warehouse limits.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "43870cac"
+    },
+    {
+      "q": "You updated a Source YAML with new columns, but 'dbt docs generate' doesn't show them. Why?",
+      "a": "You must run the models that use that source or run a freshness check to update the catalog\n\n**Watch out:** Thinking `docs generate` queries the warehouse directly for every possible source; it relies on the `catalog.json` artifact.",
+      "group": "Documentation",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "54923624"
+    },
+    {
+      "q": "You are seeing 'Out of Memory' errors during a dbt run. Your project has 5,000 models. Fix?",
+      "a": "Use `partial parsing` and increase the memory allocation for the machine running dbt\n\n**Watch out:** Reducing the number of `threads`; threads affect warehouse concurrency, but the OOM error happens in the dbt Python process itself.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "4a559c43"
+    },
+    {
+      "q": "A 'relationship' test is failing, but all keys exist in both tables. What is the hidden cause?",
+      "a": "Check for `Data Type` mismatches (e.g., String `123` vs Integer 123) that prevent a successful join\n\n**Watch out:** Assuming the data is missing; many warehouses allow comparison but will fail to join different types without explicit casting.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f2c1b307"
+    },
+    {
+      "q": "A dbt run is 'hanging' indefinitely. No error is thrown. How to troubleshoot?",
+      "a": "Check the warehouse `Query History` for a blocked process or a long-running metadata lock\n\n**Watch out:** Restarting dbt immediately; you need to find the specific SQL statement that is causing the hang in the warehouse.",
+      "group": "Warehouse",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "73dab49b"
+    },
+    {
+      "q": "You receive a 'Compilation Error' saying a macro could not be found, but it's in the 'macros/' folder. Why?",
+      "a": "Check if the macro filename has a `.sql` extension and the macro name is spelled correctly in the model\n\n**Watch out:** Re-running `dbt deps`; dbt deps is for external packages, it doesn`t affect your local `macros/' folder.",
+      "group": "Jinja",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "c0b538b8"
+    },
+    {
+      "q": "You are getting 'Multiple objects found' when using 'ref()'. Why?",
+      "a": "Check if you have two models with the same name in different folders\n\n**Watch out:** Renaming the `file`; dbt cares about the model name defined in the SQL or config, not just the filename.",
+      "group": "DAG",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "40585b72"
+    },
+    {
+      "q": "You see 'Compiled SQL' that looks correct, but it fails in the warehouse with a 'Syntax Error'. Why?",
+      "a": "Check for `hidden` Jinja issues like a trailing comma generated by a loop or a missing whitespace\n\n**Watch out:** Trusting the IDE syntax highlighter; the highlighter doesn't know how the Jinja will resolve at runtime.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "db32807c"
+    },
+    {
+      "q": "A model contract is failing because a column is 'Missing', but it is in the SELECT statement. Why?",
+      "a": "Check if the column is being aliased differently in the SQL vs the YAML definition\n\n**Watch out:** Thinking dbt `ignores` case sensitivity in contracts; contracts are often case-sensitive depending on the warehouse.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "6d81b855"
+    },
+    {
+      "q": "You are seeing '0 records' in an incremental model. You just did a full-refresh yesterday. Cause?",
+      "a": "Check if the `is_incremental()` logic is too restrictive or if the `max(updated_at)` is ahead of today's data\n\n**Watch out:** Assuming the warehouse `lost` the data; incremental logic is only as good as the `where` clause.",
+      "group": "Incremental",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "989655b5"
+    },
+    {
+      "q": "You want to debug a failing dbt Cloud CI job. Where is the first place to look?",
+      "a": "The `Run Details` log to see the specific dbt exit code and the failed SQL\n\n**Watch out:** Checking the `GitHub` PR comments; GitHub only shows the pass/fail status, not the technical reason for failure.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "070275a7"
+    },
+    {
+      "q": "A macro works in 'dbt run' but fails in 'dbt docs generate'. Why?",
+      "a": "Use `{% if execute %}` to wrap any logic that requires querying the warehouse during compilation\n\n**Watch out:** Hardcoding `ref()` calls inside logic that only runs during the docs generation phase.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "21ac34fd"
+    },
+    {
+      "q": "You are seeing 'Ambiguous column reference' in a joined model. Best fix?",
+      "a": "Explicitly prefix every column with the table alias (e.g., `orders.order_id`)\n\n**Watch out:** Using `SELECT *` from multiple joined tables; this is the leading cause of ambiguity in SQL.",
+      "group": "SQL",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "4dc69391"
+    },
+    {
+      "q": "A test fails in production but passes when you run it locally. Why?",
+      "a": "Check if your local `Dev` schema has different/cleaner data than the `Prod` warehouse\n\n**Watch out:** Assuming dbt code is `broken`; tests reflect the data, and dev data is rarely a perfect mirror of prod.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "552cdde8"
+    },
+    {
+      "q": "You are hitting Snowflake 'Cloud Services' cost limits during dbt runs. How to troubleshoot?",
+      "a": "Check for an excessive number of `Show` or `Describe` commands caused by high-concurrency dbt threads\n\n**Watch out:** Increasing the `Warehouse` size; cloud services costs are separate from compute and are often tied to metadata operations.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "6a39fd86"
+    },
+    {
+      "q": "A dbt project fails to compile with 'dbt_project.yml not found'. You are in the project folder. Why?",
+      "a": "Check if you are in a sub-folder or if the file is named exactly `dbt_project.yml` (all lowercase)\n\n**Watch out:** Reinstalling dbt; this is a pathing or naming issue 100% of the time.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "85811eb7"
+    },
+    {
+      "q": "You are seeing 'Division by zero' in a Mart. How to find the specific row?",
+      "a": "Run a `Singular` test: `select * from mart where divisor_col = 0`\n\n**Watch out:** Checking the source data; the `0` might be introduced by a join or a null-to-zero conversion in the intermediate layer.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "102494d7"
+    },
+    {
+      "q": "You want to debug the 'Selection' logic of a complex dbt command. How to preview nodes without running them?",
+      "a": "Use `dbt ls --select [your_complex_logic]`\n\n**Watch out:** Running `dbt run --dry-run`; dbt does not have a native `dry-run` that validates selection without building.",
+      "group": "Selection",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0a71a649"
+    },
+    {
+      "q": "A model build fails because of a 'Schema change' in an incremental model. You used 'on_schema_change: fail'. Fix?",
+      "a": "Update the model code to match the new schema and run with `--full-refresh`\n\n**Watch out:** Manually `altering` the table in the warehouse; dbt should always be the source of truth for schema state.",
+      "group": "Incremental",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "21b628b7"
+    },
+    {
+      "q": "You are getting 'Invalid character' errors in your YAML. How to find the invisible character?",
+      "a": "Use a `Show Invisibles` mode in your IDE to check for `tabs` instead of `spaces`\n\n**Watch out:** Deleting and retyping the SQL; YAML errors are about the configuration files, not the SQL files.",
+      "group": "YAML",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2a6792ad"
+    },
+    {
+      "q": "A dbt run is slow because of 'Parsing' time. Fix?",
+      "a": "Enable `Partial Parsing` in the dbt config or CLI\n\n**Watch out:** Deleting the `target/` folder; this actually makes parsing slower as dbt has to rebuild the manifest from scratch.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2066ffac"
+    },
+    {
+      "q": "You are seeing 'Stale' data in a BI tool, but the dbt job says 'Success'. How to troubleshoot?",
+      "a": "Check the `Lineage` to ensure the BI tool is pointing to the final Mart, not an intermediate view\n\n**Watch out:** Re-running the dbt job; if the job succeeded, the data is there, the issue is the `connection` or `caching` in BI.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "90e292f3"
+    },
+    {
+      "q": "You are seeing 'Invalid ref' error for a model you just created. Why?",
+      "a": "Ensure the filename and the `ref()` string match exactly, including underscores\n\n**Watch out:** Assuming `ref()` uses the folder name; it only uses the model`s `name'.",
+      "group": "DAG",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "16df54d4"
+    },
+    {
+      "q": "A macro using 'run_query' is failing. How to debug the returned object?",
+      "a": "Use `{{ log(results_variable, info=True) }}` to see the row/column structure of the result\n\n**Watch out:** Checking the warehouse logs; the warehouse only shows the query, not how dbt's Python logic handled the output.",
+      "group": "Jinja",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0011dd6c"
+    },
+    {
+      "q": "You are getting 'Database error: Transaction aborted' on Postgres. Why?",
+      "a": "Check for a previous model failure in the same thread that didn't close its transaction\n\n**Watch out:** Increasing the memory; this is a logical `state` error, not a hardware resource error.",
+      "group": "Warehouse",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "54e5d6dd"
+    },
+    {
+      "q": "A 'source freshness' check is failing, but the data is fresh. Why?",
+      "a": "Check if the `loaded_at_field` in YAML is pointing to a column with the wrong timezone\n\n**Watch out:** Assuming dbt `knows` the current time; dbt compares the column value to the warehouse`s `current_timestamp'.",
+      "group": "Lineage",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "7526b73a"
+    },
+    {
+      "q": "You want to find all 'unused' sources in your project. Tool?",
+      "a": "Use `dbt-project-evaluator` to flag sources with no downstream refs\n\n**Watch out:** Checking the DAG in docs; the DAG only shows what *is* connected, not what *isn't*.",
+      "group": "Governance",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "34f7f982"
+    },
+    {
+      "q": "A model build fails with 'User does not have access to schema [X]'. You checked permissions. What else?",
+      "a": "Check if dbt is trying to build into a `Custom Schema` (e.g., analytics_finance) that hasn't been created yet\n\n**Watch out:** Granting more permissions to the `Raw` schema; the error is about the `Target` schema.",
+      "group": "Security",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "69c66b76"
+    },
+    {
+      "q": "You are seeing 'Arithmetic overflow' in a Mart. How to debug?",
+      "a": "Identify the column causing the issue and use `CAST(col as BIGINT)` or equivalent\n\n**Watch out:** Trying to fix with a dbt test; tests only happen after the data is successfully written.",
+      "group": "Data Integrity",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f8bbe177"
+    },
+    {
+      "q": "You want to see 'Historical' error trends for a specific model. Tool?",
+      "a": "dbt Cloud Explorer (Run History)\n\n**Watch out:** `run_results.json`; this file is ephemeral and is overwritten by every new run.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "9746b095"
+    },
+    {
+      "q": "You added a package to 'packages.yml', but its macros are still not found. Why?",
+      "a": "You must run `dbt deps` to physically download the package files into your project\n\n**Watch out:** Restarting the IDE; the IDE can`t find files that haven`t been downloaded yet.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "facbd033"
+    },
+    {
+      "q": "You are seeing 'Column 'X' is ambiguous' in a model using 'dbt_utils.star'. Why?",
+      "a": "Use the `except` argument in `dbt_utils.star` to remove the duplicate column name from the star\n\n**Watch out:** Manually listing 50 columns; the whole point of `star` is to avoid manual lists.",
+      "group": "Macros",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "6cccf113"
+    },
+    {
+      "q": "You want to debug a 'Singular' test that only fails in CI. How?",
+      "a": "Use `state:failed` selection in a local environment pointed at the CI target\n\n**Watch out:** Guessing based on the code; logic that fails in CI usually fails due to `data` differences in the CI warehouse.",
+      "group": "Testing",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "8dc01e0d"
+    },
+    {
+      "q": "A dbt build fails with 'Snapshot id not found'. Why?",
+      "a": "Check if someone manually deleted rows from the Snapshot table in the warehouse\n\n**Watch out:** Running `dbt clean`; `clean` doesn't affect the warehouse tables, only local files.",
+      "group": "Snapshots",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "76647ee4"
+    },
+    {
+      "q": "You are seeing 'Too many open files' during a dbt run. Fix?",
+      "a": "Increase the `ulimit` on the machine running dbt or reduce the number of threads\n\n**Watch out:** Deleting the `target/` folder; the issue is concurrent file access by dbt's multi-threaded processes.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "ddcf3b84"
+    },
+    {
+      "q": "A model is materializing as a 'View' but should be a 'Table' per dbt_project.yml. Why?",
+      "a": "Check if there is a `config()` block inside the .sql file overriding the YAML\n\n**Watch out:** Assuming `dbt_project.yml` has the highest precedence; the .sql file itself always wins.",
+      "group": "Configuration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "26b8f6ce"
+    },
+    {
+      "q": "You are getting 'KeyError' in a dbt run. What is the usual cause?",
+      "a": "dbt is trying to access a dictionary key (like a tag or config) that doesn't exist\n\n**Watch out:** Checking the SQL syntax; `KeyError` is a Python/Jinja metadata error.",
+      "group": "Jinja",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "799c43de"
+    },
+    {
+      "q": "You see 'Compiled SQL' using the 'dev' schema in your CI job. Why?",
+      "a": "Check if the CI job is missing the `--target prod` flag or if the `default` target in profiles is `dev`\n\n**Watch out:** Thinking dbt `knows` it is in CI; you must explicitly tell it which target to use.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "618f4676"
+    },
+    {
+      "q": "You are seeing 'Character limit exceeded' in a dbt column description. Fix?",
+      "a": "Use a `doc block` in an `.md` file to handle long descriptions\n\n**Watch out:** Trying to wrap the string in YAML; YAML has limits, but doc blocks are handled as separate files.",
+      "group": "Documentation",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "5a86cab0"
+    },
+    {
+      "q": "A 'not_null' test fails, but the data looks correct. How to investigate?",
+      "a": "Check for `invisible` characters like null bytes or non-breaking spaces\n\n**Watch out:** Assuming the test is `wrong`; tests do not lie about the binary state of the data.",
+      "group": "Data Integrity",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "31c95602"
+    },
+    {
+      "q": "You want to debug the 'Performance' of a specific macro. Tool?",
+      "a": "Use the `dbt-profiler` package or look at the `compile` time in the logs\n\n**Watch out:** Checking the warehouse query time; the warehouse doesn't know about macro execution, only the final SQL.",
+      "group": "Macros",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "050128d0"
+    },
+    {
+      "q": "You are seeing '0 models found' when running dbt. You have 100 models. Why?",
+      "a": "Check if your `dbt_project.yml` has the correct `model-paths` configured\n\n**Watch out:** Re-running `dbt deps`; `deps` handles external code, but your local models are managed by `model-paths`.",
+      "group": "Environment",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "e2862cab"
+    },
+    {
+      "q": "A model is slow because of a 'Recrusive CTE'. How to troubleshoot performance?",
+      "a": "Run the compiled SQL with `EXPLAIN` in the warehouse to find the bottleneck\n\n**Watch out:** Changing the materialization to `Ephemeral`; this makes recursion even harder for the warehouse to optimize.",
+      "group": "Performance",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "0b653d07"
+    },
+    {
+      "q": "You are getting 'invalid identifier' for a column you just added to a Source. Why?",
+      "a": "Action: Ensure the source table in the warehouse actually has that column; dbt doesn't 'create' source columns.",
+      "group": "Lineage",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "2b6decd1"
+    }
+  ]
+}

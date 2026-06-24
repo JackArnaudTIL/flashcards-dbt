@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "Your Snowflake incremental model uses 'merge' but is very slow on large tables. What strategy often outperforms it?",
+      "a": "strategy=`delete+insert` — runs a DELETE WHERE unique_key IN (...) then bulk INSERT, which often outperforms MERGE on Snowflake for large batches due to how Snowflake handles micro-partitions\n\n**Watch out:** strategy=`insert_overwrite` on Snowflake requires a partition_by config and replaces whole partitions — not a row-level operation.",
+      "group": "Strategy Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "482277ba"
+    },
+    {
+      "q": "Your BigQuery incremental model with strategy='insert_overwrite' is overwriting far more data than expected. Root cause?",
+      "a": "Without partition_by, insert_overwrite on BigQuery replaces the entire table, not just the new rows. Add a partition_by config so only affected partitions are replaced\n\n**Watch out:** Adding a WHERE clause alone does not limit the overwrite scope on BigQuery without partition_by.",
+      "group": "Strategy Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "e0799b95"
+    },
+    {
+      "q": "What does on_schema_change='fail' do on an incremental model, and what is the default?",
+      "a": "`fail` raises an error at build time if the model`s column list differs from the existing table — preventing silent schema drift. The default is `ignore', which silently continues without adding new columns\n\n**Watch out:** The default `ignore` means new columns you add to your model are silently dropped from the incremental run.",
+      "group": "Schema Evolution",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "f4769d92"
+    },
+    {
+      "q": "You add a new column to an incremental model and want it backfilled with NULLs into the existing table automatically. Config?",
+      "a": "Set on_schema_change=`append_new_columns` — dbt adds new columns to the existing table with NULL for historical rows\n\n**Watch out:** on_schema_change=`sync_all_columns` also DROPS columns removed from the model, which can cause unintended data loss.",
+      "group": "Schema Evolution",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "d6c84e4c"
+    },
+    {
+      "q": "Your incremental filter is 'updated_at > (select max(updated_at) from {{ this }})'. What is the reliability risk?",
+      "a": "Records updated exactly at max(updated_at) from the previous run can be missed if they arrived late. Use >= with downstream deduplication, or subtract a safe lookback buffer (e.g., 1 hour)\n\n**Watch out:** Using strict `>` is idiomatic but misses late-arriving records with the exact boundary timestamp.",
+      "group": "Reliability",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "2d195ed8"
+    },
+    {
+      "q": "What is the dbt microbatch incremental strategy and when is it appropriate?",
+      "a": "Introduced in dbt 1.9 — processes data in discrete time batches (e.g., one day at a time) defined by event_time and batch_size. Failed batches can be independently retried. Ideal for large-scale event data with strict partition guarantees\n\n**Watch out:** microbatch is not the same as insert_overwrite — it requires an event_time column and manages retries per batch, not per run.",
+      "group": "Strategy Selection",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "48ff5ff4"
+    },
+    {
+      "q": "You want to backfill a specific date range in an incremental model without a full rebuild. Approach?",
+      "a": "Pass vars (e.g., --vars `{start_date: 2024-01-01, end_date: 2024-01-31}`) and conditionally use them inside the is_incremental() block instead of querying {{ this }}\n\n**Watch out:** There is no native --backfill flag in dbt — you must control the filter via Jinja vars or run with --full-refresh for the specific model.",
+      "group": "Reliability",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "b208460d"
+    },
+    {
+      "q": "When should you choose strategy='merge' over strategy='delete+insert'?",
+      "a": "Use `merge` when you need atomic upserts in a single SQL statement (supported on Snowflake, BigQuery, Databricks). Use `delete+insert` when `merge` is slow, not supported (Redshift), or when you're replacing large batches where delete+bulk insert is faster\n\n**Watch out:** `merge` is not available on all adapters — always check adapter compatibility before selecting a strategy.",
+      "group": "Strategy Selection",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "35b6edc9"
+    },
+    {
+      "q": "You want an incremental model to use insert_overwrite on BigQuery but merge on Snowflake in the same codebase. How?",
+      "a": "Use a conditional in the config block: {{ config(materialized=`incremental`, incremental_strategy=`insert_overwrite` if target.type == `bigquery` else `merge`) }}. Or define adapter-specific configs in dbt_project.yml per target profile\n\n**Watch out:** You cannot set incremental_strategy conditionally inside the model SQL body — it must be in the config() block or project YAML.",
+      "group": "Cross-Platform",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 2: Advanced Incremental Strategies",
+      "module": "dbt Architect",
+      "id": "d4a8c465"
+    },
+    {
+      "q": "What happens at build time when contract.enforced: true is set and the compiled model output doesn't match the declared columns?",
+      "a": "dbt raises a compile-time error before any SQL runs — the build fails immediately. Column names and declared data types must match exactly between the YAML contract and the SELECT output\n\n**Watch out:** contract.enforced does not enforce constraints at the database level — it is a dbt compile-time check only.",
+      "group": "Contracts",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "a8485875"
+    },
+    {
+      "q": "You need to add a new NOT NULL column to a contracted public model without breaking existing consumers. Safest approach?",
+      "a": "Create v2 of the model with the new column. Mark v1 with a deprecation_date. Consumers migrate to v2 at their own pace; v1 continues running until decommissioned\n\n**Watch out:** Adding a column to an existing contracted model's YAML mid-version is a breaking change for any consumer that queries SELECT * or validates the schema.",
+      "group": "Contracts",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "c677bd68"
+    },
+    {
+      "q": "What is the difference between data_tests: and constraints: at the column level in dbt?",
+      "a": "data_tests (e.g., not_null, unique) are query-based — dbt runs a SELECT to find failing rows. constraints (e.g., not_null, primary_key) are DDL-level — included in CREATE TABLE statements and enforced by the database (where supported)\n\n**Watch out:** constraints do not run SELECT-based tests — they rely on the warehouse to enforce integrity, which may be silently ignored on some adapters.",
+      "group": "Contracts",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "dc452ce9"
+    },
+    {
+      "q": "A downstream Mesh project needs to verify that an upstream public model hasn't silently changed its schema. Mechanism?",
+      "a": "Define contract.enforced: true on the upstream public model with declared column types. dbt validates the contract at build time on the upstream project, ensuring the interface is stable before the model is published\n\n**Watch out:** Cross-project dbt tests on upstream models are not natively supported — contracts are the enforcement mechanism for cross-project schema guarantees.",
+      "group": "Contracts",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "4258f8cb"
+    },
+    {
+      "q": "What dbt column-level constraints are available, and which require database support?",
+      "a": "not_null, unique, primary_key — widely supported. foreign_key — requires adapter support (Snowflake, BigQuery). check — adapter-dependent (Snowflake, Postgres). dbt declares them in DDL; enforcement depends on the warehouse\n\n**Watch out:** All constraints appear in generated DDL regardless of adapter — but some warehouses (e.g., BigQuery) accept but do not enforce certain constraints.",
+      "group": "Contracts",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 3: Model Contracts & Versioning",
+      "module": "dbt Architect",
+      "id": "092bd5db"
+    },
+    {
+      "q": "You want CI to only build and test models that changed in the PR, not the entire project. Command pattern?",
+      "a": "dbt build --select state:modified+ --defer --state path/to/prod/artifacts — runs only changed models and their downstream deps; resolves unselected upstream models against prod relations via --defer\n\n**Watch out:** Without --defer, unselected upstream models must exist in the CI environment; without --state, dbt has no baseline to compare against.",
+      "group": "Slim CI",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "f36d9f94"
+    },
+    {
+      "q": "What does --defer do in dbt, and what does it require?",
+      "a": "--defer tells dbt to resolve unselected models against a prior run's compiled relations (specified via --state path/to/manifest). In CI, this means unmodified upstream models use prod tables rather than needing to be rebuilt\n\n**Watch out:** --defer without --state errors — it needs a manifest.json to know what relations existed in the reference environment.",
+      "group": "Slim CI",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "d71512c9"
+    },
+    {
+      "q": "Where do dbt Cloud CI jobs get their 'production' artifacts (manifest.json) for state comparison?",
+      "a": "From the designated Production environment`s latest successful run in dbt Cloud. The CI job is configured to `defer to' the Production environment, which dbt Cloud fetches automatically\n\n**Watch out:** You cannot manually upload artifacts to dbt Cloud — they are generated automatically and retrieved by environment reference.",
+      "group": "Slim CI",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "bf1dceea"
+    },
+    {
+      "q": "You want dbt Cloud CI to block PR merges if tests fail. What configuration is required outside dbt Cloud?",
+      "a": "In your Git provider (GitHub/GitLab/Azure DevOps), mark the dbt Cloud CI check as a required status check in branch protection rules. dbt Cloud sends pass/fail status back to the Git provider\n\n**Watch out:** dbt Cloud runs CI checks but cannot enforce merge blocking itself — that is configured in your Git provider's branch protection settings.",
+      "group": "CI/CD",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "bf817b24"
+    },
+    {
+      "q": "What is the recommended way to manage secrets (e.g., warehouse passwords) across dbt Cloud environments?",
+      "a": "Store credentials in dbt Cloud Environment → Connection settings. For additional secrets, use environment variables prefixed with DBT_ENV_SECRET_ — dbt masks these in logs and UI\n\n**Watch out:** Never hardcode credentials in profiles.yml committed to source control — dbt Cloud manages credentials per environment securely.",
+      "group": "Secrets Management",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "dfa49dfd"
+    },
+    {
+      "q": "You want to trigger a dbt Cloud job via API from an external orchestrator (e.g., Airflow). What do you need?",
+      "a": "The dbt Cloud Account ID, Job ID, and a Service Token with `Jobs → Run` permission. POST to the dbt Cloud API v2 run endpoint. The orchestrator polls the run status endpoint to detect completion\n\n**Watch out:** Use Service Tokens (not personal access tokens) for automation — personal tokens are tied to individual users and should not be used in shared systems.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "6f783f7c"
+    },
+    {
+      "q": "A dbt Cloud job fails because a CI environment doesn't have the upstream models that --defer should resolve. Root cause?",
+      "a": "The CI job`s --state artifacts are missing or the Production environment hasn`t had a recent successful run. Ensure the Production job runs before CI can use its artifacts; confirm --defer-to-env points to the right environment\n\n**Watch out:** --defer resolves unselected models against prod — if prod artifacts are stale or missing, resolution fails.",
+      "group": "Slim CI",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "9ae41e3e"
+    },
+    {
+      "q": "You want to automatically run a dbt Cloud job every time code is merged to main. What dbt Cloud trigger type?",
+      "a": "`Merge` trigger (Continuous Deployment) — fires when a PR is merged to the target branch. Keeps production data fresh on every merge without a separate scheduler\n\n**Watch out:** `Schedule` triggers run at fixed times regardless of code changes — use `Merge` for deploy-on-merge behaviour.",
+      "group": "CI/CD",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "cbd7a2be"
+    },
+    {
+      "q": "You need to rotate a dbt Cloud Service Token without downtime. Steps?",
+      "a": "1) Create a new Service Token with identical permissions. 2) Update all CI/CD systems and integrations to use the new token. 3) Verify everything works. 4) Revoke the old token\n\n**Watch out:** Revoking the old token before updating integrations immediately breaks all automated jobs using it.",
+      "group": "Administration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "53eb396e"
+    },
+    {
+      "q": "What is the purpose of dbt Cloud's 'Continuous Integration' job type vs. a 'Scheduled' job?",
+      "a": "CI jobs are triggered by PR open/update events and use Slim CI (state:modified+) to only test changed models. Scheduled jobs run on a fixed cadence and typically rebuild the full production dataset\n\n**Watch out:** CI jobs should not run dbt build (full) — this is expensive and defeats the purpose of Slim CI.",
+      "group": "CI/CD",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 4: Enterprise CI/CD & Deployment",
+      "module": "dbt Architect",
+      "id": "86ceab91"
+    },
+    {
+      "q": "What is the difference between a 'simple' and a 'derived' metric in MetricFlow?",
+      "a": "`simple` maps directly to a single measure (e.g., sum of amount). `derived` is calculated from one or more existing metrics using an expression (e.g., revenue - cost). Derived metrics reference metrics, not raw measures\n\n**Watch out:** A derived metric cannot directly reference a measure — it must reference other defined metrics.",
+      "group": "Metric Types",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "e16d773f"
+    },
+    {
+      "q": "You need a metric that shows 'total revenue over the last 30 days' as a rolling window. MetricFlow metric type?",
+      "a": "cumulative metric with window: {count: 30, granularity: day} — accumulates the measure over a rolling time window\n\n**Watch out:** There is no `rolling_window` metric type in MetricFlow — use cumulative. `simple` metrics do not support time windowing.",
+      "group": "Metric Types",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "ecbdd46a"
+    },
+    {
+      "q": "How does MetricFlow automatically join two semantic models for a cross-model query?",
+      "a": "Through shared entity names and types — if model A has a `foreign` entity named `customer` and model B has a `primary` entity named `customer`, MetricFlow resolves the join automatically at query time\n\n**Watch out:** MetricFlow does not use SQL foreign key constraints — only entity declarations in semantic models drive join resolution.",
+      "group": "Semantic Models",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "1f4119b6"
+    },
+    {
+      "q": "What are the valid entity types in MetricFlow and what does each mean?",
+      "a": "primary — unique row identifier for the semantic model. foreign — references another model's primary entity for joining. unique — unique but not the primary join key. natural — a natural business key (may not be database-enforced)\n\n**Watch out:** MetricFlow entity types are semantic metadata — they do not map 1:1 to SQL primary/foreign key constraints.",
+      "group": "Semantic Models",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "afa8c1d0"
+    },
+    {
+      "q": "A MetricFlow query returns inflated numbers on a cross-model metric. Likely cause?",
+      "a": "Fan-out from a many-to-many join — the entity relationship between semantic models is not correctly defined, causing row multiplication. Fix: review entity types and ensure the join path is one-to-many, not many-to-many\n\n**Watch out:** MetricFlow does not automatically detect fan-out — it relies on correctly typed entity definitions to produce valid join paths.",
+      "group": "Semantic Models",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "87a5d187"
+    },
+    {
+      "q": "What is a 'saved_query' in MetricFlow and how does it differ from a dbt model?",
+      "a": "A saved_query defines a reusable, named combination of metrics, group-by dimensions, and filters that is executed at query time via the semantic layer API — not materialized. A dbt model is a materialized SQL query stored in the warehouse\n\n**Watch out:** saved_query is not pre-computed — it is resolved at query time by the MetricFlow engine each time it is requested.",
+      "group": "Semantic Layer",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "3f3c30e1"
+    },
+    {
+      "q": "What dbt Cloud feature allows BI tools (Tableau, Power BI) to query MetricFlow metrics without writing SQL?",
+      "a": "The dbt Semantic Layer API — exposed via a JDBC/ADBC connection or partner tool integrations. Business users query named metrics and dimensions; MetricFlow generates the SQL at runtime\n\n**Watch out:** The Semantic Layer is not a database — you cannot connect to it with a standard SQL client; use the semantic layer SDK or a supported BI connector.",
+      "group": "Semantic Layer",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "1e149b60"
+    },
+    {
+      "q": "You want to define a dimension shared across multiple semantic models (e.g., a date dimension). Approach?",
+      "a": "Define the time dimension in the semantic model that owns the event_time column (e.g., orders). Other semantic models join to it via shared entities. MetricFlow resolves the dimension at query time\n\n**Watch out:** You cannot define a `global` dimension outside a semantic model — dimensions must belong to a semantic model and are accessed via join resolution.",
+      "group": "Semantic Models",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 5: Advanced Semantic Layer",
+      "module": "dbt Architect",
+      "id": "e2119023"
+    },
+    {
+      "q": "You want a test to issue a warning instead of failing the build when the threshold is exceeded. Config?",
+      "a": "Add config: {severity: warn} to the test block in schema.yml. dbt logs a warning and continues the build; the run is marked `Pass` but with warnings\n\n**Watch out:** Without severity: warn, all test failures cause the run to fail — there is no implicit partial-failure mode.",
+      "group": "Test Configuration",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "4ad2586e"
+    },
+    {
+      "q": "You want to persist failing test rows to a database table for post-run investigation. Config?",
+      "a": "Set store_failures: true in the test config (or pass --store-failures at runtime). dbt materialises failing rows into a schema named dbt_test__audit\n\n**Watch out:** store_failures does not alert anyone — you must query the audit schema separately or integrate with an observability tool.",
+      "group": "Test Configuration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "8552c5bf"
+    },
+    {
+      "q": "What is the difference between a singular test and a generic test in dbt?",
+      "a": "Singular test — a SQL file in tests/ returning failing rows; one-off logic. Generic test — a Jinja macro ({% test ... %}) reusable across many models/columns via schema.yml. Both fail if they return rows\n\n**Watch out:** The difference is reusability, not the SQL mechanism — both return rows as failures.",
+      "group": "Test Types",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "e54f698b"
+    },
+    {
+      "q": "You want to validate that total revenue in fct_orders matches total payments in stg_payments (a cross-model aggregate assertion). Test type?",
+      "a": "Singular test — write a SQL file in tests/ that computes both aggregates and asserts the delta is 0. Singular tests are ideal for cross-model, multi-table assertions\n\n**Watch out:** Generic tests cannot easily express cross-model aggregate comparisons — singular tests are the correct pattern.",
+      "group": "Test Types",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "b63d76de"
+    },
+    {
+      "q": "Your accepted_values test fails on NULLs, but NULLs are expected and valid. Fix?",
+      "a": "Add a where clause to the test config: config: {where: `status is not null`} — excludes NULLs from the test scope\n\n**Watch out:** accepted_values does not have an `allow_null` parameter — use the `where` config to exclude NULLs.",
+      "group": "Test Configuration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "bd877425"
+    },
+    {
+      "q": "You want to share a custom generic test macro across all projects in a dbt Mesh. Approach?",
+      "a": "Package the custom test macro in a standalone dbt package (published to a Git repo or dbt Hub) and install it via packages.yml in each project\n\n**Watch out:** Custom test macros defined in one dbt project cannot be directly referenced by other Mesh projects — they must be packaged.",
+      "group": "Test Distribution",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "22f3f81c"
+    },
+    {
+      "q": "You want to test that row counts haven't dropped more than 10% between runs. Approach?",
+      "a": "Use the dbt_expectations package (expect_table_row_count_to_be_between) with a dynamic threshold, or write a singular test that queries a reference audit table from the previous run\n\n**Watch out:** There is no built-in dbt row-count-delta test — use a package (dbt_expectations) or a custom singular test.",
+      "group": "Test Types",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "126a5973"
+    },
+    {
+      "q": "What does store_failures_as: 'view' do differently from store_failures_as: 'table'?",
+      "a": "`view` materialises failing rows as a view (re-executed on each query, no storage cost). `table` persists the rows as a physical table at test runtime. `table` is better for point-in-time auditing; `view` always reflects the current state\n\n**Watch out:** `view` does not capture a snapshot of failures at test time — it re-runs the test query each time the view is queried.",
+      "group": "Test Configuration",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "10b7ab25"
+    },
+    {
+      "q": "You want to run tests only for models that were 'ERROR' in the last run without re-running the models themselves. Command?",
+      "a": "dbt test --select result:error --state path/to/last/run/results — selects only nodes that had an ERROR result in the previous run_results.json\n\n**Watch out:** `result:error` selects nodes by their last run result — this requires a valid run_results.json from a prior run passed via --state.",
+      "group": "Test Execution",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 6: Advanced Testing Patterns",
+      "module": "dbt Architect",
+      "id": "5ab33800"
+    },
+    {
+      "q": "You want to create a custom materialization called 'incremental_merge_v2' that does not exist natively. How?",
+      "a": "Create a macro file with {% materialization incremental_merge_v2, adapter=`default` %} block following the materialization macro API (must include relation management, pre/post hooks, and return a tuple). Reference with materialized=`incremental_merge_v2` in config()\n\n**Watch out:** Custom materializations are not just SQL files — they must implement the full dbt materialization macro contract.",
+      "group": "Custom Materializations",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "279eea12"
+    },
+    {
+      "q": "What is the difference between pre-hook and on-run-start in dbt?",
+      "a": "pre-hook runs before each individual model node (per-model). on-run-start (in dbt_project.yml) runs once before the entire dbt run begins. Use on-run-start for session-level setup (USE ROLE, CREATE SCHEMA IF NOT EXISTS)\n\n**Watch out:** pre-hook fires for every selected model — using it for session-level setup causes it to run redundantly for each node.",
+      "group": "Hooks",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "5cbd5dd1"
+    },
+    {
+      "q": "You want to grant SELECT on every model to a reporting role after each build, without adding a hook to every model individually. Config?",
+      "a": "In dbt_project.yml, set +post-hook: \"GRANT SELECT ON {{ this }} TO ROLE reporting\" under the relevant model path. This applies the hook to all models in that folder hierarchy\n\n**Watch out:** Setting post-hook in each model's config() block works but is unmaintainable at scale — use dbt_project.yml path-based config instead.",
+      "group": "Hooks",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "413ab3a8"
+    },
+    {
+      "q": "What problem does {% set ns = namespace(found=false) %} solve in Jinja?",
+      "a": "Jinja variables are block-scoped — a variable set inside a {% for %} loop is not visible outside it. The namespace() object is mutable and accessible outside the loop, enabling patterns like `found any matching item`\n\n**Watch out:** {% set found = false %} at the outer scope cannot be reassigned from inside a loop in Jinja2 — the inner assignment creates a new scoped variable.",
+      "group": "Jinja Patterns",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "fa2fe97e"
+    },
+    {
+      "q": "You want a macro to route to a Snowflake-specific implementation vs. a BigQuery-specific one without if/else logic in the macro body. Pattern?",
+      "a": "adapter.dispatch(`macro_name`, `package_name`) — dbt automatically resolves to macro_name__snowflake or macro_name__bigquery based on the active adapter, with a __default fallback\n\n**Watch out:** Hardcoding {% if target.type == `snowflake` %} inside macros tightly couples logic and makes it hard to extend — dispatch is the idiomatic cross-adapter pattern.",
+      "group": "Adapter Dispatch",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "3f9a48ac"
+    },
+    {
+      "q": "What does overriding generate_schema_name do, and what is the most common use case?",
+      "a": "Controls the physical schema name for every model. Most common use: strip the default schema prefix from custom schemas (so staging models land in `staging` not `prod_staging`) in non-prod environments\n\n**Watch out:** The default generate_schema_name concatenates the default schema with the custom schema — override it to use the custom schema name directly.",
+      "group": "Schema Generation",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "de4585af"
+    },
+    {
+      "q": "You want every model in the 'marts/' folder to be automatically aliased with a 'fct_' prefix without setting alias in each model's config. Approach?",
+      "a": "Override the generate_alias_name macro to detect models in the marts/ folder (via node.path or node.fqn) and prepend `fct_`. Set this macro in a macros/ file at the project level\n\n**Watch out:** You cannot set a folder-level alias prefix in dbt_project.yml — alias must be set per-model or via macro override.",
+      "group": "Schema Generation",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "dfcf4f12"
+    },
+    {
+      "q": "What is the {% if execute %} guard in dbt, and when is it required?",
+      "a": "Jinja macros run during both parse and execute phases. run_query(), adapter.get_columns_in_relation(), and other warehouse-dependent calls must be wrapped in {% if execute %} to skip them during the parse phase, preventing errors when dbt parses the project without a warehouse connection\n\n**Watch out:** Calling run_query() without {% if execute %} causes failures during dbt parse, dbt compile, and docs generation.",
+      "group": "Jinja Patterns",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 7: Advanced Macros & Customization",
+      "module": "dbt Architect",
+      "id": "e706d3b7"
+    },
+    {
+      "q": "What is a dbt Cloud Service Token and when should you use one over a personal access token?",
+      "a": "A Service Token is a machine credential scoped to specific dbt Cloud permissions (e.g., `Jobs → Run`). Use for CI/CD, API integrations, and automation. Personal access tokens are tied to individual users and must not be used in shared systems\n\n**Watch out:** If the user who owns a personal access token leaves the company, all automation using their token breaks immediately.",
+      "group": "Authentication",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "7e2c700b"
+    },
+    {
+      "q": "What dbt Cloud permission level should a CI/CD service account have to trigger and monitor jobs?",
+      "a": "Create a Service Token with `Jobs → Run` and `Jobs → Read` permissions — the minimum required to trigger a job and poll its status. Avoid granting Account Admin to service accounts\n\n**Watch out:** Account Admin grants unrestricted access to all settings, users, and connections — never use it for a CI/CD service account.",
+      "group": "Authentication",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "3227e75a"
+    },
+    {
+      "q": "What is IP allowlisting in dbt Cloud and which plan is it available on?",
+      "a": "IP allowlisting restricts dbt Cloud access to requests from specified CIDR ranges, preventing unauthorised access from outside the corporate network. Available on the Enterprise plan only\n\n**Watch out:** IP allowlisting is not available on Developer or Team plans — upgrade to Enterprise or use an alternative access control strategy.",
+      "group": "Security",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "559ee758"
+    },
+    {
+      "q": "Your organisation uses Snowflake SSO. What authentication method should dbt Cloud use for developer connections?",
+      "a": "Configure a Snowflake OAuth integration in dbt Cloud — each developer authenticates with their SSO credentials via OAuth. Service accounts use key-pair authentication (RSA private key)\n\n**Watch out:** Username/password authentication bypasses SSO policies and is typically non-compliant with enterprise SSO mandates.",
+      "group": "Authentication",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "022c0611"
+    },
+    {
+      "q": "What does the dbt Cloud Audit Log track, and who can access it?",
+      "a": "Tracks account-level administrative events: user logins, permission changes, job runs, environment edits, API token creation/revocation. Accessible to Account Admins in Account Settings (Enterprise feature)\n\n**Watch out:** The Audit Log tracks administrative actions — for run-level details (model timing, test results), use Run History and run artifacts.",
+      "group": "Auditing",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "c52a2394"
+    },
+    {
+      "q": "You have multiple teams sharing one dbt Cloud account. How do you isolate their projects, environments, and permissions?",
+      "a": "Use dbt Cloud Groups (Enterprise) — assign users to groups with scoped permissions per project. Each team gets their own project(s) and environments; Group permissions limit what each team can see and do\n\n**Watch out:** Without Groups, all developers share the same permission scope — one developer could accidentally trigger or edit another team's production jobs.",
+      "group": "Access Control",
+      "difficulty": "hard",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "2fb12314"
+    },
+    {
+      "q": "Jobs are queuing in a single dbt Cloud environment and running sequentially when they should be parallel. Cause and fix?",
+      "a": "Each dbt Cloud environment has a concurrency limit. Fix: split workloads across multiple environments with separate warehouse credentials, or check the account`s scheduler concurrency settings. Increasing `threads' only helps within a single run\n\n**Watch out:** `threads` controls model parallelism within one run — it does not affect job-to-job queuing.",
+      "group": "Performance",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "1e3dca74"
+    },
+    {
+      "q": "You want to trigger a dbt Cloud job when an external pipeline (e.g., Fivetran) completes. What is the recommended integration pattern?",
+      "a": "Use the dbt Cloud API (POST /jobs/{id}/run) triggered by the external pipeline`s completion webhook or callback. Fivetran also has a native `dbt Cloud' integration that triggers jobs directly after a sync\n\n**Watch out:** dbt Cloud does not natively listen for external events — you need either the external tool's built-in dbt Cloud trigger or an intermediary (Lambda, Airflow).",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 8: dbt Cloud Administration",
+      "module": "dbt Architect",
+      "id": "36af778e"
+    },
+    {
+      "q": "A complex dbt model is exhausting Snowflake memory during a multi-way join. How to fix within dbt?",
+      "a": "Break the model into intermediate CTE stages or separate ephemeral/staging models to reduce per-step memory pressure. Consider upsizing the warehouse for that specific job\n\n**Watch out:** Adding more threads does not help a single model's memory issue — parallelism only helps across multiple models.",
+      "group": "Warehouse Optimization",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "b34ee9da"
+    },
+    {
+      "q": "You want to partition a dbt model by event_date on BigQuery. Config?",
+      "a": "Add partition_by: {field: `event_date`, data_type: `date`} to the model's config() block. BigQuery includes the PARTITION BY clause in the CREATE TABLE DDL\n\n**Watch out:** partition_by is a BigQuery-specific config — it has no effect on other adapters without adapter-specific handling.",
+      "group": "Warehouse Optimization",
+      "difficulty": "easy",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "f8174740"
+    },
+    {
+      "q": "You want to cluster a Snowflake table on customer_id and order_date via dbt. Config?",
+      "a": "Add cluster_by: [`customer_id`, `order_date`] to the model's config() block. dbt includes CLUSTER BY in the generated DDL. Automatic Clustering (if enabled in Snowflake) handles ongoing maintenance\n\n**Watch out:** cluster_by only sets the initial cluster key — it does not re-cluster existing micro-partitions; Snowflake auto-clustering or manual RECLUSTER handles that.",
+      "group": "Warehouse Optimization",
+      "difficulty": "medium",
+      "certification": "dbt architect",
+      "category": "Domain 9: Performance & Optimization",
+      "module": "dbt Architect",
+      "id": "0390e203"
+    }
+  ]
+}

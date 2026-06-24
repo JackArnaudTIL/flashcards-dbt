@@ -1,0 +1,605 @@
+{
+  "deck": "dbt",
+  "cards": [
+    {
+      "q": "You want to ensure every 'relationship' test in your project uses the 'warn' severity. Where?",
+      "a": "In `dbt_project.yml` under `tests: +severity: warn`\n\n**Watch out:** Manually editing every YAML file; this is not scalable for a large project.",
+      "group": "Testing",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "08bc8c61"
+    },
+    {
+      "q": "You want to test if a 'Latitude' column is between -90 and 90. Implementation?",
+      "a": "`dbt_utils.expression_is_true`\n\n**Watch out:** `not_null`; latitude can be not null but still exist on the Moon (+500).",
+      "group": "Testing",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 3: Implementing dbt Tests",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "96c1a440"
+    },
+    {
+      "q": "Your CI job in dbt Cloud is taking 20 minutes because it builds the entire 2,000-model DAG for every PR. How do you optimize this?",
+      "a": "Implement `Slim CI` using `state:modified+` and defer to the production manifest\n\n**Watch out:** Using `dbt run --select tag:ci`; this requires manual tagging and often misses downstream dependencies affected by a change.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "dcd98829"
+    },
+    {
+      "q": "You want a 'Consumer' project to automatically run only after the 'Producer' project's daily job finishes successfully. How?",
+      "a": "Use `Job Chaining` in dbt Cloud or an external orchestrator via the Administrative API\n\n**Watch out:** Scheduling both jobs at the same time (e.g., 2:00 AM); if the producer is delayed, the consumer builds using stale data.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "6bd3d9bf"
+    },
+    {
+      "q": "You need to run a full refresh of your project, but only for models tagged 'finance'. Command?",
+      "a": "`dbt run --select tag:finance --full-refresh`\n\n**Watch out:** Running `dbt run --full-refresh`; this rebuilds every model in the project, potentially costing thousands in warehouse credits.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "80e909f2"
+    },
+    {
+      "q": "You have a 'Source' that updates irregularly. You want dbt to fail the build if the data hasn't been updated in 24 hours. Configuration?",
+      "a": "Set `freshness` with an `error_after: {count: 24, period: hour}` in the source YAML\n\n**Watch out:** Adding a `recency` test to the model; freshness checks run *before* the build, saving compute if data is already stale.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "14440ab6"
+    },
+    {
+      "q": "You are using 'dbt build' in production. A test fails on a 'Staging' model. What happens to the downstream 'Mart'?",
+      "a": "The Mart is `skipped` and not built\n\n**Watch out:** Thinking dbt will `roll back` the Staging model; dbt leaves the failed Staging model as-is but stops the rest of the pipeline.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c074f2b7"
+    },
+    {
+      "q": "You want to run all models that have changed since the last successful production run. What is required?",
+      "a": "The `manifest.json` from the last successful run and the `state:modified` selector\n\n**Watch out:** Running `dbt run`; without state comparison, dbt has no native way to know what changed in Git.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4715d6e6"
+    },
+    {
+      "q": "You want to run all models EXCEPT those that are 'Snapshots'. Command?",
+      "a": "`dbt run --exclude resource_type:snapshot`\n\n**Watch out:** `dbt run --exclude snapshots`; the selector must specify the `resource_type` explicitly to be precise.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fe2f83d1"
+    },
+    {
+      "q": "You want to see the 'Lineage' of a single model including its parents and children in the CLI. Command?",
+      "a": "`dbt ls --select +my_model+`\n\n**Watch out:** `dbt list my_model`; this only confirms the model exists but provides no DAG context.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "9f1700ef"
+    },
+    {
+      "q": "You are using 'State Deferral'. dbt is building a model in your 'Dev' schema but referencing a parent in 'Prod'. Is this correct?",
+      "a": "Yes, this is the intended behavior to avoid rebuilding unchanged upstream parents in Dev\n\n**Watch out:** Assuming dbt is `bugged`; deferral is a cost-saving feature designed for this exact purpose.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "cd66b090"
+    },
+    {
+      "q": "You want to run a build and stop immediately if any model or test fails. Command?",
+      "a": "`dbt build --fail-fast`\n\n**Watch out:** Running `dbt build`; by default, dbt will try to finish all independent branches of the DAG even if one branch fails.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b7c2b0d7"
+    },
+    {
+      "q": "You want to run all models that are downstream of a changed model, but only the models tagged 'hourly'. Command?",
+      "a": "`dbt run --select my_model+,tag:hourly`\n\n**Watch out:** `dbt run --select my_model+ tag:hourly`; a space is an `OR` (Union), while a comma is an `AND` (Intersection).",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fc6df208"
+    },
+    {
+      "q": "You want to exclude 'Singular' tests from a specific CI run. Command?",
+      "a": "`dbt test --exclude test_type:singular`\n\n**Watch out:** `dbt test --select generic`; while this works, the exclude approach is more explicit for removing specific resource types.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e2660834"
+    },
+    {
+      "q": "You want to run a build and only execute the tests for models that 'failed' in the previous run. Command?",
+      "a": "`dbt test --select state:failed --state path/to/artifacts`\n\n**Watch out:** `dbt retry`; retry will attempt to rerun the models AND the tests, not just the tests.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "faf7a921"
+    },
+    {
+      "q": "You want to set a 'Timeout' for a dbt Cloud job to prevent it from running for 10 hours if the warehouse hangs. Where?",
+      "a": "In the dbt Cloud Job `Timeout` settings\n\n**Watch out:** In `dbt_project.yml`; project files do not contain execution/timeout metadata for the orchestrator.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4b892c17"
+    },
+    {
+      "q": "You want to run all models that were NOT modified in the current Pull Request. Command?",
+      "a": "`dbt run --exclude state:modified --state path/to/manifest`\n\n**Watch out:** `dbt run --select ^state:modified`; dbt uses the `exclude` flag for negation in the CLI.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5ce44893"
+    },
+    {
+      "q": "You want to use a specific 'Target' named 'qa' for your production build. Command?",
+      "a": "`dbt run --target qa`\n\n**Watch out:** `dbt run --profile qa`; `--profile` selects the connection group, while `--target` selects the environment inside that group.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "82c9245f"
+    },
+    {
+      "q": "You want to run all models that have the tag 'finance' OR the tag 'marketing'. Command?",
+      "a": "`dbt run --select tag:finance tag:marketing` (space-separated)\n\n**Watch out:** `dbt run --select tag:finance,tag:marketing`; a comma would only run models that have *both* tags.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "32c1b4a4"
+    },
+    {
+      "q": "You want to run all models that were 'failed' last time AND are tagged 'finance'. Command?",
+      "a": "`dbt run --select state:failed,tag:finance`\n\n**Watch out:** `dbt run --select state:failed tag:finance`; the space would run all failures OR all finance models, wasting compute.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d3861c3c"
+    },
+    {
+      "q": "You are using 'Slim CI'. You changed a 'Macro' used by 50 models. How many models will dbt build in the PR?",
+      "a": "dbt will identify all 50 models as `modified` because their compiled code has changed\n\n**Watch out:** Thinking dbt only builds the `.sql` file you touched; state comparison is deep.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e898cf02"
+    },
+    {
+      "q": "You want to run a build and only run models that haven't been successfully built today. Requirement?",
+      "a": "Use `state:failed` or `state:modified` selection against a daily-refreshed manifest\n\n**Watch out:** Assuming dbt has an `auto-skip` feature based on warehouse timestamps.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "f1d2425a"
+    },
+    {
+      "q": "You want to trigger a dbt Cloud job via a Python script. Which feature do you use?",
+      "a": "The dbt Cloud Administrative API (POST to /jobs/{job_id}/run)\n\n**Watch out:** Trying to use `dbt run` in the Python script; dbt Cloud jobs must be triggered via API to run on the Cloud infrastructure.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "074a397d"
+    },
+    {
+      "q": "You want to run all models that have an 'enforced' contract. Possible via selector?",
+      "a": "Yes, using `config.contract.enforced:true`\n\n**Watch out:** Thinking selectors only work for tags or paths; selectors can target any model configuration value.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8a896f83"
+    },
+    {
+      "q": "You want to run only 'Singular' tests for the entire project. Command?",
+      "a": "`dbt test --select test_type:singular`\n\n**Watch out:** `dbt test --select generic`; this would run the opposite (unique, not_null, etc.).",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "dafba76c"
+    },
+    {
+      "q": "You want to run all models and tests in a specific folder. Command?",
+      "a": "`dbt build --select path:models/marts`\n\n**Watch out:** `dbt run --select marts`; `run` only builds models and skips the tests in that folder.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "c2c6dd9f"
+    },
+    {
+      "q": "You want to build a model only if the 'Source Freshness' check passes. Logic?",
+      "a": "Execute `dbt source freshness` first, and only proceed to `dbt build` if the return code is 0\n\n**Watch out:** Thinking `dbt build` includes an automatic freshness gate.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "e4e98868"
+    },
+    {
+      "q": "You want to run a build and skip tests for any 'Source' that is failing freshness. Possible?",
+      "a": "No, you must handle the logic in your orchestrator script (freshness then build)\n\n**Watch out:** Searching for a `--skip-on-stale` flag.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d56754f9"
+    },
+    {
+      "q": "You want to run a dbt job every 15 minutes. Where is this Cron schedule set?",
+      "a": "In the dbt Cloud Job `Triggers` settings\n\n**Watch out:** In `dbt_project.yml`; project files do not contain scheduling/cron logic.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "179fba0f"
+    },
+    {
+      "q": "You want to build 'Model B' which depends on 'Model A', but you ONLY want to build 'Model B'. Command?",
+      "a": "`dbt run --select ModelB`\n\n**Watch out:** `dbt run --select +ModelB`; the `+` prefix would force `Model A` to build as well.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ec8a2bf5"
+    },
+    {
+      "q": "You want to use a 'Target' to point to your 'Personal' schema for local dev. Where?",
+      "a": "In `profiles.yml` under the `dev` target\n\n**Watch out:** In `dbt_project.yml`; project files should not contain individual developer credentials or schemas.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "6a2a0c5c"
+    },
+    {
+      "q": "You want to run a build and 'Exclude' a single specific test. Command?",
+      "a": "`dbt build --exclude test_name`\n\n**Watch out:** `--exclude model_name`; this would exclude every test AND the model itself.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "2c81f3e5"
+    },
+    {
+      "q": "You want to run a job and pass an environment variable at runtime. Command?",
+      "a": "`dbt run --vars `{\"my_var\": \"value\"}''\n\n**Watch out:** Trying to set the variable in `profiles.yml`; profiles are for connection details, not runtime variables.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "41310220"
+    },
+    {
+      "q": "You want to run all models in a project that have a description. Possible?",
+      "a": "Yes, using `config.description:*`\n\n**Watch out:** Thinking selectors only work for tags or paths; metadata properties can also be used.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4e0780d7"
+    },
+    {
+      "q": "You want to build all models that are children of a specific Source. Command?",
+      "a": "`dbt build --select source:raw_data.orders+`\n\n**Watch out:** `dbt build --select +source:raw_data.orders`; the prefix selects parents, but sources have no parents.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "bfcfd703"
+    },
+    {
+      "q": "You want to run a build and skip 'Staging' models if they already exist in the warehouse. Possible?",
+      "a": "No, `dbt run` always attempts to build the selected models unless using `Incremental` logic\n\n**Watch out:** Searching for a `--skip-if-exists` flag.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8f8901b4"
+    },
+    {
+      "q": "You want to run all models that were modified and also have the tag 'finance'. Command?",
+      "a": "`dbt run --select state:modified,tag:finance`\n\n**Watch out:** `dbt run --select state:modified tag:finance`; space is Union (either/or).",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fe1e2893"
+    },
+    {
+      "q": "You want to run all tests except for 'accepted_values' tests. Command?",
+      "a": "`dbt test --exclude test_name:accepted_values`\n\n**Watch out:** `dbt test --exclude accepted_values`; you must include the `test_name:` prefix.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "3a31add0"
+    },
+    {
+      "q": "You want to run a build and capture the results in a JSON file. Command?",
+      "a": "dbt does this automatically; check the `target/run_results.json` file after the run\n\n**Watch out:** Trying to use a `--output json` flag on the build command.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "cc90db23"
+    },
+    {
+      "q": "You want to run all models in the 'Intermediate' layer. Command?",
+      "a": "`dbt run --select path:models/intermediate`\n\n**Watch out:** `dbt run --select intermediate`; folder-based selection requires the `path:` prefix or `*` syntax.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b6675839"
+    },
+    {
+      "q": "You want to build a model and its immediate parents only (1 level up). Command?",
+      "a": "`dbt build --select 1+my_model`\n\n**Watch out:** `dbt build --select +my_model`; this would build *every* upstream model in the hierarchy.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "35382db9"
+    },
+    {
+      "q": "You want to run a build and continue even if a model fails, but stop the downstream of that model. Default behavior?",
+      "a": "This is dbt's default behavior; only the failed node and its children stop\n\n**Watch out:** Thinking `fail-fast` is the default; fail-fast stops the *entire* DAG build immediately.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "ecae3d22"
+    },
+    {
+      "q": "You want to run all models except those that use a specific Macro. Possible?",
+      "a": "No, selectors cannot target the internal code logic (Macros) of a model\n\n**Watch out:** Searching for `macro:my_macro` selector.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d9f195a0"
+    },
+    {
+      "q": "You want to run all models that have an 'Owner' email set in YAML. Command?",
+      "a": "`dbt run --select config.meta.owner:*`\n\n**Watch out:** Thinking selectors only work for tags or paths.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b4cfedb4"
+    },
+    {
+      "q": "You want to run a specific 'Singular' test. Command?",
+      "a": "`dbt test --select [test_name]`\n\n**Watch out:** `dbt run --select [test_name]`; singular tests are not models and cannot be `run`.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "5ef444fa"
+    },
+    {
+      "q": "You want to run all models that are 'Seeds'. Command?",
+      "a": "`dbt seed`\n\n**Watch out:** `dbt run --select resource_type:seed`; standard `run` does not execute seed resources.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "b5e558b1"
+    },
+    {
+      "q": "You want to run a build using the manifest from 'Monday'. Command?",
+      "a": "`dbt build --state path/to/monday_manifest/`\n\n**Watch out:** Thinking dbt stores a history of manifests; you must manually provide the old manifest path.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "dc8dee69"
+    },
+    {
+      "q": "You want to run a build and skip 'Unit Tests'. Command?",
+      "a": "`dbt build --exclude resource_type:unit_test`\n\n**Watch out:** `dbt build --skip-unit-tests`; no such flag exists.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d32945f6"
+    },
+    {
+      "q": "You want to run all models that have been modified but exclude models with 'PII' tag. Command?",
+      "a": "`dbt run --select state:modified --exclude tag:pii`\n\n**Watch out:** `dbt run --select state:modified,^tag:pii`; dbt does not support caret negation inside the select flag.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "fefb462a"
+    },
+    {
+      "q": "You want to run all models that were 'Skipped' in the last run. Selection?",
+      "a": "Use `state:failed` selection (skipped models are usually the result of an upstream failure)\n\n**Watch out:** Searching for `state:skipped` selector; dbt uses `failed` to target the broken branch.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "44f12ecc"
+    },
+    {
+      "q": "You want to run a job and pass a thread count of 1. Command?",
+      "a": "`dbt run --threads 1`\n\n**Watch out:** Setting threads in `dbt_project.yml`; thread counts should be controlled via CLI or profile for environment flexibility.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "40a7db98"
+    },
+    {
+      "q": "You want to run all models in a project that have an enforced 'Contract'. Selection?",
+      "a": "`dbt run --select config.contract.enforced:true`\n\n**Watch out:** Thinking contracts can't be used for selection.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "47bfd15a"
+    },
+    {
+      "q": "You want to run all models that have a 'description' in the YAML. Selection?",
+      "a": "`dbt run --select config.description:*`\n\n**Watch out:** Thinking metadata selection isn't possible.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "d2f95172"
+    },
+    {
+      "q": "You want to run a build and capture the 'Logs' in a specific file. Command?",
+      "a": "dbt stores logs in the `logs/dbt.log` file by default\n\n**Watch out:** Trying to use a `--output-file` flag.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "8b496556"
+    },
+    {
+      "q": "You want to run all models in the 'Marts' folder. Command?",
+      "a": "`dbt run --select path:models/marts`\n\n**Watch out:** `dbt run --select marts`; folder-based selection requires the path prefix.",
+      "group": "Orchestration",
+      "difficulty": "easy",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "78d97193"
+    },
+    {
+      "q": "You want to run all models except those with the 'long_running' tag. Command?",
+      "a": "`dbt run --exclude tag:long_running`\n\n**Watch out:** `dbt run --select !tag:long_running`; dbt uses exclude flag for negation.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "eef2fbdb"
+    },
+    {
+      "q": "You want to run all tests for models that were 'Modified' in the current branch. Command?",
+      "a": "`dbt test --select state:modified --state path/to/manifest`\n\n**Watch out:** `dbt test --select my_model`; you want to test *everything* that changed, not just one model.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "4b2688f2"
+    },
+    {
+      "q": "You want to run a build and 'Fail Fast' only on tests, not models. Possible?",
+      "a": "No, `--fail-fast` applies to all node types (models, tests, seeds) in the build\n\n**Watch out:** Searching for a `--fail-fast-tests` flag.",
+      "group": "Orchestration",
+      "difficulty": "hard",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "faaa7777"
+    },
+    {
+      "q": "You want to run all models and tests in a specific schema. Command?",
+      "a": "`dbt build --select schema:my_schema`\n\n**Watch out:** Thinking selectors only work for tags or paths.",
+      "group": "Orchestration",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 4: Managing Data Pipelines",
+      "module": "Developer Cert: Modeling & Testing",
+      "id": "93283bc3"
+    },
+    {
+      "q": "A model fails with 'Relation already exists' during an incremental run on Snowflake. What is the most likely cause?",
+      "a": "Check for a `View` and `Table` with the same name in the same schema\n\n**Watch out:** Assuming dbt automatically drops a View to make room for an Incremental Table; dbt requires a --full-refresh or manual drop to resolve the name collision.",
+      "group": "Errors",
+      "difficulty": "medium",
+      "certification": "dbt analytics engineering",
+      "category": "Domain 5: Debugging & Troubleshooting",
+      "module": "Developer Cert: Governance & Debugging",
+      "id": "f22375fa"
+    }
+  ]
+}
