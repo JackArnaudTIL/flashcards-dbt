@@ -773,7 +773,7 @@ function render() {
   document.getElementById('nextBtn').disabled = index === deck.length - 1;
   document.getElementById('ratingRow').style.display = 'none';
   const hintEl = document.getElementById('hintText');
-  hintEl.textContent = card.requires_code ? '' : 'Tap “Show answer” when ready';
+  hintEl.textContent = card.requires_code ? '' : 'Show answer when ready';
   hintEl.className = 'hint';
 
   document.getElementById('cardMeta').innerHTML = [
@@ -806,7 +806,7 @@ function showAnswer() {
   if (!card.requires_code) {
     const finalASound = card.a_sound || deckConfig.a_sound;
     if (finalASound) playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
-    document.getElementById('hintText').textContent = 'How did you do?';
+    document.getElementById('hintText').textContent = 'How did you do?  1 · 2 · 3';
     document.getElementById('hintText').className = 'hint answered';
     document.getElementById('ratingRow').style.display = 'flex';
   }
@@ -1130,21 +1130,35 @@ function restart() {
 document.addEventListener('keydown', e => {
   const studyView = document.getElementById('studyView');
   if (!studyView || studyView.style.display === 'none') return;
-  
-  // Ignore keydowns if user is typing in an input, textarea, OR our new CodeMirror IDE
   if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT' || e.target.closest('.cm-editor')) return;
-  
-  if (e.code === 'Space') { 
-    e.preventDefault(); 
-    flip(); 
+
+  const schemaOpen = document.getElementById('schemaPanel')?.style.display !== 'none';
+  const card = deck[index];
+
+  if (e.code === 'Space') {
+    e.preventDefault();
+    if (!flipped && card && !card.requires_code) showAnswer();
+    return;
   }
-  
-  if (e.code === 'ArrowRight') {
-    next();
+
+  if (e.code === 'KeyS') {
+    if (document.getElementById('schemaPill')?.style.display !== 'none') toggleSchema();
+    return;
   }
-  
+
   if (e.code === 'ArrowLeft') {
-    prev();
+    schemaOpen ? schemaNav(-1) : prev();
+    return;
+  }
+  if (e.code === 'ArrowRight') {
+    schemaOpen ? schemaNav(1) : next();
+    return;
+  }
+
+  if (flipped) {
+    if (e.code === 'Digit1') rate('Hard');
+    if (e.code === 'Digit2') rate('Ok');
+    if (e.code === 'Digit3') rate('Good');
   }
 });
 
@@ -1166,7 +1180,13 @@ function hideExplanationOverlay(e) {
 
 // Since we're using a module, bind necessary UI hooks to the window so HTML onclicks work:
 function renderSchemaHtml(schema) {
-  return (schema.tables || []).map(table => {
+  const tables = schema.tables || [];
+  if (tables.length === 0) return '';
+
+  const chevL = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>`;
+  const chevR = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>`;
+
+  const slides = tables.map((table, i) => {
     const cols = table.columns || [];
     const rows = table.rows   || [];
     const colHeaders = cols.map(c => `<th class="schema-th">${c.name}</th>`).join('');
@@ -1179,7 +1199,7 @@ function renderSchemaHtml(schema) {
       }).join('')}</tr>`
     ).join('');
     return `
-      <div class="schema-table">
+      <div class="schema-slide${i === 0 ? ' active' : ''}">
         <div class="schema-table-name">${table.name}</div>
         <div class="schema-table-wrap">
           <table class="schema-data-table">
@@ -1192,6 +1212,35 @@ function renderSchemaHtml(schema) {
         </div>
       </div>`;
   }).join('');
+
+  const multi = tables.length > 1;
+  const dots = multi
+    ? `<div class="schema-dots">${tables.map((_, i) =>
+        `<span class="schema-dot${i === 0 ? ' active' : ''}"></span>`).join('')}</div>`
+    : '';
+
+  return `
+    <div class="schema-carousel">
+      ${multi ? `<button class="schema-nav schema-nav-prev" onclick="schemaNav(-1)">${chevL}</button>` : ''}
+      <div class="schema-carousel-track">${slides}</div>
+      ${multi ? `<button class="schema-nav schema-nav-next" onclick="schemaNav(1)">${chevR}</button>` : ''}
+    </div>
+    ${dots}`;
+}
+
+function schemaNav(direction) {
+  const body = document.getElementById('schemaPanelBody');
+  if (!body) return;
+  const slides = body.querySelectorAll('.schema-slide');
+  const dots   = body.querySelectorAll('.schema-dot');
+  if (slides.length <= 1) return;
+  let current = 0;
+  slides.forEach((s, i) => { if (s.classList.contains('active')) current = i; });
+  const next = (current + direction + slides.length) % slides.length;
+  slides[current].classList.remove('active');
+  slides[next].classList.add('active');
+  dots[current]?.classList.remove('active');
+  dots[next]?.classList.add('active');
 }
 
 function toggleSchema() {
@@ -1203,7 +1252,8 @@ function toggleSchema() {
   if (pill) pill.classList.toggle('active', isHidden);
 }
 window.toggleSchema = toggleSchema;
-window.showAnswer = showAnswer;
+window.showAnswer   = showAnswer;
+window.schemaNav    = schemaNav;
 
 window.submitCode = submitCode;
 window.flip = flip;

@@ -1370,8 +1370,10 @@ pre code {
   border: none;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 3px;
   color: #fff;
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: var(--shadow-sm);
@@ -1390,6 +1392,36 @@ pre code {
 .rating-btn.Good { background: var(--green); }
 .rating-btn.Ok   { background: var(--amber); }
 .rating-btn.Hard { background: var(--red); }
+
+/* ── Keyboard hint chips ─────────────────────────────────────── */
+kbd.key-hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.85);
+  border: none;
+  pointer-events: none;
+  letter-spacing: 0.03em;
+}
+
+/* Variant for the show-answer button (dark text on accent bg) */
+kbd.key-hint.key-hint-light {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Schema pill hint (dark chip on light bg) */
+.schema-pill kbd.key-hint {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--ink-soft);
+}
 
 /* ── Nav controls ────────────────────────────────────────────── */
 .controls { 
@@ -1737,10 +1769,67 @@ pre code {
 }
 
 .schema-panel-body {
+  padding: 0.75rem 1rem 0.6rem;
+}
+
+.schema-carousel {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding: 0.75rem 1rem;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.schema-carousel-track {
+  flex: 1;
+  min-width: 0;
+}
+
+.schema-slide {
+  display: none;
+}
+
+.schema-slide.active {
+  display: block;
+}
+
+.schema-nav {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  border: 1px solid var(--ink-faint);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  padding: 0;
+}
+
+.schema-nav:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--ink);
+}
+
+.schema-dots {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 0.55rem;
+}
+
+.schema-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  transition: background 0.2s;
+}
+
+.schema-dot.active {
+  background: var(--ink-mid);
 }
 
 .schema-table-name {
