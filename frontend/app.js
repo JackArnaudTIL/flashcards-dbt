@@ -1164,19 +1164,32 @@ function hideExplanationOverlay(e) {
 
 // Since we're using a module, bind necessary UI hooks to the window so HTML onclicks work:
 function renderSchemaHtml(schema) {
-  return (schema.tables || []).map(table => `
-    <div class="schema-table">
-      <div class="schema-table-name">${table.name}</div>
-      <div class="schema-columns">
-        ${(table.columns || []).map(col => `
-          <div class="schema-column">
-            <span class="schema-col-name">${col.name}</span>
-            <span class="schema-col-type">${col.type}</span>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
+  return (schema.tables || []).map(table => {
+    const cols = table.columns || [];
+    const rows = table.rows   || [];
+    const colHeaders = cols.map(c => `<th class="schema-th">${c.name}</th>`).join('');
+    const typeRow    = cols.map(c => `<td class="schema-td-type">${c.type}</td>`).join('');
+    const dataRows   = rows.map(row =>
+      `<tr>${cols.map(c => {
+        const val = row[c.name];
+        const isNull = val === null || val === undefined;
+        return `<td class="schema-td${isNull ? ' schema-null' : ''}">${isNull ? 'null' : val}</td>`;
+      }).join('')}</tr>`
+    ).join('');
+    return `
+      <div class="schema-table">
+        <div class="schema-table-name">${table.name}</div>
+        <div class="schema-table-wrap">
+          <table class="schema-data-table">
+            <thead>
+              <tr>${colHeaders}</tr>
+              <tr class="schema-type-row">${typeRow}</tr>
+            </thead>
+            <tbody>${dataRows}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 function toggleSchema() {

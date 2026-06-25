@@ -1,0 +1,93 @@
+{
+  "jaffle_shop": {
+    "orders": [
+      { "id": 1, "customer_id": 3, "order_date": "2024-01-15", "status": "completed", "amount": 2500, "_etl_loaded_at": "2024-01-16 03:00:00" },
+      { "id": 2, "customer_id": 1, "order_date": "2024-01-17", "status": "placed",    "amount": 1200, "_etl_loaded_at": "2024-01-17 14:00:00" }
+    ],
+    "customers": [
+      { "id": 1, "first_name": "Michael", "last_name": "Perez" },
+      { "id": 3, "first_name": "Amelia",  "last_name": "Turner" }
+    ]
+  },
+  "stripe": {
+    "payment": [
+      { "id": 1, "orderid": 1, "paymentmethod": "credit_card", "status": "success", "amount": 2500, "created": "2024-01-15 12:00:00" },
+      { "id": 2, "orderid": 2, "paymentmethod": "coupon",      "status": "fail",    "amount": 1200, "created": "2024-01-17 09:30:00" }
+    ]
+  },
+  "saas": {
+    "stripe.subscriptions": [
+      { "id": 1, "account_id": 42, "plan_id": "pro",     "status": "active",     "started_at": "2023-06-01 00:00:00", "cancelled_at": null,                   "monthly_amount": 14900, "billing_cycle": "monthly" },
+      { "id": 2, "account_id": 17, "plan_id": "starter", "status": "cancelled",  "started_at": "2023-01-15 00:00:00", "cancelled_at": "2024-01-10 00:00:00",  "monthly_amount": 4900,  "billing_cycle": "annual"  }
+    ],
+    "stripe.invoices": [
+      { "id": 1, "subscription_id": 1, "amount": 14900, "status": "paid", "due_date": "2024-01-01", "paid_at": "2023-12-29 10:00:00", "created_at": "2023-12-01 00:00:00" },
+      { "id": 2, "subscription_id": 2, "amount": 4900,  "status": "open", "due_date": "2024-01-15", "paid_at": null,                  "created_at": "2024-01-01 00:00:00" }
+    ],
+    "hubspot.companies": [
+      { "id": 42, "name": "Acme Corp", "domain": "acme.com", "industry": "Technology", "createdat": "2023-06-01 09:00:00", "lifecyclestage": "customer" },
+      { "id": 17, "name": "Beta Ltd",  "domain": "beta.io",  "industry": "Finance",    "createdat": "2023-01-15 11:00:00", "lifecyclestage": "churned"  }
+    ],
+    "hubspot.contacts": [
+      { "id": 1, "companyid": 42, "email": "sarah@acme.com",  "firstname": "Sarah", "lastname": "Chen",    "jobtitle": "Head of Data",    "createdat": "2023-06-01 09:15:00" },
+      { "id": 2, "companyid": 17, "email": "james@beta.io",   "firstname": "James", "lastname": "Okonkwo", "jobtitle": "Analytics Lead",  "createdat": "2023-01-15 11:30:00" }
+    ],
+    "app.events": [
+      { "anonymous_id": "anon-abc", "user_id": 1,    "event_name": "page_viewed", "occurred_at": "2024-01-20 14:23:00", "page": "/dashboard", "session_id": "sess-001" },
+      { "anonymous_id": "anon-xyz", "user_id": null, "event_name": "page_viewed", "occurred_at": "2024-01-20 14:25:00", "page": "/pricing",   "session_id": "sess-002" }
+    ]
+  },
+  "marketplace": {
+    "app.clients": [
+      { "id": 1, "email": "alice@mail.com", "first_name": "Alice", "last_name": "Park",   "created_at": "2023-03-10 08:00:00", "country": "US" },
+      { "id": 2, "email": "bob@mail.com",   "first_name": "Bob",   "last_name": "Wright", "created_at": "2023-04-01 10:00:00", "country": "UK" }
+    ],
+    "app.freelancers": [
+      { "id": 1, "email": "carlos@mail.com", "first_name": "Carlos", "last_name": "Diaz",  "created_at": "2023-02-01 09:00:00", "country": "ES", "daily_rate": 450 },
+      { "id": 2, "email": "priya@mail.com",  "first_name": "Priya",  "last_name": "Singh", "created_at": "2023-03-15 11:00:00", "country": "IN", "daily_rate": 300 }
+    ],
+    "app.listings": [
+      { "id": 1, "freelancer_id": 1, "title": "dbt modelling", "category": "Data", "daily_rate": 450, "status": "active", "created_at": "2023-02-05 10:00:00" },
+      { "id": 2, "freelancer_id": 2, "title": "Python ETL",    "category": "Data", "daily_rate": 300, "status": "paused", "created_at": "2023-03-20 09:00:00" }
+    ],
+    "app.contracts": [
+      { "id": 1, "listing_id": 1, "client_id": 1, "freelancer_id": 1, "agreed_daily_rate": 430, "total_days": 10, "status": "completed", "started_at": "2023-04-01 09:00:00", "completed_at": "2023-04-15 17:00:00" },
+      { "id": 2, "listing_id": 2, "client_id": 2, "freelancer_id": 2, "agreed_daily_rate": 280, "total_days": 5,  "status": "cancelled", "started_at": "2023-05-01 09:00:00", "completed_at": null }
+    ],
+    "app.reviews": [
+      { "id": 1, "contract_id": 1, "reviewer_id": 1, "reviewee_id": 1, "rating": 5, "created_at": "2023-04-16 10:00:00" },
+      { "id": 2, "contract_id": 1, "reviewer_id": 1, "reviewee_id": 1, "rating": 2, "created_at": "2023-04-17 10:00:00" }
+    ],
+    "stripe.charges": [
+      { "id": 1, "contract_id": 1, "amount": 430000, "status": "succeeded", "created_at": "2023-04-01 08:00:00" },
+      { "id": 2, "contract_id": 2, "amount": 140000, "status": "failed",    "created_at": "2023-05-01 08:00:00" }
+    ],
+    "stripe.transfers": [
+      { "id": 1, "contract_id": 1, "amount": 387000, "status": "paid",      "created_at": "2023-04-15 18:00:00" },
+      { "id": 2, "contract_id": 2, "amount": 0,      "status": "cancelled", "created_at": "2023-05-10 08:00:00" }
+    ]
+  },
+  "logistics": {
+    "ops.shipments": [
+      { "id": 1, "customer_id": 5, "driver_id": 3, "depot_id": 1, "service_type": "express",  "status": "delivered",  "weight_kg": 2.3, "requested_at": "2024-01-15 09:00:00", "collected_at": "2024-01-15 14:00:00", "delivered_at": "2024-01-16 11:00:00" },
+      { "id": 2, "customer_id": 8, "driver_id": 7, "depot_id": 2, "service_type": "standard", "status": "in_transit", "weight_kg": 5.1, "requested_at": "2024-01-14 10:00:00", "collected_at": "2024-01-15 09:00:00", "delivered_at": null }
+    ],
+    "ops.shipment_events": [
+      { "id": 1, "shipment_id": 1, "event_type": "collected", "occurred_at": "2024-01-15 14:00:00", "notes": null },
+      { "id": 2, "shipment_id": 1, "event_type": "delivered", "occurred_at": "2024-01-16 11:00:00", "notes": null },
+      { "id": 3, "shipment_id": 2, "event_type": "collected", "occurred_at": "2024-01-15 09:00:00", "notes": null }
+    ],
+    "ops.drivers": [
+      { "id": 3, "first_name": "Tom", "last_name": "Baker", "depot_id": 1, "vehicle_type": "van",  "joined_at": "2022-03-01 00:00:00" },
+      { "id": 7, "first_name": "Ana", "last_name": "Costa", "depot_id": 2, "vehicle_type": "bike", "joined_at": "2023-01-15 00:00:00" }
+    ],
+    "ops.depots": [
+      { "id": 1, "name": "North Hub", "city": "Manchester", "region": "North West" },
+      { "id": 2, "name": "East Hub",  "city": "Leeds",      "region": "Yorkshire"  }
+    ],
+    "gps.location_pings": [
+      { "shipment_id": 1, "driver_id": 3, "lat": 53.481, "lng": -2.243, "recorded_at": "2024-01-16 10:30:00", "speed_kmh": 42.5 },
+      { "shipment_id": 1, "driver_id": 3, "lat": 53.482, "lng": -2.241, "recorded_at": "2024-01-16 10:31:00", "speed_kmh": 0    }
+    ]
+  }
+}
