@@ -706,17 +706,15 @@ function render() {
   // ── Schema Panel ──
   const schemaPanel = document.getElementById('schemaPanel');
   const schemaPanelBody = document.getElementById('schemaPanelBody');
-  if (schemaPanel) {
-    const schemas = deckConfig.schemas;
-    if (card.schema_ref && schemas && schemas[card.schema_ref]) {
-      schemaPanelBody.innerHTML = renderSchemaHtml(schemas[card.schema_ref]);
-      schemaPanelBody.style.display = 'flex';
-      const chevron = document.getElementById('schemaPanelChevron');
-      if (chevron) chevron.classList.remove('collapsed');
-      schemaPanel.style.display = 'block';
-    } else {
-      schemaPanel.style.display = 'none';
-    }
+  const schemaPill = document.getElementById('schemaPill');
+  const hasSchema = !!(card.schema_ref && deckConfig.schemas && deckConfig.schemas[card.schema_ref]);
+  if (schemaPanel && schemaPanelBody) {
+    if (hasSchema) schemaPanelBody.innerHTML = renderSchemaHtml(deckConfig.schemas[card.schema_ref]);
+    schemaPanel.style.display = 'none';
+  }
+  if (schemaPill) {
+    schemaPill.style.display = hasSchema ? 'inline-flex' : 'none';
+    schemaPill.classList.remove('active');
   }
 
   document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('ai-suggested'));
@@ -727,8 +725,14 @@ function render() {
     studyUnit.classList.remove('result-reviewing', 'result-match', 'result-ok', 'result-hard');
   }
 
-  document.getElementById('cardInner').classList.remove('flipped');
   flipped = false;
+  const answerArea = document.getElementById('answerArea');
+  if (answerArea) answerArea.style.display = 'none';
+  const showAnswerBtn = document.getElementById('showAnswerBtn');
+  const cardFoot = document.getElementById('cardFoot');
+  const hasShowBtn = !card.requires_code;
+  if (showAnswerBtn) showAnswerBtn.style.display = hasShowBtn ? 'inline-flex' : 'none';
+  if (cardFoot) cardFoot.style.display = (hasSchema || hasShowBtn) ? 'flex' : 'none';
   
   if (card.q_sound || deckConfig.q_sound) {
     playAudio(card.q_sound || deckConfig.q_sound, card.q_sound_start || deckConfig.q_sound_start || 0);
@@ -768,8 +772,9 @@ function render() {
   document.getElementById('prevBtn').disabled = index === 0;
   document.getElementById('nextBtn').disabled = index === deck.length - 1;
   document.getElementById('ratingRow').style.display = 'none';
-  document.getElementById('hintText').textContent = 'Click the card or "Submit" to reveal the answer';
-  document.getElementById('hintText').className = 'hint';
+  const hintEl = document.getElementById('hintText');
+  hintEl.textContent = card.requires_code ? '' : 'Tap “Show answer” when ready';
+  hintEl.className = 'hint';
 
   document.getElementById('cardMeta').innerHTML = [
     card.category ? `<span class="card-meta-tag">${categoryLabel(card.category)}</span>` : '',
@@ -783,6 +788,28 @@ function render() {
   document.getElementById('pBreakdown').textContent = att > 0 ? `✓ ${ratings.filter(r=>r==='Good').length}  –  ${ratings.filter(r=>r==='Ok').length}  ✕ ${ratings.filter(r=>r==='Hard').length}` : '';
   
   renderThumbs();
+}
+
+function showAnswer() {
+  if (flipped) return;
+  flipped = true;
+
+  const answerArea = document.getElementById('answerArea');
+  if (answerArea) answerArea.style.display = 'block';
+
+  const showAnswerBtn = document.getElementById('showAnswerBtn');
+  if (showAnswerBtn) showAnswerBtn.style.display = 'none';
+
+  const card = deck[index];
+  const deckConfig = DECKS[currentDeckName];
+
+  if (!card.requires_code) {
+    const finalASound = card.a_sound || deckConfig.a_sound;
+    if (finalASound) playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
+    document.getElementById('hintText').textContent = 'How did you do?';
+    document.getElementById('hintText').className = 'hint answered';
+    document.getElementById('ratingRow').style.display = 'flex';
+  }
 }
 
 function submitCode() {
@@ -805,18 +832,10 @@ function autoRate(score) {
 }
 
 async function flip() {
-  // Prevent unflipping code cards — locks the card once the answer is shown
-  if (deck[index] && deck[index].requires_code && flipped) return;
+  if (flipped) return;
 
-  flipped = !flipped;
-  
-  const cardInner = document.getElementById('cardInner');
-  if (flipped) {
-    cardInner.classList.add('flipped');
-  } else {
-    cardInner.classList.remove('flipped');
-  }
-  
+  showAnswer();
+
   const card = deck[index];
   const deckConfig = DECKS[currentDeckName];
   
@@ -985,29 +1004,12 @@ async function flip() {
     }
   }
 
-  const hint = document.getElementById('hintText');
-  const ratingRow = document.getElementById('ratingRow');
-
-  if (flipped) {
+  // For code cards: show rating and play sound after comparison
+  if (card.requires_code) {
     const finalASound = card.a_sound || deckConfig.a_sound;
-    if (finalASound) {
-      playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
-    } 
-    
-    if (!card.requires_code) hint.textContent = 'How did you do?';
-    hint.className = 'hint answered';
-    ratingRow.style.display = 'flex';
-  } else {
-    stopAudio();
-    
-    const finalQSound = card.q_sound || deckConfig.q_sound;
-    if (finalQSound) {
-        playAudio(finalQSound, card.q_sound_start || deckConfig.q_sound_start || 0);
-    }
-    
-    hint.textContent = 'Click the card to reveal the answer';
-    hint.className = 'hint';
-    ratingRow.style.display = 'none';
+    if (finalASound) playAudio(finalASound, card.a_sound_start || deckConfig.a_sound_start || 0);
+    document.getElementById('hintText').className = 'hint answered';
+    document.getElementById('ratingRow').style.display = 'flex';
   }
 }
 
@@ -1193,14 +1195,15 @@ function renderSchemaHtml(schema) {
 }
 
 function toggleSchema() {
-  const body = document.getElementById('schemaPanelBody');
-  const chevron = document.getElementById('schemaPanelChevron');
-  if (!body) return;
-  const isHidden = body.style.display === 'none';
-  body.style.display = isHidden ? 'flex' : 'none';
-  if (chevron) chevron.classList.toggle('collapsed', !isHidden);
+  const panel = document.getElementById('schemaPanel');
+  const pill = document.getElementById('schemaPill');
+  if (!panel) return;
+  const isHidden = panel.style.display === 'none';
+  panel.style.display = isHidden ? 'block' : 'none';
+  if (pill) pill.classList.toggle('active', isHidden);
 }
 window.toggleSchema = toggleSchema;
+window.showAnswer = showAnswer;
 
 window.submitCode = submitCode;
 window.flip = flip;

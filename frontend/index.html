@@ -187,32 +187,22 @@
     
     <div id="cardArea">
       <div id="cardStudyUnit">
-      <div class="scene" onclick="flip()">
-        <div class="card-inner" id="cardInner">
-          
-          <div class="card-face front">
-            <div class="card-label">question</div>
-            <img id="frontImage" class="card-image" src="" alt="Question Image" style="display:none;">
-            <div class="card-text" id="frontText"></div>
-            <div class="card-meta" id="cardMeta"></div>
-          </div>
-
-          <div class="card-face back">
-            <div class="card-label">answer</div>
-            <img id="backImage" class="card-image" src="" alt="Answer Image" style="display:none;">
-            <div class="card-text" id="backText"></div>
-            <div class="card-meta card-meta-back"></div>
-          </div>
-
+      <div class="card-face" id="cardFace">
+        <div class="card-label">question</div>
+        <img id="frontImage" class="card-image" src="" alt="Question Image" style="display:none;">
+        <div class="card-text" id="frontText"></div>
+        <div class="card-meta" id="cardMeta"></div>
+        <div class="card-foot" id="cardFoot" style="display:none">
+          <button id="schemaPill" class="schema-pill" onclick="toggleSchema()" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+            Schema
+          </button>
+          <button id="showAnswerBtn" class="show-answer-btn" onclick="showAnswer()" style="display:none">Show answer</button>
         </div>
       </div>
 
-      <!-- Schema Reference Panel -->
+      <!-- Schema panel (collapsed by default, toggled by pill) -->
       <div id="schemaPanel" class="schema-panel" style="display:none">
-        <div class="schema-panel-header" onclick="toggleSchema()">
-          <span class="schema-panel-title">Schema Reference</span>
-          <svg class="schema-panel-chevron" id="schemaPanelChevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </div>
         <div class="schema-panel-body" id="schemaPanelBody"></div>
       </div>
 
@@ -235,6 +225,13 @@
         
         <div id="diffContainer" class="diff-container" style="display:none;"></div>
         <div id="syntaxErrorContainer" class="syntax-error-container" style="display:none;"></div>
+      </div>
+
+      <!-- Answer reveal area -->
+      <div id="answerArea" class="answer-area" style="display:none">
+        <div class="answer-divider"><span class="answer-label">answer</span></div>
+        <img id="backImage" class="card-image" src="" alt="Answer Image" style="display:none;">
+        <div class="card-text" id="backText"></div>
       </div>
       </div><!-- #cardStudyUnit -->
 
