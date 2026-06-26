@@ -1,0 +1,102 @@
+﻿[
+  {
+    "id": "a2c4e6f8",
+    "q": "Complete the `amount` cast in `stg_orders` (stored in cents):\n```sql\nwith source as (\n    select * from {{ source('jaffle_shop', 'orders') }}\n),\n\nrenamed as (\n    select\n        id          as order_id,\n        customer_id,\n        order_date,\n        status,\n        -- ??? amount in dollars\n        _etl_loaded_at\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\namount / 100.0  as amount_usd,\n```"
+  },
+  {
+    "id": "b3d5f7a9",
+    "q": "Complete the `amount` cast in `stg_payment` (stored in cents):\n```sql\nwith source as (\n    select * from {{ source('stripe', 'payment') }}\n),\n\nrenamed as (\n    select\n        id              as payment_id,\n        orderid         as order_id,\n        paymentmethod,\n        status,\n        -- ??? amount in dollars\n        created\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\namount / 100.0  as amount_usd,\n```"
+  },
+  {
+    "id": "c1d2e3f4",
+    "q": "Complete the `is_active` flag in `stg_subscriptions`:\n```sql\nwith source as (\n    select * from {{ source('stripe', 'subscriptions') }}\n),\n\nrenamed as (\n    select\n        id              as subscription_id,\n        account_id,\n        plan_id,\n        status,\n        started_at,\n        cancelled_at,\n        monthly_amount / 100.0  as monthly_amount_usd,\n        billing_cycle,\n        -- ??? is_active\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nstatus = 'active'  as is_active\n```"
+  },
+  {
+    "id": "a5b6c7d8",
+    "q": "Complete the camelCase renames in `stg_companies` (`createdat` and `lifecyclestage`):\n```sql\nrenamed as (\n    select\n        id              as account_id,\n        name            as account_name,\n        domain,\n        industry,\n        -- ??? created_at\n        -- ??? lifecycle_stage\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\ncreatedat       as created_at,\nlifecyclestage  as lifecycle_stage\n```"
+  },
+  {
+    "id": "e9f0a1b2",
+    "q": "Complete the `full_name` concat in `stg_contacts`:\n```sql\nrenamed as (\n    select\n        id                  as user_id,\n        companyid           as account_id,\n        email,\n        firstname           as first_name,\n        lastname            as last_name,\n        -- ??? full_name\n        jobtitle            as job_title,\n        createdat           as created_at\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nfirstname || ' ' || lastname    as full_name,\n```"
+  },
+  {
+    "id": "c3d4e5f6",
+    "q": "Complete the `is_overdue` flag in `stg_invoices`:\n```sql\nrenamed as (\n    select\n        id              as invoice_id,\n        subscription_id,\n        amount / 100.0  as amount_usd,\n        status,\n        due_date,\n        paid_at,\n        created_at,\n        -- ??? is_overdue\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nstatus = 'open'\n    and due_date < current_date  as is_overdue\n```"
+  },
+  {
+    "id": "a7b8c9d0",
+    "q": "Complete the `is_incremental()` filter in `stg_events`:\n```sql\n{{ config(materialized='incremental', unique_key='anonymous_id') }}\n\nwith source as (\n\n    select * from {{ source('app', 'events') }}\n\n    -- ???\n\n),\n\nfiltered as (\n    select ...\n    from source\n    where user_id is not null\n)\n\nselect * from filtered\n```",
+    "a": "```sql\n{% if is_incremental() %}\nwhere occurred_at > (select max(occurred_at) from {{ this }})\n{% endif %}\n```"
+  },
+  {
+    "id": "c5d6e7f8",
+    "q": "Complete the aggregation in `fct_mrr` (active subscriptions grouped by plan):\n```sql\naggregated as (\n\n    select\n        -- ???\n\n    from subscriptions\n\n    where is_active\n\n    group by 1\n\n)\n\nselect * from aggregated\n```",
+    "a": "```sql\nplan_id,\ncount(*)                as subscription_count,\nsum(monthly_amount_usd) as total_mrr_usd\n```"
+  },
+  {
+    "id": "e3f4a5b6",
+    "q": "Complete the `ranked` CTE in `dim_accounts` (one active subscription per account):\n```sql\nranked as (\n\n    select\n        *,\n        -- ???\n\n    from subscriptions\n\n),\n\njoined as (\n    ...\n    from accounts a\n    left join ranked s\n        on a.account_id = s.account_id\n        and s.rn = 1\n)\n```",
+    "a": "```sql\nrow_number() over (\n    partition by account_id\n    order by started_at desc\n) as rn\n```"
+  },
+  {
+    "id": "f1a2b3c4",
+    "q": "Complete the fee columns in `stg_contracts` (10% platform fee, 90% to freelancer):\n```sql\nrenamed as (\n    select\n        id                  as contract_id,\n        listing_id,\n        client_id,\n        freelancer_id,\n        agreed_daily_rate,\n        total_days,\n        -- ??? contract_value_usd\n        -- ??? platform_fee_usd\n        -- ??? freelancer_payout_usd\n        status,\n        started_at,\n        completed_at\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nagreed_daily_rate * total_days            as contract_value_usd,\nagreed_daily_rate * total_days * 0.10     as platform_fee_usd,\nagreed_daily_rate * total_days * 0.90     as freelancer_payout_usd,\n```"
+  },
+  {
+    "id": "d5e6f7a8",
+    "q": "Complete the `amount` cast in `stg_charges` (stored in cents; only succeeded charges):\n```sql\nrenamed as (\n    select\n        id          as charge_id,\n        contract_id,\n        -- ??? amount in dollars\n        status,\n        created_at\n    from source\n    where status = 'succeeded'\n)\n\nselect * from renamed\n```",
+    "a": "```sql\namount / 100.0  as amount_usd,\n```"
+  },
+  {
+    "id": "b9c0d1e2",
+    "q": "Complete the `is_positive` flag in `stg_reviews` (rating of 4 or above):\n```sql\nrenamed as (\n    select\n        id          as review_id,\n        contract_id,\n        reviewer_id,\n        reviewee_id,\n        rating,\n        -- ??? is_positive\n        created_at\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nrating >= 4     as is_positive,\n```"
+  },
+  {
+    "id": "d7e8f9a0",
+    "q": "Complete the monthly aggregation in `fct_platform_revenue`:\n```sql\nmonthly as (\n\n    select\n        -- ???\n\n    from contracts\n\n    where status = 'completed'\n        and completed_at is not null\n\n    group by 1\n\n)\n\nselect * from monthly\n```",
+    "a": "```sql\ndate_trunc('month', completed_at)   as revenue_month,\ncount(*)                            as contract_count,\nsum(platform_fee_usd)               as total_platform_fees_usd\n```"
+  },
+  {
+    "id": "f5a6b7c8",
+    "q": "Complete the `contract_stats` CTE in `dim_freelancers`:\n```sql\ncontract_stats as (\n\n    select\n        freelancer_id,\n        -- ???\n\n    from {{ ref('stg_contracts') }}\n\n    group by 1\n\n),\n```",
+    "a": "```sql\ncount(*)                                            as total_contracts,\ncount(case when status = 'completed' then 1 end)    as completed_contracts,\nsum(case when status = 'completed'\n    then freelancer_payout_usd end)                 as total_earned_usd\n```"
+  },
+  {
+    "id": "1a2b3c4d",
+    "q": "Complete the `sla_days` CASE in `stg_shipments`:\n```sql\nwith_sla as (\n\n    select\n        *,\n        -- ???\n\n    from source\n\n),\n\nrenamed as (\n    select\n        ...\n        sla_days,\n        delivered_at is not null\n            and delivered_at <= requested_at + (sla_days * interval '1 day') as is_on_time\n    from with_sla\n)\n```",
+    "a": "```sql\ncase service_type\n    when 'same_day'  then 0\n    when 'express'   then 1\n    when 'standard'  then 3\nend as sla_days\n```"
+  },
+  {
+    "id": "2e3f4a5b",
+    "q": "Complete the select list in `stg_shipment_events` (rename `id` → `event_id`):\n```sql\nwith source as (\n    select * from {{ source('ops', 'shipment_events') }}\n),\n\nrenamed as (\n    select\n        -- ???\n    from source\n)\n\nselect * from renamed\n```",
+    "a": "```sql\nid          as event_id,\nshipment_id,\nevent_type,\noccurred_at,\nnotes\n```"
+  },
+  {
+    "id": "3c4d5e6f",
+    "q": "Complete the `ranked` CTE in `int_shipments_current_status` (latest event per shipment):\n```sql\nranked as (\n\n    select\n        *,\n        -- ???\n\n    from events\n\n),\n\ncurrent_status as (\n    select shipment_id, event_type as current_status, occurred_at as status_updated_at\n    from ranked where rn = 1\n)\n```",
+    "a": "```sql\nrow_number() over (\n    partition by shipment_id\n    order by occurred_at desc\n) as rn\n```"
+  },
+  {
+    "id": "5e6f7a8b",
+    "q": "Complete the `is_incremental()` filter in `stg_location_pings`:\n```sql\n{{ config(\n    materialized='incremental',\n    unique_key=['shipment_id', 'recorded_at']\n) }}\n\nwith source as (\n\n    select * from {{ source('gps', 'location_pings') }}\n\n    -- ???\n\n),\n\nfiltered as (\n    select ...\n    from source\n    where speed_kmh > 0\n)\n\nselect * from filtered\n```",
+    "a": "```sql\n{% if is_incremental() %}\nwhere recorded_at > (select max(recorded_at) from {{ this }})\n{% endif %}\n```"
+  },
+  {
+    "id": "8e9f0a1b",
+    "q": "Complete the aggregation in `fct_deliveries` (by delivery day and service type):\n```sql\naggregated as (\n\n    select\n        -- ???\n\n    from shipments\n\n    where status = 'delivered'\n        and delivered_at is not null\n\n    group by 1, 2\n\n)\n\nselect * from aggregated\n```",
+    "a": "```sql\ndate_trunc('day', delivered_at)         as delivery_date,\nservice_type,\ncount(*)                                as delivery_count,\ncount(case when is_on_time then 1 end)  as on_time_count,\navg(weight_kg)                          as avg_weight_kg\n```"
+  },
+  {
+    "id": "9c0d1e2f",
+    "q": "Complete `on_time_rate` in `fct_driver_performance` (guard against divide-by-zero):\n```sql\naggregated as (\n\n    select\n        driver_id,\n        count(*)                                            as total_shipments,\n        count(case when status = 'delivered' then 1 end)    as delivered_count,\n        -- ??? on_time_rate\n\n    from shipments\n\n    group by 1\n\n)\n\nselect * from aggregated\n```",
+    "a": "```sql\ncount(case when is_on_time then 1 end)\n    / nullif(\n        count(case when status = 'delivered' then 1 end), 0\n      )::numeric                              as on_time_rate\n```"
+  }
+]
